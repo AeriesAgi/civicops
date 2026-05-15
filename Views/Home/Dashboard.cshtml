@@ -3,140 +3,323 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container">
-    <h1 style="color: #06b6d4; margin-bottom: 2rem;">📊 CivicOps Dashboard</h1>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div class="card" style="text-align: center;">
-            <div style="font-size: 2.5rem; font-weight: bold; color: #06b6d4;">@Model.TotalIncidents</div>
-            <div style="color: #94a3b8; margin-top: 0.5rem;">Total Incidents</div>
+<div class="container my-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="text-navy fw-bold mb-2">
+                <i class="bi bi-speedometer2 me-2"></i>Operations Dashboard
+            </h1>
+            <p class="text-muted mb-0">Real-time civic operations overview</p>
         </div>
-        <div class="card" style="text-align: center;">
-            <div style="font-size: 2.5rem; font-weight: bold; color: #fbbf24;">@Model.NewIncidents</div>
-            <div style="color: #94a3b8; margin-top: 0.5rem;">New</div>
-        </div>
-        <div class="card" style="text-align: center;">
-            <div style="font-size: 2.5rem; font-weight: bold; color: #3b82f6;">@Model.InProgressIncidents</div>
-            <div style="color: #94a3b8; margin-top: 0.5rem;">In Progress</div>
-        </div>
-        <div class="card" style="text-align: center;">
-            <div style="font-size: 2.5rem; font-weight: bold; color: #ef4444;">@Model.EscalatedIncidents</div>
-            <div style="color: #94a3b8; margin-top: 0.5rem;">Escalated</div>
-        </div>
-        <div class="card" style="text-align: center;">
-            <div style="font-size: 2.5rem; font-weight: bold; color: #22c55e;">@Model.ResolvedIncidents</div>
-            <div style="color: #94a3b8; margin-top: 0.5rem;">Resolved</div>
+        <div>
+            <span class="badge bg-success">
+                <i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>System Online
+            </span>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
-        <div class="card">
-            <h2 class="card-title">Incidents by Department</h2>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                @foreach (var dept in Model.IncidentsByDepartment)
-                {
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                        <a href="/Home/Department?dept=@dept.Department" style="color: #e0e7ff; text-decoration: none; flex: 1;">
-                            @dept.Department.GetDisplayName()
-                        </a>
-                        <span style="background: rgba(6, 182, 212, 0.2); color: #06b6d4; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: 600;">
-                            @dept.Count
-                        </span>
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-lg-4 col-xl">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-value">@Model.TotalIncidents</div>
+                        <div class="kpi-label">Total Incidents</div>
                     </div>
-                }
+                    <div class="kpi-icon text-cyan">
+                        <i class="bi bi-clipboard-data"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <h2 class="card-title">Incidents by Source</h2>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                @foreach (var source in Model.IncidentsBySource)
-                {
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                        <span style="color: #e0e7ff;">
-                            @(source.Source == CivicOps.Models.SourceChannel.Web ? "🌐 Web" :
-                              source.Source == CivicOps.Models.SourceChannel.Android ? "📱 Android" :
-                              source.Source == CivicOps.Models.SourceChannel.WhatsApp ? "💬 WhatsApp" :
-                              source.Source == CivicOps.Models.SourceChannel.VoiceNote ? "🎤 Voice Note" : "Demo")
-                        </span>
-                        <span style="background: rgba(6, 182, 212, 0.2); color: #06b6d4; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: 600;">
-                            @source.Count
-                        </span>
+        <div class="col-md-6 col-lg-4 col-xl">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-value text-info">@Model.NewIncidents</div>
+                        <div class="kpi-label">New</div>
                     </div>
-                }
+                    <div class="kpi-icon text-info">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 col-xl">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-value text-warning">@Model.InProgressIncidents</div>
+                        <div class="kpi-label">In Progress</div>
+                    </div>
+                    <div class="kpi-icon text-warning">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 col-xl">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-value text-danger">@Model.EscalatedIncidents</div>
+                        <div class="kpi-label">Escalated</div>
+                    </div>
+                    <div class="kpi-icon text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 col-xl">
+            <div class="kpi-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="kpi-value text-success">@Model.ResolvedIncidents</div>
+                        <div class="kpi-label">Resolved</div>
+                    </div>
+                    <div class="kpi-icon text-success">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
-        <div class="card">
-            <h2 class="card-title">High Priority Incidents</h2>
-            @if (Model.HighPriorityIncidents.Any())
-            {
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    @foreach (var incident in Model.HighPriorityIncidents)
+    <!-- Main Content Grid -->
+    <div class="row g-4">
+        <!-- Incidents by Department -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-building me-2"></i>Incidents by Department
+                </div>
+                <div class="card-body">
+                    @if (Model.IncidentsByDepartment.Any())
                     {
-                        <a href="/Home/Incident?id=@incident.Id" style="text-decoration: none;">
-                            <div style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: 0.5rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span style="font-family: monospace; color: #06b6d4; font-weight: 600;">@incident.ReferenceNumber</span>
-                                    <span style="color: #ef4444; font-weight: 600;">@incident.Priority</span>
-                                </div>
-                                <div style="color: #e0e7ff; font-size: 0.875rem;">@incident.AISummary</div>
-                                <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 0.5rem;">
-                                    @incident.AssignedDepartment.GetDisplayName() • @incident.Suburb
-                                </div>
-                            </div>
-                        </a>
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var dept in Model.IncidentsByDepartment)
+                            {
+                                <a href="/Home/Department?dept=@dept.Department" class="text-decoration-none">
+                                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded hover-shadow">
+                                        <span class="text-navy fw-semibold">
+                                            <i class="bi bi-diagram-3 me-2 text-teal"></i>@dept.Department.GetDisplayName()
+                                        </span>
+                                        <span class="badge badge-department">@dept.Count</span>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">No incidents yet</p>
                     }
                 </div>
-            }
-            else
-            {
-                <p style="color: #94a3b8;">No high priority incidents</p>
-            }
+            </div>
         </div>
 
-        <div class="card">
-            <h2 class="card-title">Recent Incidents</h2>
-            @if (Model.RecentIncidents.Any())
-            {
-                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    @foreach (var incident in Model.RecentIncidents.Take(5))
+        <!-- Incidents by Source -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-diagram-2 me-2"></i>Incidents by Source Channel
+                </div>
+                <div class="card-body">
+                    @if (Model.IncidentsBySource.Any())
                     {
-                        <a href="/Home/Incident?id=@incident.Id" style="text-decoration: none;">
-                            <div style="padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span style="font-family: monospace; color: #06b6d4; font-weight: 600;">@incident.ReferenceNumber</span>
-                                    <span style="color: #94a3b8; font-size: 0.875rem;">@incident.Status</span>
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var source in Model.IncidentsBySource)
+                            {
+                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                    <span class="text-navy">
+                                        @if (source.Source == CivicOps.Models.SourceChannel.Web)
+                                        {
+                                            <i class="bi bi-globe me-2"></i><span>Web</span>
+                                        }
+                                        else if (source.Source == CivicOps.Models.SourceChannel.Android)
+                                        {
+                                            <i class="bi bi-phone me-2"></i><span>Android</span>
+                                        }
+                                        else if (source.Source == CivicOps.Models.SourceChannel.WhatsApp)
+                                        {
+                                            <i class="bi bi-whatsapp me-2"></i><span>WhatsApp</span>
+                                        }
+                                        else if (source.Source == CivicOps.Models.SourceChannel.VoiceNote)
+                                        {
+                                            <i class="bi bi-mic me-2"></i><span>Voice Note</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-gear me-2"></i><span>Demo</span>
+                                        }
+                                    </span>
+                                    <span class="badge badge-source-@source.Source.ToString().ToLower()">@source.Count</span>
                                 </div>
-                                <div style="color: #e0e7ff; font-size: 0.875rem;">@incident.Category</div>
-                                <div style="color: #94a3b8; font-size: 0.75rem; margin-top: 0.5rem;">
-                                    @incident.AssignedDepartment.GetDisplayName() • @incident.Suburb
-                                </div>
-                            </div>
-                        </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">No incidents yet</p>
                     }
                 </div>
-            }
-            else
-            {
-                <p style="color: #94a3b8;">No recent incidents</p>
-            }
+            </div>
+        </div>
+
+        <!-- High Priority Incidents -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>High Priority Incidents
+                </div>
+                <div class="card-body">
+                    @if (Model.HighPriorityIncidents.Any())
+                    {
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var incident in Model.HighPriorityIncidents)
+                            {
+                                <a href="/Home/Incident?id=@incident.Id" class="text-decoration-none">
+                                    <div class="p-3 border-start border-4 border-danger bg-light rounded hover-shadow">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <code class="text-cyan fw-bold">@incident.ReferenceNumber</code>
+                                            <span class="badge badge-priority-@incident.Priority.ToString().ToLower()">
+                                                @incident.Priority
+                                            </span>
+                                        </div>
+                                        <p class="text-navy mb-2 small">@incident.AISummary</p>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <span class="badge badge-department small">@incident.AssignedDepartment.GetDisplayName()</span>
+                                            <span class="badge bg-secondary small">@incident.Suburb</span>
+                                            <span class="badge badge-status-@incident.Status.ToString().ToLower() small">@incident.Status</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No high priority incidents</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Incidents -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <i class="bi bi-clock-history me-2"></i>Recent Incidents
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentIncidents.Any())
+                    {
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var incident in Model.RecentIncidents.Take(5))
+                            {
+                                <a href="/Home/Incident?id=@incident.Id" class="text-decoration-none">
+                                    <div class="p-3 bg-light rounded hover-shadow">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <code class="text-cyan fw-bold">@incident.ReferenceNumber</code>
+                                            <span class="badge badge-status-@incident.Status.ToString().ToLower()">
+                                                @incident.Status
+                                            </span>
+                                        </div>
+                                        <p class="text-navy mb-2 small fw-semibold">@incident.Category</p>
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <span class="badge badge-department small">@incident.AssignedDepartment.GetDisplayName()</span>
+                                            <span class="badge bg-secondary small">@incident.Suburb</span>
+                                            <span class="badge badge-priority-@incident.Priority.ToString().ToLower() small">@incident.Priority</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">No recent incidents</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-gear me-2"></i>System Status
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <span class="text-navy fw-semibold">
+                                    <i class="bi bi-robot me-2 text-teal"></i>Gemini AI
+                                </span>
+                                <span class="badge @(Model.GeminiStatus.Contains("Enabled") ? "bg-success" : "bg-warning")">
+                                    @Model.GeminiStatus
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <span class="text-navy fw-semibold">
+                                    <i class="bi bi-exclamation-triangle me-2 text-warning"></i>Active Alerts
+                                </span>
+                                <span class="badge bg-info">@Model.ActiveAlerts</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <span class="text-navy fw-semibold">
+                                    <i class="bi bi-plug me-2 text-cyan"></i>Connectors
+                                </span>
+                                <a href="/Home/Connectors" class="btn btn-sm btn-primary">View Status</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card" style="margin-top: 1.5rem;">
-        <h2 class="card-title">System Status</h2>
-        <div style="display: grid; gap: 0.75rem;">
-            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <span style="color: #cbd5e1;">Gemini AI Status:</span>
-                <span style="color: #06b6d4; font-weight: 600;">@Model.GeminiStatus</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <span style="color: #cbd5e1;">Active Alerts:</span>
-                <span style="color: #06b6d4; font-weight: 600;">@Model.ActiveAlerts</span>
-            </div>
+    <!-- Quick Actions -->
+    <div class="row g-3 mt-2">
+        <div class="col-md-4">
+            <a href="/Home/Report" class="btn btn-primary w-100 py-3">
+                <i class="bi bi-file-earmark-plus me-2"></i>Create New Report
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Home/Alerts" class="btn btn-outline-primary w-100 py-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>Manage Alerts
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="/Home/Connectors" class="btn btn-outline-primary w-100 py-3">
+                <i class="bi bi-plug me-2"></i>Connector Status
+            </a>
         </div>
     </div>
 </div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    .hover-shadow:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+</style>

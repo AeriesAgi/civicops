@@ -1,5 +1,6 @@
 using CivicOps.Models;
 using CivicOps.Services;
+using CivicOps.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Diagnostics;
@@ -85,7 +86,11 @@ namespace CivicOps.Controllers
                     IsPublic = false
                 });
 
-                incident.PublicUpdates.Add("Your report has been received and assigned to the appropriate department.");
+                incident.PublicUpdates.Add(new PublicUpdate 
+                { 
+                    Content = "Your report has been received and assigned to the appropriate department.",
+                    UpdatedBy = "System"
+                });
 
                 await _dataService.SaveIncidentAsync(incident);
 
@@ -142,6 +147,7 @@ namespace CivicOps.Controllers
             return View(alerts);
         }
 
+        [DemoAuthorize]
         public async Task<IActionResult> Dashboard()
         {
             var incidents = await _dataService.GetAllIncidentsAsync();
@@ -170,6 +176,7 @@ namespace CivicOps.Controllers
             return View(model);
         }
 
+        [DemoAuthorize]
         public async Task<IActionResult> Department(string dept)
         {
             if (!Enum.TryParse<Department>(dept, true, out var department))
@@ -183,6 +190,7 @@ namespace CivicOps.Controllers
             return View(incidents);
         }
 
+        [DemoAuthorize]
         public async Task<IActionResult> Incident(string id)
         {
             var incident = await _dataService.GetIncidentByIdAsync(id);
@@ -195,6 +203,7 @@ namespace CivicOps.Controllers
         }
 
         [HttpPost]
+        [DemoAuthorize(UserRole.Dispatcher)]
         public async Task<IActionResult> UpdateStatus(string id, string status, string? publicNote)
         {
             var incident = await _dataService.GetIncidentByIdAsync(id);
@@ -215,7 +224,12 @@ namespace CivicOps.Controllers
 
                 if (!string.IsNullOrEmpty(publicNote))
                 {
-                    incident.PublicUpdates.Add(publicNote);
+                    incident.PublicUpdates.Add(new PublicUpdate 
+                    { 
+                        Content = publicNote,
+                        UpdatedBy = "Admin",
+                        RelatedStatus = newStatus
+                    });
                 }
 
                 await _dataService.UpdateIncidentAsync(incident);
@@ -224,6 +238,7 @@ namespace CivicOps.Controllers
             return RedirectToAction("Incident", new { id });
         }
 
+        [DemoAuthorize]
         public IActionResult Connectors()
         {
             var connectors = new[]

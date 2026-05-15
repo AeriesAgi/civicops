@@ -1,0 +1,490 @@
+/* CivicOps Professional Theme - Dark Navy/Teal/Cyan */
+
+:root {
+    --civicops-navy: #0a1929;
+    --civicops-navy-light: #1a2332;
+    --civicops-navy-dark: #050d14;
+    --civicops-teal: #00897b;
+    --civicops-teal-light: #4db6ac;
+    --civicops-teal-dark: #00695c;
+    --civicops-cyan: #00bcd4;
+    --civicops-cyan-light: #4dd0e1;
+    --civicops-cyan-dark: #0097a7;
+    --civicops-accent: #26c6da;
+    --civicops-warning: #ff9800;
+    --civicops-danger: #f44336;
+    --civicops-success: #4caf50;
+    --civicops-info: #2196f3;
+    --civicops-gray: #546e7a;
+    --civicops-gray-light: #78909c;
+    --civicops-gray-dark: #37474f;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+/* Navigation */
+.navbar {
+    background: linear-gradient(135deg, var(--civicops-navy) 0%, var(--civicops-navy-light) 100%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--civicops-cyan) !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255,255,255,0.85) !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--civicops-cyan) !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--civicops-teal) 0%, var(--civicops-teal-dark) 100%);
+    border: none;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--civicops-teal-dark) 0%, var(--civicops-teal) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,137,123,0.3);
+}
+
+.btn-secondary {
+    background-color: var(--civicops-gray);
+    border: none;
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background-color: var(--civicops-gray-dark);
+}
+
+.btn-success {
+    background-color: var(--civicops-success);
+    border: none;
+}
+
+.btn-danger {
+    background-color: var(--civicops-danger);
+    border: none;
+}
+
+.btn-info {
+    background-color: var(--civicops-cyan);
+    border: none;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--civicops-navy) 0%, var(--civicops-navy-light) 100%);
+    color: white;
+    font-weight: 600;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1rem 1.5rem;
+}
+
+/* Badges */
+.badge {
+    padding: 0.5rem 0.8rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.badge-status-new {
+    background-color: var(--civicops-info);
+    color: white;
+}
+
+.badge-status-triaged {
+    background-color: var(--civicops-cyan);
+    color: white;
+}
+
+.badge-status-assigned {
+    background-color: var(--civicops-teal);
+    color: white;
+}
+
+.badge-status-inprogress {
+    background-color: var(--civicops-warning);
+    color: white;
+}
+
+.badge-status-escalated {
+    background-color: var(--civicops-danger);
+    color: white;
+}
+
+.badge-status-resolved {
+    background-color: var(--civicops-success);
+    color: white;
+}
+
+.badge-status-closed {
+    background-color: var(--civicops-gray);
+    color: white;
+}
+
+.badge-priority-low {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.badge-priority-medium {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.badge-priority-high {
+    background-color: #ffe0b2;
+    color: #e65100;
+}
+
+.badge-priority-urgent {
+    background-color: #ffebee;
+    color: #c62828;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.badge-source-web {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-source-android {
+    background-color: #e1f5fe;
+    color: #0277bd;
+}
+
+.badge-source-whatsapp {
+    background-color: #e8f5e9;
+    color: #388e3c;
+}
+
+.badge-source-voicenote {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.badge-source-demo {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+.badge-department {
+    background: linear-gradient(135deg, var(--civicops-teal-light) 0%, var(--civicops-teal) 100%);
+    color: white;
+}
+
+/* Alert Severity */
+.alert-severity-info {
+    background-color: #e3f2fd;
+    border-left: 4px solid var(--civicops-info);
+}
+
+.alert-severity-warning {
+    background-color: #fff3e0;
+    border-left: 4px solid var(--civicops-warning);
+}
+
+.alert-severity-urgent {
+    background-color: #ffebee;
+    border-left: 4px solid var(--civicops-danger);
+}
+
+.alert-severity-critical {
+    background-color: #ffcdd2;
+    border-left: 4px solid #b71c1c;
+    animation: pulse 2s infinite;
+}
+
+/* KPI Cards */
+.kpi-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.kpi-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.kpi-card .kpi-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--civicops-navy);
+}
+
+.kpi-card .kpi-label {
+    font-size: 0.9rem;
+    color: var(--civicops-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.kpi-card .kpi-icon {
+    font-size: 3rem;
+    opacity: 0.2;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding: 1rem 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--civicops-cyan-light);
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--civicops-cyan);
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px var(--civicops-cyan);
+}
+
+.timeline-item.timeline-public::before {
+    background: var(--civicops-teal);
+    box-shadow: 0 0 0 2px var(--civicops-teal);
+}
+
+.timeline-item.timeline-internal::before {
+    background: var(--civicops-gray);
+    box-shadow: 0 0 0 2px var(--civicops-gray);
+}
+
+.timeline-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* Forms */
+.form-control:focus {
+    border-color: var(--civicops-cyan);
+    box-shadow: 0 0 0 0.2rem rgba(0,188,212,0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--civicops-navy);
+}
+
+/* Tables */
+.table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background: var(--civicops-navy);
+    color: white;
+    font-weight: 600;
+    border: none;
+}
+
+.table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Connector Status */
+.connector-card {
+    border-left: 4px solid var(--civicops-gray);
+}
+
+.connector-card.connector-configured {
+    border-left-color: var(--civicops-success);
+}
+
+.connector-card.connector-demo {
+    border-left-color: var(--civicops-warning);
+}
+
+.connector-card.connector-disabled {
+    border-left-color: var(--civicops-gray);
+    opacity: 0.7;
+}
+
+.connector-card.connector-future {
+    border-left-color: var(--civicops-info);
+    opacity: 0.6;
+}
+
+/* Emergency Disclaimer */
+.emergency-disclaimer {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border-left: 4px solid var(--civicops-danger);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.emergency-disclaimer .disclaimer-icon {
+    font-size: 2rem;
+    color: var(--civicops-danger);
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--civicops-navy) 0%, var(--civicops-navy-light) 50%, var(--civicops-teal-dark) 100%);
+    color: white;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".1" fill="%23ffffff"></path></svg>') no-repeat bottom;
+    background-size: cover;
+    opacity: 0.1;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    opacity: 0.9;
+}
+
+/* Feature Cards */
+.feature-card {
+    text-align: center;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: var(--civicops-cyan);
+    margin-bottom: 1rem;
+}
+
+/* Footer */
+.footer {
+    background: var(--civicops-navy);
+    color: rgba(255,255,255,0.8);
+    padding: 2rem 0;
+    margin-top: 4rem;
+}
+
+.footer a {
+    color: var(--civicops-cyan);
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: var(--civicops-cyan-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .kpi-card .kpi-value {
+        font-size: 2rem;
+    }
+}
+
+/* Utility Classes */
+.text-navy {
+    color: var(--civicops-navy) !important;
+}
+
+.text-teal {
+    color: var(--civicops-teal) !important;
+}
+
+.text-cyan {
+    color: var(--civicops-cyan) !important;
+}
+
+.bg-navy {
+    background-color: var(--civicops-navy) !important;
+}
+
+.bg-teal {
+    background-color: var(--civicops-teal) !important;
+}
+
+.bg-cyan {
+    background-color: var(--civicops-cyan) !important;
+}

@@ -72,7 +72,11 @@ namespace CivicOps.Controllers
                     IsPublic = false
                 });
 
-                incident.PublicUpdates.Add("Your report has been received and assigned to the appropriate department.");
+                incident.PublicUpdates.Add(new PublicUpdate 
+                { 
+                    Content = "Your report has been received and assigned to the appropriate department.",
+                    UpdatedBy = "System"
+                });
 
                 await _dataService.SaveIncidentAsync(incident);
 
@@ -248,7 +252,12 @@ namespace CivicOps.Controllers
 
                 if (!string.IsNullOrEmpty(update.PublicNote))
                 {
-                    incident.PublicUpdates.Add(update.PublicNote);
+                    incident.PublicUpdates.Add(new PublicUpdate 
+                    { 
+                        Content = update.PublicNote,
+                        UpdatedBy = update.Author ?? "System",
+                        RelatedStatus = newStatus
+                    });
                 }
 
                 await _dataService.UpdateIncidentAsync(incident);
@@ -279,7 +288,11 @@ namespace CivicOps.Controllers
 
             if (note.IsPublic)
             {
-                incident.PublicUpdates.Add(note.Content);
+                incident.PublicUpdates.Add(new PublicUpdate 
+                { 
+                    Content = note.Content,
+                    UpdatedBy = note.Author ?? "System"
+                });
             }
 
             await _dataService.UpdateIncidentAsync(incident);
@@ -306,7 +319,11 @@ namespace CivicOps.Controllers
                 IsPublic = false
             });
 
-            incident.PublicUpdates.Add("Your report has been escalated for urgent attention.");
+            incident.PublicUpdates.Add(new PublicUpdate 
+            { 
+                Content = "Your report has been escalated for urgent attention.",
+                UpdatedBy = request.Author ?? "System"
+            });
 
             await _dataService.UpdateIncidentAsync(incident);
 

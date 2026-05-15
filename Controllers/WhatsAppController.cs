@@ -120,7 +120,11 @@ namespace CivicOps.Controllers
                     IsPublic = false
                 });
 
-                incident.PublicUpdates.Add($"Your report has been received. Reference: {incident.ReferenceNumber}");
+                incident.PublicUpdates.Add(new PublicUpdate 
+                { 
+                    Content = $"Your report has been received. Reference: {incident.ReferenceNumber}",
+                    UpdatedBy = "WhatsApp Bot"
+                });
 
                 await _dataService.SaveIncidentAsync(incident);
 

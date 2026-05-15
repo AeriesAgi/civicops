@@ -69,7 +69,11 @@ namespace CivicOps.Controllers
                     IsPublic = false
                 });
 
-                incident.PublicUpdates.Add($"Your report has been received via WhatsApp. Reference: {incident.ReferenceNumber}");
+                incident.PublicUpdates.Add(new PublicUpdate 
+                { 
+                    Content = $"Your report has been received via WhatsApp. Reference: {incident.ReferenceNumber}",
+                    UpdatedBy = "WhatsApp Demo"
+                });
 
                 await _dataService.SaveIncidentAsync(incident);
 
@@ -140,7 +144,11 @@ namespace CivicOps.Controllers
                     IsPublic = false
                 });
 
-                incident.PublicUpdates.Add($"Your voice report has been received and transcribed. Reference: {incident.ReferenceNumber}");
+                incident.PublicUpdates.Add(new PublicUpdate 
+                { 
+                    Content = $"Your voice report has been received and transcribed. Reference: {incident.ReferenceNumber}",
+                    UpdatedBy = "Voice System"
+                });
 
                 await _dataService.SaveIncidentAsync(incident);
 

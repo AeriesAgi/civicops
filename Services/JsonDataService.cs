@@ -190,7 +190,11 @@ namespace CivicOps.Services
                     Priority = IncidentPriority.High,
                     CreatedAt = DateTime.UtcNow.AddHours(-5),
                     LastUpdatedAt = DateTime.UtcNow.AddHours(-2),
-                    PublicUpdates = new List<string> { "Crew dispatched to site", "Repair work in progress" },
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Crew dispatched to site", UpdatedBy = "Dispatcher" },
+                        new PublicUpdate { Content = "Repair work in progress", UpdatedBy = "Field Crew" }
+                    },
                     ClassificationMethod = "Deterministic"
                 },
                 new Incident
@@ -207,7 +211,10 @@ namespace CivicOps.Services
                     Priority = IncidentPriority.High,
                     CreatedAt = DateTime.UtcNow.AddHours(-3),
                     LastUpdatedAt = DateTime.UtcNow.AddHours(-1),
-                    PublicUpdates = new List<string> { "Investigating cause of outage" },
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Investigating cause of outage", UpdatedBy = "Dispatcher" }
+                    },
                     ClassificationMethod = "Deterministic"
                 },
                 new Incident
@@ -273,7 +280,11 @@ namespace CivicOps.Services
                     Priority = IncidentPriority.Urgent,
                     CreatedAt = DateTime.UtcNow.AddHours(-8),
                     LastUpdatedAt = DateTime.UtcNow.AddHours(-7),
-                    PublicUpdates = new List<string> { "Fire safety inspection scheduled", "Escalated to disaster management" },
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Fire safety inspection scheduled", UpdatedBy = "Fire Inspector" },
+                        new PublicUpdate { Content = "Escalated to disaster management", UpdatedBy = "Admin" }
+                    },
                     ClassificationMethod = "Deterministic"
                 },
                 new Incident
@@ -290,7 +301,10 @@ namespace CivicOps.Services
                     Priority = IncidentPriority.High,
                     CreatedAt = DateTime.UtcNow.AddHours(-4),
                     LastUpdatedAt = DateTime.UtcNow.AddHours(-2),
-                    PublicUpdates = new List<string> { "Emergency crew dispatched" },
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Emergency crew dispatched", UpdatedBy = "Dispatcher" }
+                    },
                     ClassificationMethod = "Deterministic"
                 },
                 new Incident
@@ -323,7 +337,11 @@ namespace CivicOps.Services
                     Priority = IncidentPriority.Medium,
                     CreatedAt = DateTime.UtcNow.AddDays(-3),
                     LastUpdatedAt = DateTime.UtcNow.AddDays(-1),
-                    PublicUpdates = new List<string> { "Catch-up collection scheduled", "Collection completed" },
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Catch-up collection scheduled", UpdatedBy = "Waste Manager" },
+                        new PublicUpdate { Content = "Collection completed", UpdatedBy = "Collection Crew" }
+                    },
                     ClassificationMethod = "Deterministic"
                 },
                 new Incident
@@ -340,7 +358,162 @@ namespace CivicOps.Services
                     Priority = IncidentPriority.High,
                     CreatedAt = DateTime.UtcNow.AddHours(-2),
                     LastUpdatedAt = DateTime.UtcNow.AddMinutes(-30),
-                    PublicUpdates = new List<string> { "Patrol dispatched to area" },
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Patrol dispatched to area", UpdatedBy = "Metro Police" }
+                    },
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0011",
+                    SourceChannel = SourceChannel.Android,
+                    Description = "Street light not working on corner of Main and 5th for over a week",
+                    AISummary = "Street lighting maintenance required in Morningside.",
+                    Category = "Street Lighting",
+                    AssignedDepartment = Department.Electricity,
+                    Suburb = "Morningside",
+                    Ward = "Ward 33",
+                    Status = IncidentStatus.Assigned,
+                    Priority = IncidentPriority.Low,
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    LastUpdatedAt = DateTime.UtcNow.AddDays(-1),
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0012",
+                    SourceChannel = SourceChannel.Web,
+                    Description = "Manhole cover missing on busy road, very dangerous",
+                    AISummary = "Urgent road safety hazard - missing manhole cover.",
+                    Category = "Road Safety",
+                    AssignedDepartment = Department.RoadsAndStormwater,
+                    Suburb = "Westville",
+                    Ward = "Ward 45",
+                    Status = IncidentStatus.Escalated,
+                    Priority = IncidentPriority.Urgent,
+                    CreatedAt = DateTime.UtcNow.AddHours(-4),
+                    LastUpdatedAt = DateTime.UtcNow.AddHours(-3),
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Emergency crew dispatched", UpdatedBy = "Dispatcher" },
+                        new PublicUpdate { Content = "Temporary barriers placed, repair scheduled", UpdatedBy = "Roads Crew" }
+                    },
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0013",
+                    SourceChannel = SourceChannel.VoiceNote,
+                    Description = "Water pressure very low in our area since yesterday",
+                    AISummary = "Low water pressure reported in Glenwood area.",
+                    Category = "Water Supply",
+                    AssignedDepartment = Department.WaterAndSanitation,
+                    Suburb = "Glenwood",
+                    Ward = "Ward 29",
+                    Status = IncidentStatus.InProgress,
+                    Priority = IncidentPriority.Medium,
+                    CreatedAt = DateTime.UtcNow.AddHours(-18),
+                    LastUpdatedAt = DateTime.UtcNow.AddHours(-12),
+                    AudioMetadata = "voice-note-water-pressure.mp3",
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Investigating cause of low pressure", UpdatedBy = "Water Department" }
+                    },
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0014",
+                    SourceChannel = SourceChannel.WhatsApp,
+                    Description = "Tree fallen across road after storm, blocking traffic",
+                    AISummary = "Storm damage - fallen tree blocking road in Kloof.",
+                    Category = "Storm Damage",
+                    AssignedDepartment = Department.ParksAndPublicSpaces,
+                    Suburb = "Kloof",
+                    Ward = "Ward 12",
+                    Status = IncidentStatus.Resolved,
+                    Priority = IncidentPriority.High,
+                    CreatedAt = DateTime.UtcNow.AddHours(-8),
+                    LastUpdatedAt = DateTime.UtcNow.AddHours(-5),
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Emergency tree removal crew dispatched", UpdatedBy = "Dispatcher" },
+                        new PublicUpdate { Content = "Tree removed, road cleared", UpdatedBy = "Parks Crew" }
+                    },
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0015",
+                    SourceChannel = SourceChannel.Android,
+                    Description = "Graffiti on public building and bus shelter",
+                    AISummary = "Vandalism reported - graffiti on public property in Berea.",
+                    Category = "Vandalism",
+                    AssignedDepartment = Department.ParksAndPublicSpaces,
+                    Suburb = "Berea",
+                    Ward = "Ward 25",
+                    Status = IncidentStatus.New,
+                    Priority = IncidentPriority.Low,
+                    CreatedAt = DateTime.UtcNow.AddHours(-6),
+                    LastUpdatedAt = DateTime.UtcNow.AddHours(-6),
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0016",
+                    SourceChannel = SourceChannel.Web,
+                    Description = "Stray dogs in residential area, concerned about safety",
+                    AISummary = "Animal control needed - stray dogs in Reservoir Hills.",
+                    Category = "Animal Control",
+                    AssignedDepartment = Department.EnvironmentalHealth,
+                    Suburb = "Reservoir Hills",
+                    Ward = "Ward 27",
+                    Status = IncidentStatus.Triaged,
+                    Priority = IncidentPriority.Medium,
+                    CreatedAt = DateTime.UtcNow.AddHours(-12),
+                    LastUpdatedAt = DateTime.UtcNow.AddHours(-10),
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0017",
+                    SourceChannel = SourceChannel.WhatsApp,
+                    Description = "Noise complaint - construction work starting at 5am",
+                    AISummary = "Noise pollution complaint in Umhlanga.",
+                    Category = "Noise Pollution",
+                    AssignedDepartment = Department.EnvironmentalHealth,
+                    Suburb = "Umhlanga",
+                    Ward = "Ward 35",
+                    Status = IncidentStatus.Assigned,
+                    Priority = IncidentPriority.Low,
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    LastUpdatedAt = DateTime.UtcNow.AddHours(-20),
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Inspector assigned to investigate", UpdatedBy = "Health Department" }
+                    },
+                    ClassificationMethod = "Deterministic"
+                },
+                new Incident
+                {
+                    ReferenceNumber = "CIV-2026-0018",
+                    SourceChannel = SourceChannel.Demo,
+                    Description = "Flooding in low-lying area after heavy rain",
+                    AISummary = "Flood response needed in Cato Manor.",
+                    Category = "Flood",
+                    AssignedDepartment = Department.DisasterManagement,
+                    Suburb = "Cato Manor",
+                    Ward = "Ward 28",
+                    Status = IncidentStatus.Escalated,
+                    Priority = IncidentPriority.Urgent,
+                    CreatedAt = DateTime.UtcNow.AddHours(-3),
+                    LastUpdatedAt = DateTime.UtcNow.AddHours(-2),
+                    PublicUpdates = new List<PublicUpdate> 
+                    { 
+                        new PublicUpdate { Content = "Disaster management team activated", UpdatedBy = "Admin" },
+                        new PublicUpdate { Content = "Evacuation assistance available", UpdatedBy = "Disaster Management" }
+                    },
                     ClassificationMethod = "Deterministic"
                 }
             };
@@ -409,6 +582,42 @@ namespace CivicOps.Services
                     Ward = "Ward 66",
                     AffectedDepartment = Department.MetroPolicePublicSafety,
                     CreatedAt = DateTime.UtcNow.AddHours(-18)
+                },
+                new Alert
+                {
+                    Type = AlertType.Flood,
+                    Severity = AlertSeverity.Urgent,
+                    Title = "Flood Warning - Heavy Rain Expected",
+                    Description = "Heavy rainfall expected. Low-lying areas may experience flooding. Residents advised to take precautions.",
+                    Suburb = "Cato Manor",
+                    Ward = "Ward 28",
+                    AffectedDepartment = Department.DisasterManagement,
+                    CreatedAt = DateTime.UtcNow.AddHours(-4),
+                    ExpiresAt = DateTime.UtcNow.AddHours(20)
+                },
+                new Alert
+                {
+                    Type = AlertType.EnvironmentalHazard,
+                    Severity = AlertSeverity.Warning,
+                    Title = "Air Quality Advisory",
+                    Description = "Elevated air pollution levels due to industrial activity. Sensitive individuals should limit outdoor exposure.",
+                    Suburb = "Merebank",
+                    Ward = "Ward 70",
+                    AffectedDepartment = Department.EnvironmentalHealth,
+                    CreatedAt = DateTime.UtcNow.AddHours(-36),
+                    ExpiresAt = DateTime.UtcNow.AddHours(12)
+                },
+                new Alert
+                {
+                    Type = AlertType.DisasterWarning,
+                    Severity = AlertSeverity.Critical,
+                    Title = "Severe Weather Warning",
+                    Description = "Severe thunderstorms and strong winds expected this evening. Secure loose objects and stay indoors.",
+                    Suburb = "All Areas",
+                    Ward = "All Wards",
+                    AffectedDepartment = Department.DisasterManagement,
+                    CreatedAt = DateTime.UtcNow.AddHours(-2),
+                    ExpiresAt = DateTime.UtcNow.AddHours(8)
                 }
             };
 

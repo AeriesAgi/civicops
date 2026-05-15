@@ -2,151 +2,339 @@
     ViewData["Title"] = "Home";
 }
 
-<div class="container">
-    <div class="hero" style="text-align: center; padding: 3rem 0;">
-        <h1 style="font-size: 3rem; font-weight: bold; color: #06b6d4; margin-bottom: 1rem;">
-            CivicOps
-        </h1>
-        <p style="font-size: 1.25rem; color: #cbd5e1; max-width: 800px; margin: 0 auto 2rem;">
-            Integration-Ready Civic Operations Platform for Municipal Incident Intake, Routing, and Public Tracking
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container position-relative">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-7">
+                <h1 class="hero-title mb-4">
+                    <i class="bi bi-building me-3"></i>CivicOps
+                </h1>
+                <p class="hero-subtitle mb-4">
+                    Integration-Ready Civic Operations Platform for Municipal Incident Intake, AI-Powered Routing, and Public Tracking
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/Home/Report" class="btn btn-primary btn-lg">
+                        <i class="bi bi-file-earmark-plus me-2"></i>Report an Issue
+                    </a>
+                    <a href="/Home/Lookup" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-search me-2"></i>Track Your Report
+                    </a>
+                    <a href="/Home/Alerts" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-exclamation-triangle me-2"></i>View Alerts
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <div class="feature-icon" style="font-size: 8rem; opacity: 0.3;">
+                    <i class="bi bi-diagram-3"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Emergency Disclaimer -->
+<div class="container mt-4">
+    <div class="emergency-disclaimer">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="disclaimer-icon">
+                    <i class="bi bi-shield-exclamation"></i>
+                </div>
+            </div>
+            <div class="col">
+                <h5 class="mb-2"><strong>Emergency Disclaimer</strong></h5>
+                <p class="mb-0">
+                    <strong>If you or someone else is in immediate danger, please contact official emergency services directly:</strong>
+                    Police: <strong>10111</strong> | Fire/EMS: <strong>10177</strong>
+                    <br>
+                    CivicOps is for non-emergency civic issues only and does not replace official emergency response systems.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Problem Statement -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="text-center mb-5">
+                <h2 class="text-navy fw-bold mb-3">The Challenge</h2>
+                <p class="lead text-muted">
+                    Municipal governments face fragmented citizen reporting channels, slow manual routing, 
+                    and limited public visibility into incident resolution. CivicOps solves this.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Solution Features -->
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+                    <h4 class="text-navy fw-bold mb-3">Multi-Channel Intake</h4>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Web/PWA reporting</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Android mobile app</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>WhatsApp text intake</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Voice note support</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Photo/media attachments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <h4 class="text-navy fw-bold mb-3">AI-Powered Classification</h4>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Gemini AI integration</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Smart categorization</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Auto department routing</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Priority assignment</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Deterministic fallback</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <h4 class="text-navy fw-bold mb-3">Department Operations</h4>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Department queues</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Incident management</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Status workflows</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Internal notes</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Escalation support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="bi bi-eye"></i>
+                    </div>
+                    <h4 class="text-navy fw-bold mb-3">Public Transparency</h4>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Reference tracking</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Status updates</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Public timeline</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Area-based alerts</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Department visibility</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="bi bi-diagram-3"></i>
+                    </div>
+                    <h4 class="text-navy fw-bold mb-3">13 Municipal Departments</h4>
+                    <ul class="list-unstyled small">
+                        <li><i class="bi bi-droplet-fill text-cyan me-2"></i>Water & Sanitation</li>
+                        <li><i class="bi bi-lightning-fill text-warning me-2"></i>Electricity</li>
+                        <li><i class="bi bi-sign-turn-right-fill text-secondary me-2"></i>Roads & Stormwater</li>
+                        <li><i class="bi bi-trash-fill text-success me-2"></i>Waste Management</li>
+                        <li><i class="bi bi-fire text-danger me-2"></i>Fire & Rescue</li>
+                        <li class="text-muted">+ 8 more departments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <div class="feature-icon">
+                        <i class="bi bi-plug"></i>
+                    </div>
+                    <h4 class="text-navy fw-bold mb-3">Integration Ready</h4>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>WhatsApp Cloud API</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Voice transcription</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>SMS notifications</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>GIS/mapping</li>
+                        <li><i class="bi bi-check-circle-fill text-teal me-2"></i>Municipal ERP</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="bg-light py-5 my-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="text-navy fw-bold mb-3">How CivicOps Works</h2>
+            <p class="lead text-muted">Simple, transparent, and efficient civic operations</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="text-center">
+                    <div class="bg-cyan text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        1
+                    </div>
+                    <h5 class="text-navy fw-bold mb-2">Report Issue</h5>
+                    <p class="text-muted">
+                        Residents report civic issues via web, mobile, or WhatsApp. Describe the problem and location.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="text-center">
+                    <div class="bg-teal text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        2
+                    </div>
+                    <h5 class="text-navy fw-bold mb-2">AI Classification</h5>
+                    <p class="text-muted">
+                        CivicOps uses Gemini AI or deterministic rules to classify, route to the correct department, and set priority.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="text-center">
+                    <div class="bg-cyan text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        3
+                    </div>
+                    <h5 class="text-navy fw-bold mb-2">Get Reference</h5>
+                    <p class="text-muted">
+                        Receive a unique reference number (e.g., CIV-2026-0001) to track your report's progress.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="text-center">
+                    <div class="bg-teal text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        4
+                    </div>
+                    <h5 class="text-navy fw-bold mb-2">Department Action</h5>
+                    <p class="text-muted">
+                        Assigned department reviews, updates status, and takes action to resolve the issue.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="text-center">
+                    <div class="bg-cyan text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        5
+                    </div>
+                    <h5 class="text-navy fw-bold mb-2">Track Progress</h5>
+                    <p class="text-muted">
+                        Use your reference number to check status updates and see when the issue is resolved.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="text-center">
+                    <div class="bg-teal text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        6
+                    </div>
+                    <h5 class="text-navy fw-bold mb-2">Public Updates</h5>
+                    <p class="text-muted">
+                        Receive public updates throughout the lifecycle. View area alerts for broader issues.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Integration Readiness -->
+<div class="container my-5">
+    <div class="card border-0 shadow-lg">
+        <div class="card-body p-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h3 class="text-navy fw-bold mb-3">
+                        <i class="bi bi-plug-fill text-teal me-2"></i>Built for Integration
+                    </h3>
+                    <p class="lead mb-3">
+                        CivicOps is designed as a connector-ready platform. While it works fully in demo mode, 
+                        it's architected for production integration.
+                    </p>
+                    <p class="text-muted mb-0">
+                        Each connector has a clear interface, environment variable configuration, and documentation 
+                        for production deployment. Connect to WhatsApp Cloud API, voice transcription services, 
+                        SMS gateways, GIS/mapping systems, municipal ERP platforms, and authentication systems.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                    <a href="/Home/Connectors" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plug me-2"></i>View Connectors
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-navy text-white py-5 my-5">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">Ready to Transform Civic Operations?</h2>
+        <p class="lead mb-4">
+            Start reporting issues, track progress, and see how CivicOps streamlines municipal operations.
         </p>
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="/Home/Report" class="btn btn-primary" style="font-size: 1.125rem;">
-                📝 Report an Issue
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="/Home/Report" class="btn btn-primary btn-lg">
+                <i class="bi bi-file-earmark-plus me-2"></i>Report an Issue
             </a>
-            <a href="/Home/Lookup" class="btn btn-secondary" style="font-size: 1.125rem;">
-                🔍 Track Your Report
+            <a href="/Auth/Login" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Demo Login
+            </a>
+            <a href="/Home/Mobile" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-phone me-2"></i>Mobile Access
             </a>
         </div>
     </div>
+</div>
 
-    <div class="alert alert-warning" style="margin: 2rem 0;">
-        <strong>⚠️ Emergency Disclaimer:</strong> If you or someone else is in immediate danger, please contact official emergency services directly (Police: 10111, Fire/EMS: 10177). CivicOps is for non-emergency civic issues only.
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 3rem 0;">
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">📱 Multiple Reporting Channels</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8;">
-                <li>Web/PWA reporting</li>
-                <li>Android mobile app</li>
-                <li>WhatsApp text intake</li>
-                <li>Voice note reporting</li>
-                <li>Photo/media support</li>
-            </ul>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">🤖 AI-Assisted Classification</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8;">
-                <li>Gemini-powered extraction</li>
-                <li>Smart categorization</li>
-                <li>Department routing</li>
-                <li>Priority assignment</li>
-                <li>Deterministic fallback</li>
-            </ul>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">🏛️ Municipal Departments</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8;">
-                <li>Water & Sanitation</li>
-                <li>Electricity</li>
-                <li>Roads & Stormwater</li>
-                <li>Waste Management</li>
-                <li>Fire & Rescue</li>
-                <li>+ 8 more departments</li>
-            </ul>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">📊 Public Tracking</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8;">
-                <li>Reference number system</li>
-                <li>Status updates</li>
-                <li>Department assignment</li>
-                <li>Public timeline</li>
-                <li>Area-based alerts</li>
-            </ul>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">👥 Department Workflows</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8;">
-                <li>Department queues</li>
-                <li>Incident management</li>
-                <li>Status updates</li>
-                <li>Internal notes</li>
-                <li>Escalation support</li>
-            </ul>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">🔌 Integration Ready</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8;">
-                <li>WhatsApp Cloud API</li>
-                <li>Voice transcription</li>
-                <li>SMS notifications</li>
-                <li>GIS/mapping</li>
-                <li>Municipal ERP systems</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="card" style="margin: 3rem 0;">
-        <h2 style="color: #06b6d4; margin-bottom: 1.5rem;">How CivicOps Works</h2>
-        <div style="display: grid; gap: 1.5rem;">
-            <div style="display: flex; gap: 1rem; align-items: start;">
-                <div style="background: rgba(6, 182, 212, 0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; color: #06b6d4;">1</div>
-                <div>
-                    <h4 style="color: #e0e7ff; margin-bottom: 0.5rem;">Report an Issue</h4>
-                    <p style="color: #cbd5e1;">Residents report civic issues through web, mobile app, or WhatsApp. Describe the problem, add location details, and submit.</p>
-                </div>
-            </div>
-            <div style="display: flex; gap: 1rem; align-items: start;">
-                <div style="background: rgba(6, 182, 212, 0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; color: #06b6d4;">2</div>
-                <div>
-                    <h4 style="color: #e0e7ff; margin-bottom: 0.5rem;">AI Classification & Routing</h4>
-                    <p style="color: #cbd5e1;">CivicOps uses Gemini AI (when configured) or deterministic rules to classify the issue, assign it to the correct department, and set priority.</p>
-                </div>
-            </div>
-            <div style="display: flex; gap: 1rem; align-items: start;">
-                <div style="background: rgba(6, 182, 212, 0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; color: #06b6d4;">3</div>
-                <div>
-                    <h4 style="color: #e0e7ff; margin-bottom: 0.5rem;">Get Reference Number</h4>
-                    <p style="color: #cbd5e1;">You receive a unique reference number (e.g., CIV-2026-0001) to track your report's progress.</p>
-                </div>
-            </div>
-            <div style="display: flex; gap: 1rem; align-items: start;">
-                <div style="background: rgba(6, 182, 212, 0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; color: #06b6d4;">4</div>
-                <div>
-                    <h4 style="color: #e0e7ff; margin-bottom: 0.5rem;">Department Action</h4>
-                    <p style="color: #cbd5e1;">The assigned department reviews the incident, updates status, and takes action to resolve the issue.</p>
-                </div>
-            </div>
-            <div style="display: flex; gap: 1rem; align-items: start;">
-                <div style="background: rgba(6, 182, 212, 0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: bold; color: #06b6d4;">5</div>
-                <div>
-                    <h4 style="color: #e0e7ff; margin-bottom: 0.5rem;">Track Progress</h4>
-                    <p style="color: #cbd5e1;">Use your reference number to check status updates and see when the issue is resolved.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" style="background: rgba(6, 182, 212, 0.1); border-color: rgba(6, 182, 212, 0.3);">
-        <h3 style="color: #06b6d4; margin-bottom: 1rem;">🚀 Built for Integration</h3>
-        <p style="color: #cbd5e1; line-height: 1.8;">
-            CivicOps is designed as a connector-ready platform. While it works fully in demo mode, it's built to integrate with:
-            WhatsApp Cloud API, voice transcription services, SMS gateways, GIS/mapping systems, municipal ERP platforms, 
-            and authentication systems. Each connector has a clear interface and documentation for production deployment.
+<!-- Disclaimer -->
+<div class="container my-5">
+    <div class="text-center text-muted small">
+        <p class="mb-2">
+            <i class="bi bi-info-circle me-1"></i>
+            <strong>Demo Platform:</strong> CivicOps is a demonstration platform showcasing integration-ready civic operations technology.
         </p>
-    </div>
-
-    <div style="text-align: center; margin: 3rem 0;">
-        <p style="color: #94a3b8; font-size: 0.875rem;">
-            CivicOps does not replace official emergency services. This platform is for non-emergency civic issues only.
-            <br>Not affiliated with any official municipal government.
+        <p class="mb-0">
+            Not affiliated with any official municipal government. Does not replace official emergency services.
+            For emergencies, always contact Police (10111) or Fire/EMS (10177) directly.
         </p>
     </div>
 </div>

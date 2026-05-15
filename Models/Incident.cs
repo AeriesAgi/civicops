@@ -46,8 +46,10 @@ namespace CivicOps.Models
         public IncidentPriority Priority { get; set; } = IncidentPriority.Medium;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
-        public List<string> PublicUpdates { get; set; } = new();
+        public List<PublicUpdate> PublicUpdates { get; set; } = new();
         public List<IncidentNote> InternalNotes { get; set; } = new();
+        public List<IncidentStatusHistory> StatusHistory { get; set; } = new();
+        public List<MediaAttachment> MediaAttachments { get; set; } = new();
         public string? ContactName { get; set; }
         public string? ContactPhone { get; set; }
         public string? ContactEmail { get; set; }

@@ -1,356 +1,288 @@
 # CivicOps Demo Script
 
-## 3-5 Minute Hackathon Demo
-
-**Target Audience:** Hackathon judges, technical evaluators  
-**Demo Duration:** 3-5 minutes  
-**Goal:** Showcase CivicOps as a complete, integration-ready civic operations platform
+**Duration**: 3-5 minutes  
+**Audience**: Municipal officials, NGOs, smart-city partners, hackathon judges, pilot customers  
+**Platform**: CivicOps - Integration-Ready Civic Operations Platform
 
 ---
 
-## Pre-Demo Setup (Before Presentation)
+## Opening (30 seconds)
 
-1. **Start the application:**
-   ```bash
-   cd /workspaces/civicops
-   dotnet run
-   ```
+"Good morning/afternoon. I'm here to demonstrate **CivicOps**, an integration-ready civic operations platform that transforms how municipalities handle citizen reporting, incident routing, and public service delivery.
 
-2. **Open browser tabs (in order):**
-   - Tab 1: Landing page (https://localhost:5001)
-   - Tab 2: Dashboard (https://localhost:5001/Home/Dashboard)
-   - Tab 3: Report form (https://localhost:5001/Home/Report)
-   - Tab 4: WhatsApp simulator (https://localhost:5001/demo/whatsapp)
-   - Tab 5: Connectors page (https://localhost:5001/Home/Connectors)
-
-3. **Have ready:**
-   - Sample report text: "Burst water pipe on Main Road in Chatsworth causing flooding"
-   - Reference number from demo data: CIV-2026-0001
+CivicOps addresses a critical challenge: fragmented citizen reporting channels, slow manual routing, and limited public visibility into incident resolution."
 
 ---
 
-## Demo Script
+## Problem Statement (30 seconds)
 
-### Opening (30 seconds)
+"Today, municipalities face:
+- **Fragmented intake**: Citizens report via phone, email, walk-in, social media
+- **Manual routing**: Staff manually classify and assign incidents
+- **Limited transparency**: Residents don't know what's happening with their reports
+- **Slow response**: Issues get lost or delayed in the system
 
-**[Show Landing Page - Tab 1]**
-
-> "Hi, I'm presenting CivicOps - an integration-ready civic operations platform built entirely from scratch using IBM Bob in under an hour."
-
-**Key Points:**
-- Multi-channel reporting (web, mobile, WhatsApp, voice notes)
-- AI-powered classification with Gemini
-- Municipal department routing
-- Public tracking and area alerts
-
-**Visual:** Scroll through landing page features
+CivicOps solves this with multi-channel intake, AI-powered classification, and transparent tracking."
 
 ---
 
-### Section 1: Citizen Reporting Flow (60 seconds)
+## Demo Flow (3-4 minutes)
 
-**[Switch to Report Form - Tab 3]**
+### 1. Citizen Experience (60 seconds)
 
-> "Let me show you how a resident reports a civic issue."
+**Navigate to Landing Page** (`/`)
 
-**Actions:**
-1. Fill in description: "Burst water pipe on Main Road in Chatsworth causing flooding"
-2. Select suburb: "Chatsworth"
-3. Enter ward: "Ward 73"
-4. Click "Submit Report"
+"Let's start with the citizen experience. This is our landing page - professional, clear value proposition, and multiple ways to engage."
 
-**[Show Confirmation Page]**
+**Click "Report an Issue"** (`/Home/Report`)
 
-> "The system immediately:
-> - Generates a unique reference number
-> - Classifies the issue using AI or deterministic logic
-> - Routes it to Water & Sanitation department
-> - Assigns priority based on keywords
-> - Provides the resident with tracking information"
+"Citizens can report issues through:
+- This web form
+- Our Android mobile app
+- WhatsApp text messages
+- Voice notes
 
-**Key Points:**
-- Reference number: CIV-2026-XXXX
-- Automatic classification
-- Department routing
-- Priority assignment
+Let me submit a report..."
 
----
+**Fill form**:
+- Description: "Large pothole on Main Road near the library, causing traffic issues"
+- Category: Road Maintenance
+- Suburb: Durban CBD
+- Ward: Ward 26
 
-### Section 2: Multi-Channel Intake (45 seconds)
+**Submit**
 
-**[Switch to WhatsApp Simulator - Tab 4]**
+"Notice the confirmation page shows:
+- Reference number: **CIV-2026-XXXX**
+- Assigned department: **Roads & Stormwater**
+- Current status: **New**
+- AI-generated summary
 
-> "CivicOps supports multiple reporting channels. Here's WhatsApp integration."
+The system used either Gemini AI or our deterministic classifier to automatically route this to the correct department."
 
-**Actions:**
-1. Enter message: "Power outage in Umlazi since this morning"
-2. Fill suburb: "Umlazi"
-3. Click "Send WhatsApp Message"
+### 2. Public Tracking (45 seconds)
 
-**[Show Result]**
+**Click "Track Your Report"** (`/Home/Lookup`)
 
-> "The same classification engine processes WhatsApp messages, voice notes, and mobile app submissions. Everything flows into the same incident management system."
+"Citizens can track their reports anytime using their reference number."
 
-**Key Points:**
-- WhatsApp Cloud API ready
-- Voice note transcription ready
-- Android app included
-- Unified incident processing
+**Enter reference number from previous step**
 
----
+"Here's the status page showing:
+- Current status and timeline
+- Department assignment
+- Public updates from staff
+- Location and priority information
+- What happens next
 
-### Section 3: Department Operations (60 seconds)
+Notice the **emergency disclaimer** - CivicOps does not replace emergency services."
 
-**[Switch to Dashboard - Tab 2]**
+### 3. Operations Dashboard (60 seconds)
 
-> "Now let's see the municipal operations side."
+**Navigate to Login** (`/Auth/Login`)
 
-**Visual Tour:**
-1. **Statistics Cards:**
-   - Total incidents
-   - Status breakdown
-   - Priority distribution
+"Now let's see the staff side. This is demo authentication - production would use proper identity management."
 
-2. **Department Breakdown:**
-   - Click on "Water & Sanitation" department
-   
-**[Show Department Queue]**
+**Login as**: `dispatcher@civicops.demo` / `CivicOps2026!`
 
-> "Each department has a dedicated queue showing:
-> - All assigned incidents
-> - Priority levels
-> - Status tracking
-> - Source channels"
+**Dashboard loads** (`/Home/Dashboard`)
 
-**Actions:**
-1. Click on an incident (e.g., CIV-2026-0001)
+"This is the operations dashboard showing:
+- **KPI cards**: Total incidents, new, in progress, escalated, resolved
+- **Incidents by department**: Clickable to see department queues
+- **Incidents by source**: Web, Android, WhatsApp, voice notes
+- **High priority incidents**: Urgent items requiring attention
+- **Recent incidents**: Latest submissions
+- **System status**: Gemini AI status, active alerts, connector health
 
-**[Show Incident Detail]**
+Everything is real-time and actionable."
 
-> "Department staff can:
-> - View full incident details
-> - Update status
-> - Add internal notes
-> - Post public updates
-> - Escalate if needed"
+### 4. Department Queue (45 seconds)
 
-**Key Points:**
-- Department-specific queues
-- Full incident lifecycle
-- Public and internal notes
-- Status workflow
+**Click on "Roads & Stormwater"** (`/Home/Department?dept=RoadsAndStormwater`)
 
----
+"Department responders see their queue filtered to their department. Each incident shows:
+- Reference number
+- Category and summary
+- Status and priority
+- Location
+- Source channel
 
-### Section 4: Integration Readiness (45 seconds)
+Let's open one..."
 
-**[Switch to Connectors Page - Tab 5]**
+**Click on an incident** (`/Home/Incident?id={id}`)
 
-> "CivicOps is built for integration. Let me show you the connector framework."
+"The incident detail page shows:
+- Complete description and AI summary
+- Timeline with all status changes
+- Internal notes (staff-only)
+- Public updates (visible to residents)
+- Status update controls
+- Escalation options
 
-**Visual Tour:**
-1. **Gemini AI:**
-   - Status: Configured/Demo
-   - Hybrid mode with deterministic fallback
+Staff can update status, add notes, and communicate with residents."
 
-2. **WhatsApp Cloud API:**
-   - Webhook ready
-   - Demo mode active
+### 5. Integration Readiness (30 seconds)
 
-3. **Future Connectors:**
-   - Voice transcription
-   - SMS notifications
-   - Email notifications
-   - GIS/mapping
-   - Municipal ERP systems
+**Navigate to Connectors** (`/Home/Connectors`)
 
-> "Each connector has:
-> - Clear interface
-> - Demo implementation
-> - Environment variable configuration
-> - Production documentation"
+"CivicOps is built for integration. We have connector interfaces for:
+- **Gemini AI**: Classification and routing (configurable)
+- **WhatsApp Cloud API**: Message intake (production-ready structure)
+- **Voice transcription**: Audio-to-text (ready for service integration)
+- **SMS notifications**: Resident updates (ready for service integration)
+- **GIS/mapping**: Location services (ready for service integration)
+- **Municipal ERP**: Ticketing system integration (ready for service integration)
 
-**Key Points:**
-- Connector-ready architecture
-- No hardcoded secrets
-- Demo mode for all services
-- Production path documented
+Each connector has clear environment variable configuration and documentation."
+
+### 6. Area Alerts (30 seconds)
+
+**Navigate to Alerts** (`/Home/Alerts`)
+
+"Municipalities can publish area-wide alerts for:
+- Water outages
+- Electricity disruptions
+- Road closures
+- Flood warnings
+- Public safety notices
+
+Residents can filter by their suburb or ward to see relevant alerts."
 
 ---
 
-### Section 5: Technical Highlights (30 seconds)
+## Closing (30 seconds)
 
-**[Can show any page or code if time permits]**
+"To summarize, CivicOps provides:
 
-> "Technical highlights:
-> - Built with ASP.NET Core 8
-> - RESTful API for mobile apps
-> - JSON persistence (easily replaceable with SQL)
-> - Gemini AI integration with automatic fallback
-> - Mobile-responsive design
-> - Android app source included
-> - Complete documentation"
+✅ **Multi-channel intake**: Web, mobile, WhatsApp, voice  
+✅ **AI-powered routing**: Gemini or deterministic classification  
+✅ **Department workflows**: Queues, status updates, notes, escalation  
+✅ **Public transparency**: Reference tracking, status updates, timeline  
+✅ **Integration-ready**: Clean interfaces for production connectors  
+✅ **Role-based access**: Admin, dispatcher, department responder, viewer  
 
-**Key Points:**
-- Modern tech stack
-- API-first design
-- Production-ready architecture
-- Comprehensive documentation
+**Current Status**: Pilot-ready demo with 18 sample incidents and 8 area alerts
 
----
+**Next Steps**: 
+- Production database (SQLite/PostgreSQL/SQL Server)
+- Production authentication (ASP.NET Core Identity)
+- Gemini API key configuration
+- WhatsApp Business API setup
+- Pilot deployment
 
-### Closing (30 seconds)
+**Important Disclaimers**:
+- This is a demonstration platform
+- Not affiliated with any official municipal government
+- Does not replace emergency services (Police: 10111, Fire/EMS: 10177)
+- Live integrations require environment variable configuration
 
-**[Return to Landing Page or Dashboard]**
-
-> "CivicOps demonstrates:
-> 1. Complete application built with IBM Bob in under an hour
-> 2. Multi-channel civic reporting
-> 3. AI-powered classification with fallback
-> 4. Municipal department workflows
-> 5. Integration-ready architecture
-> 6. Production deployment path
-> 
-> All code, documentation, and Android app source are in the repository. The application is running live right now and ready for production deployment with database and authentication additions."
-
-**Final Points:**
-- Built entirely with IBM Bob
-- Zero manual coding
-- Production-ready demo
-- Integration framework
-- Complete documentation
+Questions?"
 
 ---
 
-## Alternative Demo Flows
+## Demo Credentials
 
-### Quick 2-Minute Demo
+**Login URL**: `/Auth/Login`
 
-1. **Landing page** (15 sec) - Overview
-2. **Submit report** (30 sec) - Show classification
-3. **Dashboard** (30 sec) - Show department operations
-4. **Connectors** (30 sec) - Show integration readiness
-5. **Closing** (15 sec) - Technical highlights
-
-### Extended 7-Minute Demo
-
-Add these sections:
-- **Public status lookup** - Show resident tracking
-- **Area alerts** - Show public notifications
-- **Voice note simulator** - Show audio intake
-- **Mobile/PWA page** - Show mobile strategy
-- **Code walkthrough** - Show architecture
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@civicops.demo | CivicOps2026! |
+| Dispatcher | dispatcher@civicops.demo | CivicOps2026! |
+| Water Dept | water@civicops.demo | CivicOps2026! |
+| Electricity Dept | electricity@civicops.demo | CivicOps2026! |
+| Roads Dept | roads@civicops.demo | CivicOps2026! |
 
 ---
 
-## Demo Tips
+## Key Talking Points
 
-### Do's
-✅ Keep energy high and pace brisk  
-✅ Focus on unique features (multi-channel, AI, integration)  
-✅ Show working features, not just slides  
-✅ Emphasize "built with IBM Bob in under an hour"  
-✅ Highlight production readiness  
-✅ Show the connector framework  
+### For Municipal Officials
+- "Reduces manual routing time by automating classification"
+- "Provides transparency to residents, reducing follow-up calls"
+- "Integrates with existing systems via clean APIs"
+- "Role-based access ensures proper security"
 
-### Don'ts
-❌ Don't get stuck on one page too long  
-❌ Don't apologize for demo limitations  
-❌ Don't dive too deep into code unless asked  
-❌ Don't claim features that aren't implemented  
-❌ Don't skip the IBM Bob mention  
+### For NGOs
+- "Enables community-driven reporting"
+- "Tracks issues from report to resolution"
+- "Supports multiple languages and channels"
+- "Can be deployed on-premises or cloud"
 
----
+### For Smart-City Partners
+- "API-first architecture for integration"
+- "Connector interfaces for IoT sensors, GIS, analytics"
+- "Real-time data for dashboards and reporting"
+- "Scalable from pilot to city-wide deployment"
 
-## Handling Questions
-
-### "How long did this take to build?"
-> "Approximately one hour using IBM Bob. Bob generated over 6,000 lines of code, 50+ files, complete documentation, and Android app source - all from a detailed requirements prompt."
-
-### "Is this production-ready?"
-> "It's demo-ready and development-ready. For production, you'd add: database migration from JSON to SQL, authentication/authorization, rate limiting, and production hosting. The architecture is designed for these additions."
-
-### "Does Gemini actually work?"
-> "Yes, when you provide a GEMINI_API_KEY environment variable. The system has intelligent fallback - if Gemini is unavailable, it uses deterministic keyword-based classification. Both methods work seamlessly."
-
-### "Can I see the code?"
-> "Absolutely. The entire codebase is in the repository. The architecture follows ASP.NET Core best practices with service layer separation, dependency injection, and interface-based design."
-
-### "What about the Android app?"
-> "The Android app source structure is complete in /mobile/CivicOpsAndroid with Gradle configuration, manifest, and API integration ready. You'd open it in Android Studio to complete the UI implementation."
-
-### "How do you handle security?"
-> "No secrets are hardcoded - everything uses environment variables. The .gitignore prevents committing sensitive data. For production, you'd add ASP.NET Core Identity for authentication and role-based access control."
-
-### "What's the integration story?"
-> "Every external service has a clear interface, demo implementation, and production documentation. WhatsApp, voice transcription, SMS, email, GIS, and ERP connectors are all architected and ready for implementation."
+### For Hackathon Judges
+- "Built with ASP.NET Core MVC and .NET 10"
+- "Gemini AI integration for intelligent classification"
+- "WhatsApp Cloud API ready for messaging"
+- "Professional UI/UX with responsive design"
+- "Complete RBAC and audit trail"
 
 ---
 
-## Backup Demos (If Live Demo Fails)
+## Technical Details (If Asked)
 
-### Option 1: Screenshots
-Have screenshots ready of:
-- Landing page
-- Report submission
-- Confirmation page
-- Dashboard
-- Department queue
-- Incident detail
-- Connectors page
+**Stack**:
+- ASP.NET Core MVC (.NET 10)
+- Bootstrap 5 + Custom CSS
+- JSON persistence (demo) → SQLite/PostgreSQL (production)
+- Gemini AI (optional)
+- WhatsApp Cloud API (optional)
 
-### Option 2: Video Recording
-Record a 3-minute walkthrough before the presentation
+**Architecture**:
+- Repository pattern (IDataService)
+- Service layer (Classification, Gemini, Auth)
+- MVC controllers (Home, API, Auth, Demo, WhatsApp)
+- Razor views with shared layout
+- RBAC via custom authorization filter
 
-### Option 3: Code Walkthrough
-Show the codebase structure:
-- Models folder
-- Services folder
-- Controllers folder
-- Views folder
-- Documentation
+**Deployment**:
+- Azure App Service
+- AWS Elastic Beanstalk
+- On-premises IIS
+- Docker container
 
----
-
-## Post-Demo
-
-### If Time for Q&A
-- Show additional features (alerts, mobile page)
-- Demonstrate API endpoints
-- Show documentation quality
-- Discuss architecture decisions
-
-### Closing Statement
-> "CivicOps showcases IBM Bob's capability to transform requirements into a complete, production-ready application. From concept to deployment in under an hour, with zero manual coding. Thank you!"
+**Build**:
+```bash
+dotnet restore
+dotnet build
+dotnet run
+```
 
 ---
 
-## Demo Checklist
+## Backup Scenarios
 
-**Before Demo:**
-- [ ] Application running
-- [ ] Browser tabs open
-- [ ] Sample data loaded
-- [ ] Internet connection stable
-- [ ] Backup plan ready
+### If Gemini is not configured:
+"Gemini AI is optional. The system has a deterministic classifier that works reliably without external dependencies. In production, you can enable Gemini by setting the GEMINI_API_KEY environment variable."
 
-**During Demo:**
-- [ ] Introduce CivicOps and IBM Bob
-- [ ] Show citizen reporting flow
-- [ ] Demonstrate multi-channel intake
-- [ ] Show department operations
-- [ ] Highlight integration readiness
-- [ ] Emphasize technical achievements
-- [ ] Close with impact statement
+### If WhatsApp is not configured:
+"WhatsApp integration is production-ready but requires Meta WhatsApp Business API setup. We have a demo simulator to show the workflow. In production, you configure WHATSAPP_ACCESS_TOKEN and WHATSAPP_PHONE_NUMBER_ID."
 
-**After Demo:**
-- [ ] Answer questions
-- [ ] Provide repository link
-- [ ] Share documentation
-- [ ] Thank judges
+### If asked about cost:
+"CivicOps is a demonstration platform. For pilot deployment, costs depend on:
+- Hosting (Azure/AWS/on-premises)
+- Gemini API usage (optional, pay-per-use)
+- WhatsApp Business API (optional, Meta pricing)
+- Database (SQLite free, PostgreSQL/SQL Server licensing)
+
+We can provide detailed cost estimates based on your expected volume."
+
+### If asked about timeline:
+"For pilot deployment:
+- Week 1-2: Requirements gathering, environment setup
+- Week 3-4: Database migration, authentication setup
+- Week 5-6: Connector configuration (Gemini, WhatsApp)
+- Week 7-8: Testing, training, go-live
+
+Full production deployment: 2-3 months depending on integration complexity."
 
 ---
 
-**Demo Script Version:** 1.0  
-**Last Updated:** May 15, 2026  
-**Prepared for:** IBM Bob Hackathon
+**Demo Prepared By**: IBM Bob  
+**Last Updated**: 2026-05-15  
+**Version**: 1.0 (Pilot-Ready)
