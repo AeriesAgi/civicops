@@ -1,0 +1,134 @@
+@{
+    ViewData["Title"] = "WhatsApp Simulator";
+}
+
+<div class="container">
+    <div class="card" style="max-width: 800px; margin: 2rem auto;">
+        <h1 class="card-title">💬 WhatsApp Reporting Simulator</h1>
+        
+        <div class="alert alert-warning">
+            <strong>Demo Mode:</strong> This is a simulator for testing WhatsApp reporting. In production, this would connect to WhatsApp Cloud API.
+        </div>
+
+        <p style="color: #cbd5e1; margin-bottom: 2rem;">
+            Simulate sending a WhatsApp message to report a civic issue. The system will process your message, classify it, and create an incident.
+        </p>
+
+        <form id="whatsappForm">
+            <div class="form-group">
+                <label class="form-label" for="message">WhatsApp Message *</label>
+                <textarea class="form-control" id="message" name="message" required rows="4"
+                          placeholder="Type your message as you would send it via WhatsApp. For example: 'There is a burst water pipe on Main Road in Chatsworth causing flooding'"></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="suburb">Suburb (Optional)</label>
+                    <input type="text" class="form-control" id="suburb" name="suburb" 
+                           placeholder="e.g., Chatsworth" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="ward">Ward (Optional)</label>
+                    <input type="text" class="form-control" id="ward" name="ward" 
+                           placeholder="e.g., Ward 73" />
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="senderName">Sender Name (Optional)</label>
+                    <input type="text" class="form-control" id="senderName" name="senderName" 
+                           placeholder="Demo User" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phoneNumber">Phone Number (Optional)</label>
+                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
+                           placeholder="+27..." />
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Send WhatsApp Message
+            </button>
+        </form>
+
+        <div id="result" style="margin-top: 2rem; display: none;"></div>
+
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+            <h4 style="color: #cbd5e1; margin-bottom: 1rem;">How WhatsApp Integration Works</h4>
+            <ol style="color: #94a3b8; line-height: 1.8; padding-left: 1.5rem;">
+                <li>Resident sends a WhatsApp message to the CivicOps number</li>
+                <li>WhatsApp Cloud API forwards the message to CivicOps webhook</li>
+                <li>CivicOps processes and classifies the message</li>
+                <li>An incident is created and assigned to the appropriate department</li>
+                <li>Resident receives a reply with their reference number</li>
+            </ol>
+            <p style="color: #94a3b8; margin-top: 1rem;">
+                <strong>Note:</strong> Production deployment requires Meta WhatsApp Business API setup and environment variables.
+                See <a href="/docs/whatsapp-setup.md" style="color: #06b6d4;">WhatsApp Setup Documentation</a>.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('whatsappForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+        message: document.getElementById('message').value,
+        suburb: document.getElementById('suburb').value,
+        ward: document.getElementById('ward').value,
+        senderName: document.getElementById('senderName').value,
+        phoneNumber: document.getElementById('phoneNumber').value
+    };
+    
+    try {
+        const response = await fetch('/demo/whatsapp/inbound', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        const resultDiv = document.getElementById('result');
+        
+        if (result.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h3 style="margin-bottom: 1rem;">✅ WhatsApp Message Processed</h3>
+                    <div style="font-family: monospace; font-size: 1.5rem; color: #22c55e; margin-bottom: 1rem;">
+                        ${result.referenceNumber}
+                    </div>
+                    <p style="margin-bottom: 0.5rem;"><strong>Department:</strong> ${result.department}</p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Category:</strong> ${result.category}</p>
+                    <p style="margin-bottom: 0.5rem;"><strong>Priority:</strong> ${result.priority}</p>
+                    <p style="margin-top: 1rem; font-style: italic;">${result.message}</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="/Home/Lookup" class="btn btn-primary">Track This Report</a>
+                    </div>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Error:</strong> ${result.message}
+                </div>
+            `;
+        }
+        
+        resultDiv.style.display = 'block';
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    } catch (error) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>Error:</strong> ${error.message}
+            </div>
+        `;
+        resultDiv.style.display = 'block';
+    }
+});
+</script>

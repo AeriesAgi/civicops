@@ -1,0 +1,42 @@
+@{
+    ViewData["Title"] = "Track Your Report";
+}
+
+<div class="container">
+    <div class="card" style="max-width: 600px; margin: 2rem auto;">
+        <h1 class="card-title">🔍 Track Your Report</h1>
+        <p style="color: #cbd5e1; margin-bottom: 2rem;">
+            Enter your reference number to check the status of your report.
+        </p>
+
+        <form method="post" asp-action="Lookup">
+            <div class="form-group">
+                <label class="form-label" for="referenceNumber">Reference Number</label>
+                <input type="text" class="form-control" id="referenceNumber" name="referenceNumber" 
+                       placeholder="e.g., CIV-2026-0001" required 
+                       style="font-family: monospace; font-size: 1.125rem;" />
+            </div>
+
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary(false)
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Track Report
+            </button>
+        </form>
+
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
+            <h4 style="color: #cbd5e1; margin-bottom: 1rem;">Don't have a reference number?</h4>
+            <p style="color: #94a3b8; margin-bottom: 1rem;">
+                You received a reference number when you submitted your report. Check your confirmation page, email, or SMS.
+            </p>
+            <a href="/Home/Report" class="btn btn-secondary">
+                Submit a New Report
+            </a>
+        </div>
+    </div>
+</div>
