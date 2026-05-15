@@ -237,6 +237,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/Home/Mobile"><i class="bi bi-phone me-1"></i>Mobile</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Home/Agent"><i class="bi bi-robot me-1"></i>AI Agent</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     @if (Context.Session.GetString("UserEmail") != null)
@@ -262,10 +265,36 @@
                             </ul>
                         </li>
                     }
+                    else if (Context.Session.GetString("ResidentUserId") != null)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Resident/MyReports"><i class="bi bi-file-text me-1"></i>My Reports</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Resident/MyAlerts"><i class="bi bi-bell me-1"></i>My Alerts</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="residentDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle me-1"></i>@Context.Session.GetString("ResidentUserName")
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/Resident/Profile"><i class="bi bi-person me-1"></i>Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" asp-controller="Resident" asp-action="Logout" class="d-inline">
+                                        <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-1"></i>Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
                     else
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="/Auth/Login"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a>
+                            <a class="nav-link" href="/Resident/Login"><i class="bi bi-person me-1"></i>Resident Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Auth/Login"><i class="bi bi-shield-lock me-1"></i>Staff Login</a>
                         </li>
                     }
                 </ul>

@@ -1,0 +1,221 @@
+@model List<CivicOps.Models.Incident>
+@{
+    ViewData["Title"] = "My Reports";
+    var user = ViewBag.User as CivicOps.Models.ResidentUser;
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold">
+                        <i class="bi bi-file-text me-2"></i>My Reports
+                    </h2>
+                    <p class="text-muted">Welcome back, @user?.FullName</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("Report", "Home")" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Submit New Report
+                    </a>
+                    <a href="@Url.Action("Profile", "Resident")" class="btn btn-outline-secondary">
+                        <i class="bi bi-person me-2"></i>Profile
+                    </a>
+                    <a href="@Url.Action("MyAlerts", "Resident")" class="btn btn-outline-info">
+                        <i class="bi bi-bell me-2"></i>My Alerts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (user != null)
+    {
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="display-6 text-primary">@Model.Count</h3>
+                        <p class="text-muted mb-0">Total Reports</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-warning">
+                    <div class="card-body text-center">
+                        <h3 class="display-6 text-warning">@Model.Count(i => i.Status == CivicOps.Models.IncidentStatus.InProgress || i.Status == CivicOps.Models.IncidentStatus.Assigned)</h3>
+                        <p class="text-muted mb-0">In Progress</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-success">
+                    <div class="card-body text-center">
+                        <h3 class="display-6 text-success">@Model.Count(i => i.Status == CivicOps.Models.IncidentStatus.Resolved || i.Status == CivicOps.Models.IncidentStatus.Closed)</h3>
+                        <p class="text-muted mb-0">Resolved</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-geo-alt me-2"></i>Followed Areas
+                        </h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (user.FollowedSuburbs.Any())
+                            {
+                                @foreach (var suburb in user.FollowedSuburbs)
+                                {
+                                    <span class="badge bg-info">@suburb</span>
+                                }
+                            }
+                            @if (user.FollowedWards.Any())
+                            {
+                                @foreach (var ward in user.FollowedWards)
+                                {
+                                    <span class="badge bg-secondary">@ward</span>
+                                }
+                            }
+                            @if (!user.FollowedSuburbs.Any() && !user.FollowedWards.Any())
+                            {
+                                <span class="text-muted">No followed areas. Update your profile to follow areas for alerts.</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model.Any())
+            {
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Your Submitted Reports</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Reference</th>
+                                        <th>Description</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                        <th>Priority</th>
+                                        <th>Submitted</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var incident in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong class="text-primary">@incident.ReferenceNumber</strong>
+                                            </td>
+                                            <td>
+                                                @if (incident.Description.Length > 60)
+                                                {
+                                                    @incident.Description.Substring(0, 60)<text>...</text>
+                                                }
+                                                else
+                                                {
+                                                    @incident.Description
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-gradient-department">
+                                                    @incident.AssignedDepartment.ToString().Replace("And", " & ")
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @switch (incident.Status)
+                                                {
+                                                    case CivicOps.Models.IncidentStatus.New:
+                                                        <span class="badge bg-secondary">New</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentStatus.Triaged:
+                                                        <span class="badge bg-info">Triaged</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentStatus.Assigned:
+                                                        <span class="badge bg-primary">Assigned</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentStatus.InProgress:
+                                                        <span class="badge bg-warning">In Progress</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentStatus.Escalated:
+                                                        <span class="badge bg-danger">Escalated</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentStatus.Resolved:
+                                                        <span class="badge bg-success">Resolved</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentStatus.Closed:
+                                                        <span class="badge bg-dark">Closed</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                @switch (incident.Priority)
+                                                {
+                                                    case CivicOps.Models.IncidentPriority.Low:
+                                                        <span class="badge bg-light text-dark">Low</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentPriority.Medium:
+                                                        <span class="badge bg-info">Medium</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentPriority.High:
+                                                        <span class="badge bg-warning">High</span>
+                                                        break;
+                                                    case CivicOps.Models.IncidentPriority.Urgent:
+                                                        <span class="badge bg-danger pulse">Urgent</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">@incident.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("Status", "Home", new { reference = incident.ReferenceNumber })" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye me-1"></i>View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                        <h4 class="mt-3">No Reports Yet</h4>
+                        <p class="text-muted">You haven't submitted any reports yet.</p>
+                        <a href="@Url.Action("Report", "Home")" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>Submit Your First Report
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Track Your Reports</h6>
+                <p class="mb-0">You can track the status of your reports here. You'll receive updates as your reports are processed by the relevant departments.</p>
+            </div>
+        </div>
+    </div>
+</div>

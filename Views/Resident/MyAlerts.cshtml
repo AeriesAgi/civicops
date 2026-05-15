@@ -1,0 +1,173 @@
+@model List<CivicOps.Models.Alert>
+@{
+    ViewData["Title"] = "My Alerts";
+    var user = ViewBag.User as CivicOps.Models.ResidentUser;
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold">
+                        <i class="bi bi-bell me-2"></i>My Area Alerts
+                    </h2>
+                    <p class="text-muted">Alerts for your followed areas</p>
+                </div>
+                <div>
+                    <a href="@Url.Action("MyReports", "Resident")" class="btn btn-outline-primary">
+                        <i class="bi bi-file-text me-2"></i>My Reports
+                    </a>
+                    <a href="@Url.Action("Profile", "Resident")" class="btn btn-outline-secondary">
+                        <i class="bi bi-person me-2"></i>Profile
+                    </a>
+                    <a href="@Url.Action("Alerts", "Home")" class="btn btn-outline-info">
+                        <i class="bi bi-globe me-2"></i>All Alerts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (user != null)
+    {
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-geo-alt me-2"></i>Your Followed Areas
+                        </h5>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            @if (user.FollowedSuburbs.Any())
+                            {
+                                @foreach (var suburb in user.FollowedSuburbs)
+                                {
+                                    <span class="badge bg-info">@suburb</span>
+                                }
+                            }
+                            @if (user.FollowedWards.Any())
+                            {
+                                @foreach (var ward in user.FollowedWards)
+                                {
+                                    <span class="badge bg-secondary">@ward</span>
+                                }
+                            }
+                            @if (!user.FollowedSuburbs.Any() && !user.FollowedWards.Any())
+                            {
+                                <span class="text-muted">No followed areas.</span>
+                            }
+                        </div>
+                        <a href="@Url.Action("Profile", "Resident")" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil me-1"></i>Manage Followed Areas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model.Any())
+            {
+                <div class="alert-list">
+                    @foreach (var alert in Model)
+                    {
+                        <div class="card mb-3 @(alert.Severity == CivicOps.Models.AlertSeverity.Critical ? "border-danger" : alert.Severity == CivicOps.Models.AlertSeverity.Urgent ? "border-warning" : "")">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            @switch (alert.Severity)
+                                            {
+                                                case CivicOps.Models.AlertSeverity.Info:
+                                                    <span class="badge bg-info me-2">Info</span>
+                                                    break;
+                                                case CivicOps.Models.AlertSeverity.Warning:
+                                                    <span class="badge bg-warning me-2">Warning</span>
+                                                    break;
+                                                case CivicOps.Models.AlertSeverity.Urgent:
+                                                    <span class="badge bg-danger me-2">Urgent</span>
+                                                    break;
+                                                case CivicOps.Models.AlertSeverity.Critical:
+                                                    <span class="badge bg-danger pulse me-2">Critical</span>
+                                                    break;
+                                            }
+                                            <span class="badge bg-secondary me-2">@alert.Type</span>
+                                            @if (!string.IsNullOrEmpty(alert.Suburb))
+                                            {
+                                                <span class="badge bg-light text-dark me-2">
+                                                    <i class="bi bi-geo-alt me-1"></i>@alert.Suburb
+                                                </span>
+                                            }
+                                            @if (!string.IsNullOrEmpty(alert.Ward))
+                                            {
+                                                <span class="badge bg-light text-dark">
+                                                    <i class="bi bi-pin-map me-1"></i>@alert.Ward
+                                                </span>
+                                            }
+                                        </div>
+                                        <h5 class="card-title mb-2">@alert.Title</h5>
+                                        <p class="card-text mb-2">@alert.Description</p>
+                                        <div class="text-muted small">
+                                            <i class="bi bi-clock me-1"></i>
+                                            <span>Posted: @alert.CreatedAt.ToString("yyyy-MM-dd HH:mm")</span>
+                                            @if (alert.ExpiresAt.HasValue)
+                                            {
+                                                <span class="ms-3">
+                                                    <i class="bi bi-hourglass-split me-1"></i>
+                                                    Expires: @alert.ExpiresAt.Value.ToString("yyyy-MM-dd HH:mm")
+                                                </span>
+                                            }
+                                        </div>
+                                        @if (alert.AffectedDepartment != CivicOps.Models.Department.WaterAndSanitation && alert.AffectedDepartment != default(CivicOps.Models.Department))
+                                        {
+                                            <div class="mt-2">
+                                                <span class="badge bg-gradient-department">
+                                                    @alert.AffectedDepartment.ToString().Replace("And", " & ")
+                                                </span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-bell-slash display-1 text-muted"></i>
+                        <h4 class="mt-3">No Alerts for Your Areas</h4>
+                        <p class="text-muted">There are currently no active alerts for your followed areas.</p>
+                        @if (user != null && !user.FollowedSuburbs.Any() && !user.FollowedWards.Any())
+                        {
+                            <p class="text-muted">Follow areas in your profile to receive relevant alerts.</p>
+                            <a href="@Url.Action("Profile", "Resident")" class="btn btn-primary">
+                                <i class="bi bi-geo-alt me-2"></i>Follow Areas
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Alerts", "Home")" class="btn btn-outline-primary">
+                                <i class="bi bi-globe me-2"></i>View All Alerts
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>About Area Alerts</h6>
+                <p class="mb-0">You receive alerts for areas you follow. Update your profile to follow more suburbs or wards to stay informed about issues affecting your community.</p>
+            </div>
+        </div>
+    </div>
+</div>

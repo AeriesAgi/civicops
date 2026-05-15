@@ -13,6 +13,8 @@ builder.Services.AddSingleton<IClassificationService>(sp =>
     sp.GetRequiredService<DeterministicClassificationService>());
 builder.Services.AddSingleton<IGeminiService, GeminiService>();
 builder.Services.AddSingleton<IDemoAuthService, DemoAuthService>();
+builder.Services.AddSingleton<IResidentAuthService, ResidentAuthService>();
+builder.Services.AddSingleton<IWeatherService, WeatherService>();
 
 // Add session support for demo authentication
 builder.Services.AddDistributedMemoryCache();
@@ -32,6 +34,9 @@ await dataService.InitializeAsync();
 
 var authService = app.Services.GetRequiredService<IDemoAuthService>();
 await authService.InitializeAsync();
+
+var residentAuthService = app.Services.GetRequiredService<IResidentAuthService>();
+await residentAuthService.InitializeAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

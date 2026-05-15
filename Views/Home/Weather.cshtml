@@ -1,0 +1,195 @@
+@model List<CivicOps.Models.WeatherData>
+@{
+    ViewData["Title"] = "Weather & Area Conditions";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="fw-bold">
+                <i class="bi bi-cloud-sun me-2"></i>Weather & Area Conditions
+            </h2>
+            <p class="text-muted">Live weather data for civic operations planning</p>
+        </div>
+    </div>
+
+    <div class="alert alert-info mb-4">
+        <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>About Weather Integration</h6>
+        <p class="mb-2">CivicOps integrates live weather data to support civic operations and public safety:</p>
+        <ul class="mb-0">
+            <li>Monitor weather conditions across Durban/eThekwini and Cape Town areas</li>
+            <li>Assess civic risk levels (flooding, stormwater, infrastructure, public safety)</li>
+            <li>Create weather-triggered area alerts when conditions warrant</li>
+            <li>Support proactive municipal response to weather events</li>
+        </ul>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Coverage Areas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-building me-2"></i>Durban / eThekwini</h6>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    @foreach (var area in Model.Where(w => w.AreaName.Contains("Durban") || new[] { "Chatsworth", "Umlazi", "Phoenix", "Pinetown", "Bluff", "KwaMashu", "Isipingo", "Hillcrest" }.Contains(w.AreaName)))
+                                    {
+                                        <span class="badge bg-info">@area.AreaName</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-building me-2"></i>Cape Town / Western Cape</h6>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    @foreach (var area in Model.Where(w => w.AreaName.Contains("Cape Town") || new[] { "Khayelitsha", "Mitchells Plain", "Bellville", "Strand", "Somerset West", "Table View", "Hout Bay" }.Contains(w.AreaName)))
+                                    {
+                                        <span class="badge bg-secondary">@area.AreaName</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var weather in Model.OrderBy(w => w.AreaName))
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 @(weather.RiskLevel == "High" ? "border-danger" : weather.RiskLevel == "Moderate" ? "border-warning" : "")">
+                        <div class="card-header @(weather.RiskLevel == "High" ? "bg-danger text-white" : weather.RiskLevel == "Moderate" ? "bg-warning" : "bg-light")">
+                            <h5 class="mb-0">
+                                <i class="bi bi-geo-alt me-2"></i>@weather.AreaName
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <i class="bi bi-thermometer-half display-4 text-primary"></i>
+                                        <h3 class="mb-0">@weather.Temperature.ToString("F1")°C</h3>
+                                        <small class="text-muted">Temperature</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <i class="bi bi-cloud-rain display-4 text-info"></i>
+                                        <h3 class="mb-0">@weather.PrecipitationProbability.ToString("F0")%</h3>
+                                        <small class="text-muted">Rain Chance</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-2">
+                                <strong><i class="bi bi-cloud me-2"></i>Condition:</strong>
+                                <span class="badge bg-secondary">@weather.WeatherCondition</span>
+                            </div>
+
+                            <div class="mb-2">
+                                <strong><i class="bi bi-droplet me-2"></i>Precipitation:</strong>
+                                @weather.Precipitation.ToString("F1") mm
+                            </div>
+
+                            <div class="mb-2">
+                                <strong><i class="bi bi-wind me-2"></i>Wind Speed:</strong>
+                                @weather.WindSpeed.ToString("F1") km/h
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-2">
+                                <strong><i class="bi bi-shield-exclamation me-2"></i>Risk Level:</strong>
+                                @switch (weather.RiskLevel)
+                                {
+                                    case "High":
+                                        <span class="badge bg-danger">High Risk</span>
+                                        break;
+                                    case "Moderate":
+                                        <span class="badge bg-warning">Moderate Risk</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-success">Normal</span>
+                                        break;
+                                }
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(weather.RiskDescription))
+                            {
+                                <div class="alert alert-@(weather.RiskLevel == "High" ? "danger" : weather.RiskLevel == "Moderate" ? "warning" : "info") mb-0 mt-2">
+                                    <small>@weather.RiskDescription</small>
+                                </div>
+                            }
+
+                            <div class="text-muted small mt-2">
+                                <i class="bi bi-clock me-1"></i>
+                                Updated: @weather.UpdatedAt.ToString("HH:mm")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-cloud-slash display-1 text-muted"></i>
+                <h4 class="mt-3">Weather Data Unavailable</h4>
+                <p class="text-muted">Unable to fetch weather data at this time. Please try again later.</p>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Weather Connector Information</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Data Source</h6>
+                    <p><strong>Open-Meteo</strong> - Free, open-source weather API (no API key required)</p>
+                    
+                    <h6>Civic Risk Assessment</h6>
+                    <p>CivicOps uses deterministic rules to assess weather-related civic risks:</p>
+                    <ul>
+                        <li><strong>Heavy Rain:</strong> Flood/stormwater watch when precipitation > 10mm or probability > 70%</li>
+                        <li><strong>High Wind:</strong> Infrastructure/public safety caution when wind speed > 50 km/h</li>
+                        <li><strong>Thunderstorms:</strong> Stay indoors advisory</li>
+                        <li><strong>Extreme Heat:</strong> Health advisory when temperature > 35°C</li>
+                    </ul>
+
+                    <h6>Future Integrations</h6>
+                    <ul class="mb-0">
+                        <li><strong>SAWS (South African Weather Service):</strong> Official weather warnings and alerts</li>
+                        <li><strong>CAP (Common Alerting Protocol):</strong> Structured alert feeds</li>
+                        <li><strong>Google Weather API:</strong> Enhanced forecasting (requires API key)</li>
+                        <li><strong>AfriGIS Weather Warnings:</strong> Regional weather intelligence</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="alert alert-warning">
+                <h6 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Important Disclaimers</h6>
+                <ul class="mb-0">
+                    <li><strong>Not Official Weather Warnings:</strong> This data is for civic operations planning only. For official weather warnings, consult SAWS or local authorities.</li>
+                    <li><strong>Not Emergency Services:</strong> For weather emergencies, contact official emergency services (10177 for Fire/EMS, 10111 for Police).</li>
+                    <li><strong>Demo Coverage:</strong> Durban and Cape Town areas shown for demonstration. Production deployment would cover all municipal areas.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

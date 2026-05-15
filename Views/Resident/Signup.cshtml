@@ -1,0 +1,77 @@
+@{
+    ViewData["Title"] = "Create Resident Account";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">Create Account</h2>
+                        <p class="text-muted">Join CivicOps to track your reports and get area alerts</p>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>@ViewBag.Error
+                        </div>
+                    }
+
+                    <form method="post" asp-action="Signup" asp-controller="Resident">
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" name="fullName" required placeholder="John Smith">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="your.email@example.com">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label">Phone Number (Optional)</label>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="+27 82 123 4567">
+                            <small class="text-muted">For SMS notifications (optional)</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required placeholder="Create a strong password">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Re-enter your password">
+                        </div>
+
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-muted mb-2">Already have an account?</p>
+                            <a href="@Url.Action("Login", "Resident")" class="btn btn-outline-secondary">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <a href="@Url.Action("Index", "Home")" class="text-muted">
+                            <i class="bi bi-arrow-left me-1"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-shield-exclamation me-2"></i>
+                <strong>Demo Mode:</strong> This is demonstration authentication only. Production deployment requires proper identity management and security.
+            </div>
+        </div>
+    </div>
+</div>

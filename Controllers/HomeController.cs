@@ -14,15 +14,18 @@ namespace CivicOps.Controllers
         private readonly IDataService _dataService;
         private readonly IGeminiService _geminiService;
         private readonly IClassificationService _classificationService;
+        private readonly IWeatherService _weatherService;
 
         public HomeController(
             IDataService dataService,
             IGeminiService geminiService,
-            IClassificationService classificationService)
+            IClassificationService classificationService,
+            IWeatherService weatherService)
         {
             _dataService = dataService;
             _geminiService = geminiService;
             _classificationService = classificationService;
+            _weatherService = weatherService;
         }
 
         public IActionResult Index()
@@ -315,6 +318,20 @@ namespace CivicOps.Controllers
         {
             return View();
         }
+
+        [DemoAuthorize]
+        public IActionResult Agent()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Weather()
+        {
+            var weatherData = await _weatherService.GetWeatherForAllAreasAsync();
+            return View(weatherData);
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

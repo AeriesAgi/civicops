@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Resident Login";
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">Resident Login</h2>
+                        <p class="text-muted">Access your reports and alerts</p>
+                    </div>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>@ViewBag.Error
+                        </div>
+                    }
+
+                    <form method="post" asp-action="Login" asp-controller="Resident">
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="your.email@example.com">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
+                        </div>
+
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <p class="text-muted mb-2">Don't have an account?</p>
+                            <a href="@Url.Action("Signup", "Resident")" class="btn btn-outline-secondary">
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-info mb-0">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Demo Credentials</h6>
+                        <p class="mb-1"><strong>Email:</strong> resident@civicops.demo</p>
+                        <p class="mb-0"><strong>Password:</strong> CivicOps2026!</p>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="@Url.Action("Index", "Home")" class="text-muted">
+                            <i class="bi bi-arrow-left me-1"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning mt-3">
+                <i class="bi bi-shield-exclamation me-2"></i>
+                <strong>Demo Mode:</strong> This is demonstration authentication only. Production deployment requires proper identity management and security.
+            </div>
+        </div>
+    </div>
+</div>

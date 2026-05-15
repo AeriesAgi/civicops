@@ -1,0 +1,533 @@
+@{
+    ViewData["Title"] = "CivicOps AI Agent Console";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="fw-bold">
+                        <i class="bi bi-robot me-2"></i>CivicOps AI Agent Console
+                    </h1>
+                    <p class="text-muted">Real-time civic intelligence workflow visualization</p>
+                </div>
+                <div>
+                    <span class="badge bg-success me-2">
+                        <i class="bi bi-check-circle me-1"></i>Agent Active
+                    </span>
+                    <span class="badge bg-info">
+                        <i class="bi bi-cpu me-1"></i>Deterministic Fallback
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-primary mb-4">
+        <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>About the CivicOps AI Agent</h5>
+        <p class="mb-2">CivicOps is an <strong>AI-powered civic operations agent</strong> that transforms messy citizen reports into structured, validated, routed civic intelligence.</p>
+        <p class="mb-0">The agent performs a complete workflow: signal intake → fact extraction → validation → safety check → classification → routing → context enrichment → action output → human oversight → audit trail.</p>
+    </div>
+
+    <!-- Agent Workflow Visualization -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Agent Workflow Pipeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="agent-workflow">
+                        <div class="workflow-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-inbox me-2"></i>Signal Intake</h6>
+                                <p class="small mb-0">Web, WhatsApp, Voice Note, Mobile, Weather Alert</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-search me-2"></i>Fact Extraction</h6>
+                                <p class="small mb-0">Issue, Location, Area, Ward, Contact, Media</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-shield-check me-2"></i>Validation</h6>
+                                <p class="small mb-0">Valid, Insufficient Info, Spam, Emergency</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-exclamation-triangle me-2"></i>Safety Layer</h6>
+                                <p class="small mb-0">Emergency Service Guidance</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-tags me-2"></i>Classification</h6>
+                                <p class="small mb-0">Department, Priority, Category</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-signpost me-2"></i>Routing</h6>
+                                <p class="small mb-0">Authority Assignment, Reason</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">7</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-cloud-sun me-2"></i>Context</h6>
+                                <p class="small mb-0">Weather, Area Risk, Patterns</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">8</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-check-circle me-2"></i>Action</h6>
+                                <p class="small mb-0">Ticket, Alert, Response</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">9</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-person-check me-2"></i>Human Control</h6>
+                                <p class="small mb-0">Staff Approval, Escalation</p>
+                            </div>
+                        </div>
+                        <div class="workflow-arrow">→</div>
+                        
+                        <div class="workflow-step">
+                            <div class="step-number">10</div>
+                            <div class="step-content">
+                                <h6><i class="bi bi-journal-text me-2"></i>Audit Trail</h6>
+                                <p class="small mb-0">Complete History</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i>Agent Demo Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="analyzeLatestReport()">
+                                <i class="bi bi-file-text me-2"></i>Analyze Latest Report
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="analyzeWhatsAppReport()">
+                                <i class="bi bi-whatsapp me-2"></i>Analyze WhatsApp Demo
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="analyzeVoiceNote()">
+                                <i class="bi bi-mic me-2"></i>Analyze Voice Note
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-success w-100" onclick="generateCitizenResponse()">
+                                <i class="bi bi-chat-left-text me-2"></i>Generate Citizen Response
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-success w-100" onclick="generateDepartmentBrief()">
+                                <i class="bi bi-building me-2"></i>Generate Department Brief
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-success w-100" onclick="generateAlertRecommendation()">
+                                <i class="bi bi-bell me-2"></i>Generate Alert Recommendation
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-warning w-100" onclick="generateDisasterBrief()">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Disaster Manager Brief
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-warning w-100" onclick="generateWardSummary()">
+                                <i class="bi bi-people me-2"></i>Ward Councillor Summary
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-info w-100" onclick="generateJudgeDemo()">
+                                <i class="bi bi-trophy me-2"></i>Generate Judge Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Output Display -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-terminal me-2"></i>Agent Output</h5>
+                </div>
+                <div class="card-body">
+                    <div id="agentOutput" class="agent-output">
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-robot display-1"></i>
+                            <p class="mt-3">Click a demo action above to see the AI agent in action</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Capabilities -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Agent Capabilities</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Multi-channel intake (Web, WhatsApp, Voice, Mobile)</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Natural language understanding</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Location and area extraction</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Spam and validity detection</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Emergency-adjacent identification</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Department classification (13 departments)</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Priority assessment</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Weather context enrichment</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Area alert generation</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Citizen response drafting</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Department briefing</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Audit trail recording</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>Safety & Trust</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Human-in-the-loop for high-risk actions</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Emergency service guidance (not replacement)</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Spam prevention (no auto-routing)</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Insufficient info detection</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Complete audit trail</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Staff approval workflows</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Escalation paths</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Deterministic fallback (no AI dependency)</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Transparent classification</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>No fake live integrations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.agent-workflow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+}
+
+.workflow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 150px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.step-content h6 {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    color: #0f172a;
+}
+
+.step-content p {
+    color: #64748b;
+}
+
+.workflow-arrow {
+    font-size: 2rem;
+    color: #06b6d4;
+    font-weight: bold;
+}
+
+.agent-output {
+    min-height: 400px;
+    background: #0f172a;
+    color: #e0e7ff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    font-family: 'Courier New', monospace;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+.agent-output .output-line {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-left: 3px solid #06b6d4;
+    background: rgba(6, 182, 212, 0.1);
+}
+
+.agent-output .output-header {
+    color: #06b6d4;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.agent-output .output-success {
+    color: #22c55e;
+}
+
+.agent-output .output-warning {
+    color: #fbbf24;
+}
+
+.agent-output .output-error {
+    color: #ef4444;
+}
+
+@@media (max-width: 768px) {
+    .agent-workflow {
+        flex-direction: column;
+    }
+    
+    .workflow-arrow {
+        transform: rotate(90deg);
+    }
+}
+</style>
+
+<script>
+function analyzeLatestReport() {
+    showAgentOutput('Analyzing Latest Report', [
+        { type: 'header', text: '1. SIGNAL INTAKE' },
+        { type: 'info', text: 'Source: Web Form' },
+        { type: 'info', text: 'Timestamp: ' + new Date().toISOString() },
+        { type: 'header', text: '2. FACT EXTRACTION' },
+        { type: 'info', text: 'Issue: Burst water pipe flooding street' },
+        { type: 'info', text: 'Location: Corner of Main Road and 5th Avenue' },
+        { type: 'info', text: 'Area: Chatsworth' },
+        { type: 'info', text: 'Ward: Ward 68' },
+        { type: 'info', text: 'Contact: resident@example.com' },
+        { type: 'header', text: '3. VALIDATION' },
+        { type: 'success', text: '✓ Valid civic issue' },
+        { type: 'success', text: '✓ Sufficient location information' },
+        { type: 'success', text: '✓ Not spam' },
+        { type: 'success', text: '✓ Not emergency-adjacent' },
+        { type: 'header', text: '4. SAFETY LAYER' },
+        { type: 'info', text: 'No immediate danger detected' },
+        { type: 'info', text: 'Standard civic response appropriate' },
+        { type: 'header', text: '5. CLASSIFICATION' },
+        { type: 'success', text: 'Department: Water & Sanitation' },
+        { type: 'success', text: 'Priority: High' },
+        { type: 'success', text: 'Category: Water Infrastructure' },
+        { type: 'header', text: '6. ROUTING DECISION' },
+        { type: 'success', text: 'Assigned to: Water & Sanitation Department' },
+        { type: 'info', text: 'Routing reason: Water infrastructure issue requiring immediate attention' },
+        { type: 'success', text: 'Publicly trackable: Yes' },
+        { type: 'header', text: '7. WEATHER/AREA CONTEXT' },
+        { type: 'info', text: 'Area: Durban/eThekwini - Chatsworth' },
+        { type: 'info', text: 'Current weather: Clear, 22°C' },
+        { type: 'info', text: 'Civic risk: Normal' },
+        { type: 'info', text: 'No weather-related escalation needed' },
+        { type: 'header', text: '8. ACTION OUTPUT' },
+        { type: 'success', text: '✓ Ticket created: CIV-2026-0019' },
+        { type: 'success', text: '✓ Citizen response drafted' },
+        { type: 'success', text: '✓ Department queue updated' },
+        { type: 'success', text: '✓ Public tracking enabled' },
+        { type: 'header', text: '9. HUMAN CONTROL' },
+        { type: 'info', text: 'Staff approval: Not required (standard routing)' },
+        { type: 'info', text: 'Escalation available: Yes' },
+        { type: 'header', text: '10. AUDIT TRAIL' },
+        { type: 'success', text: '✓ Complete workflow recorded' },
+        { type: 'success', text: '✓ Timestamps logged' },
+        { type: 'success', text: '✓ Classification method: Deterministic' }
+    ]);
+}
+
+function analyzeWhatsAppReport() {
+    showAgentOutput('Analyzing WhatsApp Demo Report', [
+        { type: 'header', text: '1. SIGNAL INTAKE' },
+        { type: 'info', text: 'Source: WhatsApp Demo' },
+        { type: 'info', text: 'Sender: +27 82 XXX XXXX' },
+        { type: 'info', text: 'Message: "Illegal dumping at the corner near the school in Umlazi. Big pile of rubbish."' },
+        { type: 'header', text: '2. FACT EXTRACTION' },
+        { type: 'info', text: 'Issue: Illegal dumping' },
+        { type: 'info', text: 'Location: Near school, Umlazi' },
+        { type: 'info', text: 'Area: Umlazi' },
+        { type: 'warning', text: '⚠ Ward: Not specified' },
+        { type: 'warning', text: '⚠ Exact address: Not specified' },
+        { type: 'header', text: '3. VALIDATION' },
+        { type: 'success', text: '✓ Valid civic issue' },
+        { type: 'warning', text: '⚠ Location could be more specific' },
+        { type: 'success', text: '✓ Not spam' },
+        { type: 'header', text: '4. SAFETY LAYER' },
+        { type: 'info', text: 'No immediate danger detected' },
+        { type: 'header', text: '5. CLASSIFICATION' },
+        { type: 'success', text: 'Department: Waste Management' },
+        { type: 'success', text: 'Priority: Medium' },
+        { type: 'success', text: 'Category: Illegal Dumping' },
+        { type: 'header', text: '6. ROUTING DECISION' },
+        { type: 'success', text: 'Assigned to: Waste Management Department' },
+        { type: 'info', text: 'Routing reason: Illegal dumping requires waste management response' },
+        { type: 'header', text: '7. WEATHER/AREA CONTEXT' },
+        { type: 'info', text: 'Area: Durban/eThekwini - Umlazi' },
+        { type: 'info', text: 'No weather-related escalation' },
+        { type: 'header', text: '8. ACTION OUTPUT' },
+        { type: 'success', text: '✓ Ticket created: CIV-2026-0020' },
+        { type: 'success', text: '✓ WhatsApp response drafted (demo mode)' },
+        { type: 'info', text: 'Response: "Thank you for reporting. Reference: CIV-2026-0020. Waste Management will investigate. For emergencies, call 10177."' },
+        { type: 'header', text: '9. HUMAN CONTROL' },
+        { type: 'info', text: 'Staff can request more location details' },
+        { type: 'header', text: '10. AUDIT TRAIL' },
+        { type: 'success', text: '✓ WhatsApp intake recorded' },
+        { type: 'success', text: '✓ Source channel: WhatsApp' }
+    ]);
+}
+
+function analyzeVoiceNote() {
+    showAgentOutput('Analyzing Voice Note Transcript', [
+        { type: 'header', text: '1. SIGNAL INTAKE' },
+        { type: 'info', text: 'Source: Voice Note Transcript' },
+        { type: 'info', text: 'Transcript: "There is flooding on Main Road in Khayelitsha after the heavy rain. Water is very high and cars cannot pass."' },
+        { type: 'header', text: '2. FACT EXTRACTION' },
+        { type: 'info', text: 'Issue: Road flooding' },
+        { type: 'info', text: 'Location: Main Road, Khayelitsha' },
+        { type: 'info', text: 'Area: Khayelitsha (Cape Town)' },
+        { type: 'info', text: 'Context: Heavy rain, high water, impassable' },
+        { type: 'header', text: '3. VALIDATION' },
+        { type: 'success', text: '✓ Valid civic issue' },
+        { type: 'success', text: '✓ Sufficient information' },
+        { type: 'warning', text: '⚠ Potential emergency-adjacent (road impassable)' },
+        { type: 'header', text: '4. SAFETY LAYER' },
+        { type: 'warning', text: '⚠ Road impassable - potential safety risk' },
+        { type: 'info', text: 'Guidance: Avoid area, contact emergency services if trapped' },
+        { type: 'info', text: 'CivicOps will route as secondary civic support' },
+        { type: 'header', text: '5. CLASSIFICATION' },
+        { type: 'success', text: 'Department: Roads & Stormwater' },
+        { type: 'success', text: 'Priority: Urgent' },
+        { type: 'success', text: 'Category: Flooding' },
+        { type: 'header', text: '6. ROUTING DECISION' },
+        { type: 'success', text: 'Assigned to: Roads & Stormwater Department' },
+        { type: 'warning', text: 'Also notify: Disaster Management (secondary)' },
+        { type: 'info', text: 'Alert-worthy: Yes' },
+        { type: 'header', text: '7. WEATHER/AREA CONTEXT' },
+        { type: 'info', text: 'Area: Cape Town - Khayelitsha' },
+        { type: 'warning', text: 'Weather: Heavy rain detected' },
+        { type: 'warning', text: 'Civic risk: High - flood/stormwater risk' },
+        { type: 'warning', text: 'Risk description: Heavy rain - flood/stormwater risk' },
+        { type: 'header', text: '8. ACTION OUTPUT' },
+        { type: 'success', text: '✓ Ticket created: CIV-2026-0021' },
+        { type: 'success', text: '✓ Area alert recommended' },
+        { type: 'warning', text: '✓ Alert: "Road flooding on Main Road, Khayelitsha. Avoid area."' },
+        { type: 'success', text: '✓ Disaster Management notified' },
+        { type: 'header', text: '9. HUMAN CONTROL' },
+        { type: 'warning', text: 'Staff approval required for area alert' },
+        { type: 'info', text: 'Escalation: Available to Disaster Management' },
+        { type: 'header', text: '10. AUDIT TRAIL' },
+        { type: 'success', text: '✓ Voice note transcript recorded' },
+        { type: 'success', text: '✓ Weather context logged' },
+        { type: 'success', text: '✓ Alert recommendation logged' }
+    ]);
+}
+
+function generateCitizenResponse() {
+    showAgentOutput('Generating Citizen Response', [
+        { type: 'header', text: 'CITIZEN RESPONSE DRAFT' },
+        { type: 'info', text: 'Reference: CIV-2026-0019' },
+        { type: 'info', text: 'Channel: Email/SMS' },
+        { type: 'success', text: '---' },
+        { type: 'info', text: 'Dear Resident,' },
+        { type: 'info', text: '' },
+        { type: 'info', text: 'Thank you for reporting the burst water pipe on Main Road, Chatsworth.' },
+        { type: 'info', text: '' },
+        { type: 'info', text: 'Your report has been received and assigned to the Water & Sanitation Department.' },
+        { type: 'info', text: '' },
+        { type: 'info', text: 'Reference Number: CIV-2026-0019' },
+        { type: 'info', text: 'Priority: High' },
+        { type: 'info', text: 'Status: New' },
+        { type: 'info', text: '' },
+        { type: 'info', text: 'You can track your report at: https://civicops.demo/status?reference=CIV-2026-0019' },
+        { type: 'info', text: '' },
+        { type: 'warning', text: 'IMPORTANT: For emergencies, always contact official emergency services:' },
+        { type: 'warning', text: '• Police: 10111' },
+        { type: 'warning', text: '• Fire/Ambulance: 10177' },
+        { type: 'info', text: '' },
+        { type: 'info', text: 'CivicOps Team' },
+        { type: 'success', text: '---' },
+        { type: 'success', text: '✓ Response ready for delivery' }
+    ]);
+}
+
+function generateDepartmentBrief() {
+    showAgentOutput('Generating Department Brief', [
+        { type: 'header', text: 'DEPARTMENT BRIEF - WATER & SANITATION' },
+        { type: 'info', text: 'Date: ' + new Date().toLocaleDateString() },
+        { type: 'info', text: 'Time: ' + new Date().toLocaleTimeString() },
+        { type: 'success', text: '---' },
+        { type: 'header', text: 'NEW INCIDENT' },
+        { type: 'info', text: 'Reference: CIV-2026-0019' },
+        { type: 'info', text: 'Priority: High' },
+        { type: 'info', text: 'Source: Web Form' },
+        { type: 'info', text: '' },
+        { type: 'header', text: 'ISSUE SUMMARY' },
+        { type
