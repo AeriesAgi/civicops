@@ -60,9 +60,9 @@ namespace CivicOps.Controllers
 
         // POST: /Resident/Signup
         [HttpPost]
-        public async Task<IActionResult> Signup(string email, string password, string confirmPassword, string fullName, string? phoneNumber = null)
+        public async Task<IActionResult> Signup(string email, string password, string? confirmPassword, string fullName, string? phoneNumber = null, string? areaSuburb = null, string? followedWard = null, string? whatsappNumber = null, bool whatsappConsent = false)
         {
-            if (password != confirmPassword)
+            if (!string.IsNullOrEmpty(confirmPassword) && password != confirmPassword)
             {
                 ViewBag.Error = "Passwords do not match";
                 return View();

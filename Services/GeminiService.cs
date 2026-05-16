@@ -130,10 +130,10 @@ namespace CivicOps.Services
             if (!IsEnabled || IsQuotaCoolingDown())
             {
                 RecordResult(action, "Local deterministic fallback", "Fallback used before live Gemini call");
-                var fallback = await _fallbackService.ClassifyIncidentAsync(description, category);
-                fallback.Method = "Local deterministic fallback";
-                fallback.IsGeminiProcessed = false;
-                return fallback;
+                var localFallback = await _fallbackService.ClassifyIncidentAsync(description, category);
+                localFallback.Method = "Local deterministic fallback";
+                localFallback.IsGeminiProcessed = false;
+                return localFallback;
             }
 
             foreach (var candidateModel in BuildModelPlan(action))
