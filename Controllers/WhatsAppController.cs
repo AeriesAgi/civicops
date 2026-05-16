@@ -1,31 +1,23 @@
 using CivicOps.Models;
 using CivicOps.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CivicOps.Controllers
 {
-    [ApiController]
     [Route("webhooks/whatsapp")]
+    [ApiController]
     public class WhatsAppController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly IDataService _dataService;
-        private readonly IGeminiService _geminiService;
-        private readonly IClassificationService _classificationService;
+        private readonly IIncidentIntakeService _intakeService;
+        private readonly IWhatsAppService _whatsAppService;
 
-        public WhatsAppController(
-            IConfiguration configuration,
-            IDataService dataService,
-            IGeminiService geminiService,
-            IClassificationService classificationService)
+        public WhatsAppController(IIncidentIntakeService intakeService, IWhatsAppService whatsAppService)
         {
-            _configuration = configuration;
-            _dataService = dataService;
-            _geminiService = geminiService;
-            _classificationService = classificationService;
+            _intakeService = intakeService;
+            _whatsAppService = whatsAppService;
         }
 
         [HttpGet]
@@ -33,11 +25,9 @@ namespace CivicOps.Controllers
                                           [FromQuery(Name = "hub.verify_token")] string token,
                                           [FromQuery(Name = "hub.challenge")] string challenge)
         {
-            var verifyToken = _configuration["WHATSAPP_VERIFY_TOKEN"] ?? "civicops_verify_token_2026";
-
-            if (mode == "subscribe" && token == verifyToken)
+            if (_whatsAppService.VerifyToken(mode, token))
             {
-                return Ok(challenge);
+                return Content(challenge ?? string.Empty, "text/plain");
             }
 
             return Forbid();
@@ -46,136 +36,127 @@ namespace CivicOps.Controllers
         [HttpPost]
         public async Task<IActionResult> ReceiveMessage([FromBody] WhatsAppWebhookPayload payload)
         {
-            try
+            var processed = 0;
+            var references = new List<string>();
+
+            if (payload?.Entry != null)
             {
-                // In demo mode, we accept simplified payloads
-                // In production, this would parse the full WhatsApp Cloud API webhook format
-                
-                if (payload?.Entry != null && payload.Entry.Length > 0)
+                foreach (var entry in payload.Entry)
                 {
-                    foreach (var entry in payload.Entry)
+                    if (entry.Changes == null)
                     {
-                        if (entry.Changes != null && entry.Changes.Length > 0)
+                        continue;
+                    }
+
+                    foreach (var change in entry.Changes)
+                    {
+                        if (change.Value?.Messages == null)
                         {
-                            foreach (var change in entry.Changes)
+                            continue;
+                        }
+
+                        foreach (var message in change.Value.Messages)
+                        {
+                            var result = await ProcessWhatsAppMessage(message);
+                            if (result != null)
                             {
-                                if (change.Value?.Messages != null && change.Value.Messages.Length > 0)
-                                {
-                                    foreach (var message in change.Value.Messages)
-                                    {
-                                        await ProcessWhatsAppMessage(message);
-                                    }
-                                }
+                                processed++;
+                                references.Add(result.Incident.ReferenceNumber);
                             }
                         }
                     }
                 }
+            }
 
-                return Ok(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { success = false, message = ex.Message });
-            }
+            return Ok(new { success = true, processed, references });
         }
 
-        private async Task ProcessWhatsAppMessage(WhatsAppMessage message)
+        private async Task<IncidentIntakeResult?> ProcessWhatsAppMessage(WhatsAppMessage message)
         {
-            if (message.Type == "text" && !string.IsNullOrEmpty(message.Text?.Body))
+            if (message.Type != "text" || string.IsNullOrWhiteSpace(message.Text?.Body))
             {
-                var description = message.Text.Body;
-
-                // Classify the incident
-                ClassificationResult classification;
-                if (_geminiService.IsEnabled)
-                {
-                    classification = await _geminiService.ClassifyWithGeminiAsync(description);
-                }
-                else
-                {
-                    classification = await _classificationService.ClassifyIncidentAsync(description);
-                }
-
-                // Create incident
-                var incident = new Incident
-                {
-                    SourceChannel = SourceChannel.WhatsApp,
-                    Description = description,
-                    AISummary = classification.Summary,
-                    Category = classification.Category,
-                    AssignedDepartment = classification.Department,
-                    Suburb = "Unknown",
-                    Ward = "Unknown",
-                    Priority = classification.Priority,
-                    IsGeminiProcessed = classification.IsGeminiProcessed,
-                    ClassificationMethod = classification.Method
-                };
-
-                incident.ConnectorMetadata["whatsapp_from"] = message.From ?? "unknown";
-                incident.ConnectorMetadata["whatsapp_message_id"] = message.Id ?? "unknown";
-
-                incident.InternalNotes.Add(new IncidentNote
-                {
-                    Content = $"Incident created via WhatsApp. Classified as {classification.Category} using {classification.Method}.",
-                    IsPublic = false
-                });
-
-                incident.PublicUpdates.Add(new PublicUpdate 
-                { 
-                    Content = $"Your report has been received. Reference: {incident.ReferenceNumber}",
-                    UpdatedBy = "WhatsApp Bot"
-                });
-
-                await _dataService.SaveIncidentAsync(incident);
-
-                // In production, would send WhatsApp reply here
-                // await SendWhatsAppReply(message.From, $"Thank you! Your reference number is {incident.ReferenceNumber}");
+                return null;
             }
+
+            var result = await _intakeService.ProcessAsync(new IncidentIntakeRequest
+            {
+                SourceChannel = SourceChannel.WhatsApp,
+                Description = message.Text.Body,
+                CreatedBy = "WhatsApp Webhook",
+                ConnectorMetadata = new Dictionary<string, string>
+                {
+                    ["whatsapp_demo"] = "false",
+                    ["whatsapp_from_masked"] = _whatsAppService.MaskPhone(message.From),
+                    ["whatsapp_message_id"] = message.Id ?? "unknown"
+                }
+            });
+
+            if (!string.IsNullOrWhiteSpace(message.From))
+            {
+                await _whatsAppService.SendTextAsync(message.From, result.CitizenResponse);
+            }
+
+            return result;
         }
     }
 
-    // WhatsApp webhook payload models (simplified for demo)
     public class WhatsAppWebhookPayload
     {
+        [JsonPropertyName("object")]
         public string? Object { get; set; }
+        [JsonPropertyName("entry")]
         public WhatsAppEntry[]? Entry { get; set; }
     }
 
     public class WhatsAppEntry
     {
+        [JsonPropertyName("id")]
         public string? Id { get; set; }
+        [JsonPropertyName("changes")]
         public WhatsAppChange[]? Changes { get; set; }
     }
 
     public class WhatsAppChange
     {
+        [JsonPropertyName("value")]
         public WhatsAppValue? Value { get; set; }
+        [JsonPropertyName("field")]
         public string? Field { get; set; }
     }
 
     public class WhatsAppValue
     {
+        [JsonPropertyName("messaging_product")]
         public string? MessagingProduct { get; set; }
+        [JsonPropertyName("messages")]
         public WhatsAppMessage[]? Messages { get; set; }
     }
 
     public class WhatsAppMessage
     {
+        [JsonPropertyName("from")]
         public string? From { get; set; }
+        [JsonPropertyName("id")]
         public string? Id { get; set; }
+        [JsonPropertyName("type")]
         public string? Type { get; set; }
+        [JsonPropertyName("text")]
         public WhatsAppTextMessage? Text { get; set; }
+        [JsonPropertyName("audio")]
         public WhatsAppAudioMessage? Audio { get; set; }
     }
 
     public class WhatsAppTextMessage
     {
+        [JsonPropertyName("body")]
         public string? Body { get; set; }
     }
 
     public class WhatsAppAudioMessage
     {
+        [JsonPropertyName("id")]
         public string? Id { get; set; }
+        [JsonPropertyName("mime_type")]
         public string? MimeType { get; set; }
     }
 }

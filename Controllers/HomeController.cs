@@ -15,17 +15,23 @@ namespace CivicOps.Controllers
         private readonly IGeminiService _geminiService;
         private readonly IClassificationService _classificationService;
         private readonly IWeatherService _weatherService;
+        private readonly IIncidentIntakeService _intakeService;
+        private readonly IWhatsAppService _whatsAppService;
 
         public HomeController(
             IDataService dataService,
             IGeminiService geminiService,
             IClassificationService classificationService,
-            IWeatherService weatherService)
+            IWeatherService weatherService,
+            IIncidentIntakeService intakeService,
+            IWhatsAppService whatsAppService)
         {
             _dataService = dataService;
             _geminiService = geminiService;
             _classificationService = classificationService;
             _weatherService = weatherService;
+            _intakeService = intakeService;
+            _whatsAppService = whatsAppService;
         }
 
         public IActionResult Index()
@@ -49,55 +55,21 @@ namespace CivicOps.Controllers
 
             try
             {
-                // Classify the incident
-                ClassificationResult classification;
-                if (_geminiService.IsEnabled)
-                {
-                    classification = await _geminiService.ClassifyWithGeminiAsync(
-                        model.Description, 
-                        model.Category);
-                }
-                else
-                {
-                    classification = await _classificationService.ClassifyIncidentAsync(
-                        model.Description, 
-                        model.Category);
-                }
-
-                // Create incident
-                var incident = new Incident
+                var result = await _intakeService.ProcessAsync(new IncidentIntakeRequest
                 {
                     SourceChannel = SourceChannel.Web,
                     Description = model.Description,
-                    AISummary = classification.Summary,
-                    Category = classification.Category,
-                    AssignedDepartment = classification.Department,
-                    Suburb = model.Suburb ?? "Unknown",
-                    Ward = model.Ward ?? "Unknown",
-                    Priority = classification.Priority,
+                    Category = model.Category,
+                    Suburb = model.Suburb,
+                    Ward = model.Ward,
                     ContactName = model.ContactName,
                     ContactPhone = model.ContactPhone,
                     ContactEmail = model.ContactEmail,
                     LocationNotes = model.LocationNotes,
-                    IsGeminiProcessed = classification.IsGeminiProcessed,
-                    ClassificationMethod = classification.Method
-                };
-
-                incident.InternalNotes.Add(new IncidentNote
-                {
-                    Content = $"Incident created via Web. Classified as {classification.Category} using {classification.Method}.",
-                    IsPublic = false
+                    CreatedBy = "Web Intake"
                 });
 
-                incident.PublicUpdates.Add(new PublicUpdate 
-                { 
-                    Content = "Your report has been received and assigned to the appropriate department.",
-                    UpdatedBy = "System"
-                });
-
-                await _dataService.SaveIncidentAsync(incident);
-
-                return RedirectToAction("Confirmation", new { reference = incident.ReferenceNumber });
+                return RedirectToAction("Confirmation", new { reference = result.Incident.ReferenceNumber });
             }
             catch (Exception ex)
             {
@@ -252,16 +224,16 @@ namespace CivicOps.Controllers
                     Status = _geminiService.Status,
                     Mode = _geminiService.IsEnabled ? "Configured" : "Demo",
                     Description = "AI-powered incident classification and routing",
-                    EnvVars = "GEMINI_API_KEY, GEMINI_MODEL, GEMINI_ENABLED",
+                    EnvVars = "GEMINI_API_KEY, GEMINI_ENABLED, GEMINI_MODEL, GEMINI_MODE",
                     Documentation = "/docs/gemini-setup.md"
                 },
                 new ConnectorInfo
                 {
                     Name = "WhatsApp Cloud API",
-                    Status = "Demo Mode",
-                    Mode = "Demo",
+                    Status = _whatsAppService.GetStatus().Status,
+                    Mode = _whatsAppService.GetStatus().Mode,
                     Description = "WhatsApp message intake (requires Meta app setup)",
-                    EnvVars = "WHATSAPP_VERIFY_TOKEN, WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID",
+                    EnvVars = "WHATSAPP_ENABLED, WHATSAPP_DEMO_MODE, WHATSAPP_VERIFY_TOKEN, WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_GRAPH_VERSION, WHATSAPP_PUBLIC_BASE_URL",
                     Documentation = "/docs/whatsapp-setup.md"
                 },
                 new ConnectorInfo
@@ -322,6 +294,9 @@ namespace CivicOps.Controllers
         [DemoAuthorize]
         public IActionResult Agent()
         {
+            ViewBag.GeminiStatus = _geminiService.Status;
+            ViewBag.GeminiMode = _geminiService.IsEnabled ? "Gemini" : "Fallback";
+            ViewBag.WhatsAppStatus = _whatsAppService.GetStatus().Status;
             return View();
         }
 

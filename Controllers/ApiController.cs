@@ -14,15 +14,21 @@ namespace CivicOps.Controllers
         private readonly IDataService _dataService;
         private readonly IGeminiService _geminiService;
         private readonly IClassificationService _classificationService;
+        private readonly IIncidentIntakeService _intakeService;
+        private readonly IWhatsAppService _whatsAppService;
 
         public ApiController(
             IDataService dataService,
             IGeminiService geminiService,
-            IClassificationService classificationService)
+            IClassificationService classificationService,
+            IIncidentIntakeService intakeService,
+            IWhatsAppService whatsAppService)
         {
             _dataService = dataService;
             _geminiService = geminiService;
             _classificationService = classificationService;
+            _intakeService = intakeService;
+            _whatsAppService = whatsAppService;
         }
 
         [HttpPost("reports")]
@@ -30,63 +36,33 @@ namespace CivicOps.Controllers
         {
             try
             {
-                // Classify the incident
-                ClassificationResult classification;
-                if (_geminiService.IsEnabled)
-                {
-                    classification = await _geminiService.ClassifyWithGeminiAsync(
-                        submission.Description, 
-                        submission.Category);
-                }
-                else
-                {
-                    classification = await _classificationService.ClassifyIncidentAsync(
-                        submission.Description, 
-                        submission.Category);
-                }
-
-                // Create incident
-                var incident = new Incident
+                var result = await _intakeService.ProcessAsync(new IncidentIntakeRequest
                 {
                     SourceChannel = submission.SourceChannel,
                     Description = submission.Description,
-                    AISummary = classification.Summary,
-                    Category = classification.Category,
-                    AssignedDepartment = classification.Department,
-                    Suburb = submission.Suburb ?? "Unknown",
-                    Ward = submission.Ward ?? "Unknown",
-                    Priority = classification.Priority,
+                    Category = submission.Category,
+                    Suburb = submission.Suburb,
+                    Ward = submission.Ward,
                     ContactName = submission.ContactName,
                     ContactPhone = submission.ContactPhone,
                     ContactEmail = submission.ContactEmail,
                     LocationNotes = submission.LocationNotes,
                     MediaMetadata = submission.MediaMetadata,
                     AudioMetadata = submission.AudioMetadata,
-                    IsGeminiProcessed = classification.IsGeminiProcessed,
-                    ClassificationMethod = classification.Method
-                };
-
-                incident.InternalNotes.Add(new IncidentNote
-                {
-                    Content = $"Incident created via {submission.SourceChannel}. Classified as {classification.Category} using {classification.Method}.",
-                    IsPublic = false
+                    CreatedBy = "Mobile/API Intake"
                 });
 
-                incident.PublicUpdates.Add(new PublicUpdate 
-                { 
-                    Content = "Your report has been received and assigned to the appropriate department.",
-                    UpdatedBy = "System"
-                });
-
-                await _dataService.SaveIncidentAsync(incident);
-
+                var incident = result.Incident;
                 return Ok(new
                 {
                     success = true,
                     referenceNumber = incident.ReferenceNumber,
+                    validation = result.Validation,
                     department = incident.AssignedDepartment.GetDisplayName(),
                     status = incident.Status.ToString(),
                     priority = incident.Priority.ToString(),
+                    citizenResponse = result.CitizenResponse,
+                    alertRecommendation = result.AlertRecommendation,
                     message = "Report submitted successfully"
                 });
             }
@@ -330,6 +306,20 @@ namespace CivicOps.Controllers
             return Ok(new { success = true, message = "Incident escalated" });
         }
 
+        [HttpGet("connectors/gemini/test")]
+        public async Task<IActionResult> TestGeminiConnector()
+        {
+            var result = await _geminiService.TestConnectionAsync();
+            return Ok(new
+            {
+                success = result.Success,
+                status = result.Status,
+                model = result.Model,
+                mode = result.Mode,
+                message = result.Message
+            });
+        }
+
         [HttpGet("connectors/status")]
         public IActionResult GetConnectorStatus()
         {
@@ -345,8 +335,8 @@ namespace CivicOps.Controllers
                 new
                 {
                     name = "WhatsApp Cloud API",
-                    status = "Demo Mode",
-                    mode = "Demo",
+                    status = _whatsAppService.GetStatus().Status,
+                    mode = _whatsAppService.GetStatus().Mode,
                     description = "WhatsApp message intake (requires Meta app setup)"
                 },
                 new

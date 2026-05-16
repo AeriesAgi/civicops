@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CivicOps.Models
 {
@@ -52,6 +53,7 @@ namespace CivicOps.Models
         public List<MediaAttachment> MediaAttachments { get; set; } = new();
         public string? ContactName { get; set; }
         public string? ContactPhone { get; set; }
+        public string MaskedContactPhone => MaskPhone(ContactPhone);
         public string? ContactEmail { get; set; }
         public string? LocationNotes { get; set; }
         public string? MediaMetadata { get; set; }
@@ -59,6 +61,22 @@ namespace CivicOps.Models
         public Dictionary<string, string> ConnectorMetadata { get; set; } = new();
         public bool IsGeminiProcessed { get; set; }
         public string ClassificationMethod { get; set; } = "Deterministic";
+
+        private static string MaskPhone(string? phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                return string.Empty;
+            }
+
+            var digits = new string(phoneNumber.Where(char.IsDigit).ToArray());
+            if (digits.Length <= 4)
+            {
+                return "****";
+            }
+
+            return $"***{digits[^4..]}";
+        }
     }
 
     public class IncidentNote

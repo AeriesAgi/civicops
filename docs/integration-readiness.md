@@ -663,3 +663,18 @@ The modular design allows incremental integration - start with core features and
 **Document Version:** 1.0  
 **Last Updated:** May 15, 2026  
 **Status:** Production Ready Architecture
+
+## 2026 Final Connector Readiness Pass
+
+This repository preserves the IBM Bob hackathon implementation and evidence docs. A final Codex cleanup pass added/verified:
+
+- Server-side Gemini configuration using `GEMINI_API_KEY`, `GEMINI_ENABLED`, `GEMINI_MODEL=gemini-2.5-flash`, and `GEMINI_MODE=Hybrid`.
+- Safe deterministic fallback whenever Gemini is disabled, missing credentials, fails, or returns an unparseable response.
+- `GET /api/connectors/gemini/test` for a live Gemini readiness check without exposing keys to the frontend.
+- WhatsApp Cloud API configuration using `WHATSAPP_ENABLED`, `WHATSAPP_DEMO_MODE`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_GRAPH_VERSION=v22.0`, and `WHATSAPP_PUBLIC_BASE_URL`.
+- `GET /webhooks/whatsapp` verification that returns `hub.challenge` only when the configured verify token matches.
+- `POST /webhooks/whatsapp` parsing for inbound WhatsApp Cloud API text messages.
+- Outbound WhatsApp replies guarded so live send only occurs when enabled, non-demo, and fully credentialed.
+- A shared intake pipeline for web, WhatsApp demo, real WhatsApp webhook, voice-note transcript, and mobile/API reports.
+
+No official municipal partnership is claimed. Live Gemini and WhatsApp operation require deployment-time environment variables. CivicOps is not an emergency service replacement.
