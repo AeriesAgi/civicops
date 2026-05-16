@@ -15,6 +15,8 @@ builder.Services.AddSingleton<IGeminiService, GeminiService>();
 builder.Services.AddSingleton<IDemoAuthService, DemoAuthService>();
 builder.Services.AddSingleton<IResidentAuthService, ResidentAuthService>();
 builder.Services.AddSingleton<IWeatherService, WeatherService>();
+builder.Services.AddSingleton<IIncidentIntakeService, IncidentIntakeService>();
+builder.Services.AddSingleton<IWhatsAppService, WhatsAppService>();
 
 // Add session support for demo authentication
 builder.Services.AddDistributedMemoryCache();

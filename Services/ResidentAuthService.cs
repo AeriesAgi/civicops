@@ -38,7 +38,7 @@ namespace CivicOps.Services
                         Email = "resident@civicops.demo",
                         Password = "CivicOps2026!",
                         FullName = "Demo Resident",
-                        PhoneNumber = "+27 82 123 4567",
+                        PhoneNumber = "+27 82 *** 4567",
                         FollowedSuburbs = new List<string> { "Chatsworth", "Umlazi" },
                         FollowedWards = new List<string> { "Ward 68", "Ward 80" },
                         SubmittedReportReferences = new List<string> { "CIV-2026-0001", "CIV-2026-0005" }
@@ -48,7 +48,7 @@ namespace CivicOps.Services
                         Email = "john.smith@example.com",
                         Password = "Demo2026!",
                         FullName = "John Smith",
-                        PhoneNumber = "+27 83 456 7890",
+                        PhoneNumber = "+27 83 *** 7890",
                         FollowedSuburbs = new List<string> { "Phoenix", "Durban CBD" },
                         FollowedWards = new List<string> { "Ward 25" },
                         SubmittedReportReferences = new List<string> { "CIV-2026-0003" }
@@ -58,7 +58,7 @@ namespace CivicOps.Services
                         Email = "sarah.jones@example.com",
                         Password = "Demo2026!",
                         FullName = "Sarah Jones",
-                        PhoneNumber = "+27 84 789 0123",
+                        PhoneNumber = "+27 84 *** 0123",
                         FollowedSuburbs = new List<string> { "Khayelitsha", "Mitchells Plain" },
                         FollowedWards = new List<string> { "Ward 87", "Ward 92" },
                         SubmittedReportReferences = new List<string>()

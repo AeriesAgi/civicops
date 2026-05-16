@@ -518,7 +518,7 @@ namespace CivicOps.Services
                 }
             };
 
-            _referenceCounter = 11;
+            _referenceCounter = 19;
             _incidents.AddRange(demoIncidents);
             await SaveIncidentsAsync();
 

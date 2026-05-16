@@ -18,6 +18,8 @@ namespace CivicOps.Services
 
         public bool IsEnabled { get; private set; }
         public string Status { get; private set; } = "Not Configured";
+        public string Model { get; private set; } = "gemini-2.5-flash";
+        public string Mode { get; private set; } = "Hybrid";
 
         public GeminiService(
             IConfiguration configuration,
@@ -37,18 +39,63 @@ namespace CivicOps.Services
         {
             var apiKey = _configuration["GEMINI_API_KEY"];
             var enabled = _configuration.GetValue<bool>("GEMINI_ENABLED", false);
+            Model = _configuration.GetValue<string>("GEMINI_MODEL", "gemini-2.5-flash") ?? "gemini-2.5-flash";
+            Mode = _configuration.GetValue<string>("GEMINI_MODE", "Hybrid") ?? "Hybrid";
 
             if (!string.IsNullOrEmpty(apiKey) && enabled)
             {
                 IsEnabled = true;
-                Status = "Configured - Hybrid Mode";
-                _logger.LogInformation("Gemini service enabled in hybrid mode");
+                Status = $"Configured - {Mode} Mode ({Model})";
+                _logger.LogInformation("Gemini service enabled in {Mode} mode with model {Model}", Mode, Model);
             }
             else
             {
                 IsEnabled = false;
                 Status = enabled ? "Enabled but API Key Missing" : "Disabled - Using Deterministic Fallback";
                 _logger.LogInformation("Gemini service disabled, using deterministic fallback");
+            }
+        }
+
+
+        public async Task<GeminiHealthResult> TestConnectionAsync()
+        {
+            if (!IsEnabled)
+            {
+                return new GeminiHealthResult
+                {
+                    Success = false,
+                    Status = Status,
+                    Model = Model,
+                    Mode = Mode,
+                    Message = "Gemini is not enabled or GEMINI_API_KEY is missing; deterministic fallback is active."
+                };
+            }
+
+            try
+            {
+                var result = await ClassifyWithGeminiAsync("Blocked storm drain causing flooding on a public road.");
+                return new GeminiHealthResult
+                {
+                    Success = result.IsGeminiProcessed,
+                    Status = result.IsGeminiProcessed ? "Live Gemini call succeeded" : "Gemini fallback used",
+                    Model = Model,
+                    Mode = Mode,
+                    Message = result.IsGeminiProcessed
+                        ? $"Gemini returned category '{result.Category}' and department '{result.Department}'."
+                        : "Gemini was configured but the live call failed or could not be parsed; fallback remains available."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Gemini health test failed");
+                return new GeminiHealthResult
+                {
+                    Success = false,
+                    Status = "Gemini health test failed",
+                    Model = Model,
+                    Mode = Mode,
+                    Message = "Live test failed; deterministic fallback remains available."
+                };
             }
         }
 
@@ -63,7 +110,7 @@ namespace CivicOps.Services
             try
             {
                 var apiKey = _configuration["GEMINI_API_KEY"];
-                var model = _configuration.GetValue<string>("GEMINI_MODEL", "gemini-2.0-flash-exp");
+                var model = Model;
 
                 var prompt = BuildClassificationPrompt(description, category);
                 
@@ -96,14 +143,19 @@ namespace CivicOps.Services
                 {
                     var responseJson = await response.Content.ReadAsStringAsync();
                     var result = ParseGeminiResponse(responseJson, description);
-                    result.IsGeminiProcessed = true;
-                    result.Method = "Gemini AI";
-                    _logger.LogInformation("Successfully classified incident with Gemini");
-                    return result;
+                    if (result.IsGeminiProcessed)
+                    {
+                        result.Method = "Gemini AI";
+                        _logger.LogInformation("Successfully classified incident with Gemini");
+                        return result;
+                    }
+
+                    _logger.LogWarning("Gemini response could not be parsed, falling back to deterministic");
+                    return await _fallbackService.ClassifyIncidentAsync(description, category);
                 }
                 else
                 {
-                    _logger.LogWarning($"Gemini API error: {response.StatusCode}, falling back to deterministic");
+                    _logger.LogWarning("Gemini API error: {StatusCode}, falling back to deterministic", response.StatusCode);
                     return await _fallbackService.ClassifyIncidentAsync(description, category);
                 }
             }

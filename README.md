@@ -1,9 +1,9 @@
 # CivicOps - Integration-Ready Civic Operations Platform
 
-**Version**: 1.0 (Pilot-Ready)  
-**Built with**: IBM Bob AI Agent  
-**Framework**: ASP.NET Core MVC (.NET 10)  
-**Status**: ✅ Build Passing
+**Version**: 1.0 (Hackathon Submission-Ready)<br>
+**Built with**: IBM Bob AI Agent accelerated the main hackathon implementation; this final Codex cleanup completed connector readiness and stability.<br>
+**Framework**: ASP.NET Core MVC (.NET 10)<br>
+**Status**: Build-ready when .NET 10 SDK is installed
 
 ---
 
@@ -120,11 +120,14 @@ dotnet run
 - `POST /api/incidents/{id}/note` - Add incident note
 - `POST /api/incidents/{id}/escalate` - Escalate incident
 - `GET /api/connectors/status` - Get connector status
+- `GET /api/connectors/gemini/test` - Server-side Gemini live/fallback health test
 
 ### Demo Routes
 
-- `/demo/whatsapp` - WhatsApp message simulator
-- `/demo/voicenote` - Voice note simulator
+- `/demo/whatsapp` and `/Demo/WhatsAppSimulator` - WhatsApp message simulator
+- `/demo/voicenote` and `/Demo/VoiceNoteSimulator` - Voice note simulator
+- `GET /webhooks/whatsapp` - WhatsApp Cloud API verification endpoint
+- `POST /webhooks/whatsapp` - WhatsApp Cloud API inbound message webhook
 
 ---
 
@@ -134,19 +137,24 @@ dotnet run
 
 ```bash
 GEMINI_API_KEY=your_api_key_here
-GEMINI_MODEL=gemini-1.5-flash
-GEMINI_ENABLED=false
+GEMINI_ENABLED=true
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODE=Hybrid
 ```
 
 ### WhatsApp Cloud API (Optional)
 
 ```bash
+WHATSAPP_ENABLED=true
+WHATSAPP_DEMO_MODE=false
 WHATSAPP_VERIFY_TOKEN=your_verify_token
 WHATSAPP_ACCESS_TOKEN=your_access_token
 WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
+WHATSAPP_GRAPH_VERSION=v22.0
+WHATSAPP_PUBLIC_BASE_URL=https://your-public-host.example
 ```
 
-**Note**: Without these environment variables, the system uses demo mode with deterministic classification and simulated WhatsApp.
+**Note**: Without these environment variables, the system uses deterministic fallback and the WhatsApp demo simulator. Do not claim live Gemini or live WhatsApp operation unless the deployment environment is configured. CivicOps does not claim official municipal partnerships and is not an emergency service replacement.
 
 ---
 
@@ -171,9 +179,10 @@ CivicOps/
 ├── Services/
 │   ├── DemoAuthService.cs        # Demo authentication
 │   ├── DeterministicClassificationService.cs # Fallback classifier
-│   ├── GeminiService.cs          # Gemini AI integration
-│   ├── JsonDataService.cs        # JSON persistence
-│   └── Interfaces/               # Service interfaces
+│   ├── GeminiService.cs          # Server-side Gemini integration
+│   ├── IncidentIntakeService.cs  # Unified intake pipeline
+│   ├── WhatsAppService.cs        # WhatsApp Cloud API readiness/send guard
+│   └── JsonDataService.cs        # JSON persistence
 ├── Filters/
 │   └── DemoAuthorizationFilter.cs # RBAC filter
 ├── Views/
@@ -352,17 +361,22 @@ CivicOps/
 1. Obtain Gemini API key from Google AI Studio
 2. Set environment variable: `GEMINI_API_KEY=your_key`
 3. Set `GEMINI_ENABLED=true`
-4. Configure model: `GEMINI_MODEL=gemini-1.5-flash`
+4. Configure model: `GEMINI_MODEL=gemini-2.5-flash`
+5. Optional live/fallback test: `GET /api/connectors/gemini/test`
 
 ### WhatsApp Setup
 
 1. Create Meta Business Account
 2. Set up WhatsApp Business API
-3. Configure webhook URL
+3. Configure webhook URL: `/webhooks/whatsapp`
 4. Set environment variables:
+   - `WHATSAPP_ENABLED`
+   - `WHATSAPP_DEMO_MODE`
    - `WHATSAPP_VERIFY_TOKEN`
    - `WHATSAPP_ACCESS_TOKEN`
    - `WHATSAPP_PHONE_NUMBER_ID`
+   - `WHATSAPP_GRAPH_VERSION`
+   - `WHATSAPP_PUBLIC_BASE_URL`
 
 ### Deployment Options
 
@@ -455,7 +469,7 @@ For questions or issues:
 ## Acknowledgments
 
 **Built with**: IBM Bob AI Agent  
-**Framework**: ASP.NET Core MVC (.NET 10)  
+**Framework**: ASP.NET Core MVC (.NET 10)<br>
 **UI**: Bootstrap 5 + Custom CSS  
 **AI**: Google Gemini (optional)  
 **Messaging**: WhatsApp Cloud API (optional)
