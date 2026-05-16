@@ -2,6 +2,7 @@ using CivicOps.Models;
 using CivicOps.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,19 +17,22 @@ namespace CivicOps.Controllers
         private readonly IClassificationService _classificationService;
         private readonly IIncidentIntakeService _intakeService;
         private readonly IWhatsAppService _whatsAppService;
+        private readonly IConfiguration _configuration;
 
         public ApiController(
             IDataService dataService,
             IGeminiService geminiService,
             IClassificationService classificationService,
             IIncidentIntakeService intakeService,
-            IWhatsAppService whatsAppService)
+            IWhatsAppService whatsAppService,
+            IConfiguration configuration)
         {
             _dataService = dataService;
             _geminiService = geminiService;
             _classificationService = classificationService;
             _intakeService = intakeService;
             _whatsAppService = whatsAppService;
+            _configuration = configuration;
         }
 
         [HttpPost("reports")]
@@ -306,6 +310,120 @@ namespace CivicOps.Controllers
             return Ok(new { success = true, message = "Incident escalated" });
         }
 
+
+
+        [HttpGet("agent/scenarios")]
+        public IActionResult GetAgentScenarios()
+        {
+            var whatsApp = _whatsAppService.GetStatus();
+            return Ok(new
+            {
+                success = true,
+                agentStatus = "Operational",
+                intakePipelineStatus = "Unified IncidentIntakeService online",
+                gemini = new
+                {
+                    enabled = _geminiService.IsEnabled,
+                    status = _geminiService.IsEnabled ? "Live connector ready" : _geminiService.Status,
+                    mode = _geminiService.Mode,
+                    model = _geminiService.Model,
+                    source = _geminiService.IsEnabled ? "Gemini" : "Deterministic fallback"
+                },
+                whatsapp = BuildWhatsAppConnectorSnapshot(whatsApp),
+                scenarios = new[]
+                {
+                    new { id = "latest-report", label = "Analyze latest resident report", sourceChannel = "Web" },
+                    new { id = "whatsapp-report", label = "Analyze WhatsApp report", sourceChannel = "WhatsApp" },
+                    new { id = "voice-note", label = "Analyze voice-note transcript", sourceChannel = "VoiceNote" },
+                    new { id = "gemini-health", label = "Run live Gemini health test", sourceChannel = "Connector" },
+                    new { id = "citizen-response", label = "Generate citizen response", sourceChannel = "Web" },
+                    new { id = "department-brief", label = "Generate department brief", sourceChannel = "Operations" },
+                    new { id = "area-alert", label = "Recommend area alert", sourceChannel = "Operations" },
+                    new { id = "judge-summary", label = "Generate judge summary", sourceChannel = "Operations" }
+                }
+            });
+        }
+
+        [HttpPost("agent/run")]
+        public async Task<IActionResult> RunAgentScenario([FromBody] AgentRunRequest request)
+        {
+            var scenario = string.IsNullOrWhiteSpace(request?.Scenario) ? "latest-report" : request.Scenario.Trim();
+
+            if (scenario.Equals("gemini-health", StringComparison.OrdinalIgnoreCase))
+            {
+                var health = await _geminiService.TestConnectionAsync();
+                return Ok(new
+                {
+                    success = true,
+                    action = "Gemini health test",
+                    sourceChannel = "Connector",
+                    geminiAssisted = health.Success,
+                    aiSource = health.Success ? "Gemini" : "Deterministic fallback",
+                    validation = health.Success ? "Live Gemini connector responded." : "Fallback active — live Gemini activates when GEMINI_API_KEY and GEMINI_ENABLED=true are configured.",
+                    department = "CivicOps platform",
+                    priority = health.Success ? "Ready" : "Fallback",
+                    routingReason = health.Message,
+                    citizenResponse = "Connector check completed. Results are shown in the audit trail.",
+                    referenceNumber = (string?)null,
+                    alertRecommendation = "No public alert generated from connector health check.",
+                    auditNotes = new[] { health.Status, $"Model: {health.Model}", $"Mode: {health.Mode}" },
+                    whatsapp = BuildWhatsAppConnectorSnapshot(_whatsAppService.GetStatus()),
+                    timestamp = DateTime.UtcNow
+                });
+            }
+
+            var intake = BuildAgentIntakeRequest(scenario, request);
+            var result = await _intakeService.ProcessAsync(intake);
+            var incident = result.Incident;
+            var whatsAppStatus = _whatsAppService.GetStatus();
+            var action = ScenarioLabel(scenario);
+
+            return Ok(new
+            {
+                success = true,
+                action,
+                sourceChannel = incident.SourceChannel.ToString(),
+                geminiAssisted = incident.IsGeminiProcessed,
+                aiSource = incident.IsGeminiProcessed ? "Gemini assisted" : "Deterministic fallback",
+                validation = result.Validation,
+                department = incident.AssignedDepartment.GetDisplayName(),
+                priority = incident.Priority.ToString(),
+                category = incident.Category,
+                summary = incident.AISummary,
+                routingReason = result.RoutingReason,
+                citizenResponse = result.CitizenResponse,
+                referenceNumber = incident.ReferenceNumber,
+                incidentUrl = Url.Action("Incident", "Home", new { id = incident.Id }),
+                alertRecommendation = ScenarioAlertRecommendation(scenario, result.AlertRecommendation),
+                auditNotes = new[]
+                {
+                    $"Created via shared IncidentIntakeService from {incident.SourceChannel}.",
+                    $"Classification method: {incident.ClassificationMethod}.",
+                    incident.IsGeminiProcessed ? "Gemini assisted classification was used." : "Fallback active — live Gemini activates when GEMINI_API_KEY and GEMINI_ENABLED=true are configured.",
+                    whatsAppStatus.CanSend ? "WhatsApp Cloud API send ready." : "Sandbox WhatsApp flow active — Cloud API activates through env vars.",
+                    "Human-in-the-loop review remains required before field dispatch or public alerting."
+                },
+                whatsapp = BuildWhatsAppConnectorSnapshot(whatsAppStatus),
+                timestamp = DateTime.UtcNow
+            });
+        }
+
+        [HttpPost("agent/generate-response")]
+        public Task<IActionResult> GenerateAgentResponse([FromBody] AgentRunRequest request)
+        {
+            request ??= new AgentRunRequest();
+            request.Scenario = "citizen-response";
+            return RunAgentScenario(request);
+        }
+
+        [HttpPost("agent/recommend-alert")]
+        public Task<IActionResult> RecommendAgentAlert([FromBody] AgentRunRequest request)
+        {
+            request ??= new AgentRunRequest();
+            request.Scenario = "area-alert";
+            return RunAgentScenario(request);
+        }
+
         [HttpGet("connectors/gemini/test")]
         public async Task<IActionResult> TestGeminiConnector()
         {
@@ -329,7 +447,7 @@ namespace CivicOps.Controllers
                 {
                     name = "Gemini AI",
                     status = _geminiService.Status,
-                    mode = _geminiService.IsEnabled ? "Configured" : "Demo",
+                    mode = _geminiService.IsEnabled ? "Live Ready" : "Fallback Active",
                     description = "AI-powered incident classification and routing"
                 },
                 new
@@ -343,41 +461,136 @@ namespace CivicOps.Controllers
                 {
                     name = "Voice Transcription",
                     status = "Future Connector",
-                    mode = "Placeholder",
+                    mode = "Future Connector",
                     description = "Audio-to-text transcription service"
                 },
                 new
                 {
                     name = "SMS Notifications",
                     status = "Future Connector",
-                    mode = "Placeholder",
+                    mode = "Future Connector",
                     description = "SMS notification service"
                 },
                 new
                 {
                     name = "Email Notifications",
                     status = "Future Connector",
-                    mode = "Placeholder",
+                    mode = "Future Connector",
                     description = "Email notification service"
                 },
                 new
                 {
                     name = "GIS/Geocoding",
                     status = "Future Connector",
-                    mode = "Placeholder",
+                    mode = "Future Connector",
                     description = "Location mapping and geocoding"
                 },
                 new
                 {
                     name = "Municipal ERP",
                     status = "Future Connector",
-                    mode = "Placeholder",
+                    mode = "Future Connector",
                     description = "Integration with municipal ticketing systems"
                 }
             };
 
             return Ok(new { success = true, connectors });
         }
+
+
+        private IncidentIntakeRequest BuildAgentIntakeRequest(string scenario, AgentRunRequest? request)
+        {
+            var description = !string.IsNullOrWhiteSpace(request?.Input) ? request.Input.Trim() : ScenarioDescription(scenario);
+            var source = scenario switch
+            {
+                "whatsapp-report" => SourceChannel.WhatsApp,
+                "voice-note" => SourceChannel.VoiceNote,
+                _ => SourceChannel.Web
+            };
+
+            return new IncidentIntakeRequest
+            {
+                SourceChannel = source,
+                Description = description,
+                Category = request?.Category,
+                Suburb = string.IsNullOrWhiteSpace(request?.Suburb) ? ScenarioSuburb(scenario) : request.Suburb,
+                Ward = string.IsNullOrWhiteSpace(request?.Ward) ? ScenarioWard(scenario) : request.Ward,
+                ContactName = request?.ContactName ?? "Synthetic resident",
+                ContactPhone = request?.ContactPhone,
+                ContactEmail = request?.ContactEmail,
+                LocationNotes = request?.LocationNotes ?? "Synthetic civic operations scenario for judging.",
+                MediaMetadata = scenario == "whatsapp-report" ? "optional WhatsApp media metadata: image/audio placeholder" : request?.MediaMetadata,
+                AudioMetadata = scenario == "voice-note" ? "voice-note-transcript-sandbox.wav; transcript supplied" : request?.AudioMetadata,
+                CreatedBy = "CivicOps AI Agent Command Centre",
+                ConnectorMetadata = new Dictionary<string, string>
+                {
+                    ["agent_scenario"] = scenario,
+                    ["data_note"] = "Synthetic operational data; live connector-ready when credentials are configured.",
+                    ["human_review"] = "Required before dispatch, public alert, or external escalation."
+                }
+            };
+        }
+
+        private static string ScenarioDescription(string scenario) => scenario switch
+        {
+            "whatsapp-report" => "WhatsApp resident report: Water has been running down Quarry Road since 05:30, road edge is flooding and school traffic is affected near the bus stop.",
+            "voice-note" => "Voice-note transcript: There is a fallen electricity cable sparking near the community hall after the rain. People are walking close to it and the street lights are out.",
+            "citizen-response" => "Resident reports repeated refuse collection misses for three weeks on Mkhize Street with bags now blocking the pavement and attracting animals.",
+            "department-brief" => "Three related pothole and blocked stormwater reports around Phoenix Highway after heavy rainfall; traffic is slowing and residents request repair scheduling.",
+            "area-alert" => "Multiple reports of stormwater drains overflowing in Chatsworth Ward 73 after heavy rain, with water approaching low-lying homes.",
+            "judge-summary" => "CivicOps judging flow: messy web, WhatsApp, mobile, and voice-note reports are validated, classified, routed, acknowledged, audited, and shown on dashboards with live connector readiness.",
+            _ => "Latest resident report scenario: Burst water pipe on Main Road causing flooding near a taxi stop and affecting morning commuters."
+        };
+
+        private static string ScenarioSuburb(string scenario) => scenario switch
+        {
+            "whatsapp-report" => "Chatsworth",
+            "voice-note" => "Umlazi",
+            "department-brief" => "Phoenix",
+            "area-alert" => "Chatsworth",
+            _ => "Durban"
+        };
+
+        private static string ScenarioWard(string scenario) => scenario switch
+        {
+            "whatsapp-report" => "Ward 73",
+            "voice-note" => "Ward 80",
+            "department-brief" => "Ward 52",
+            "area-alert" => "Ward 73",
+            _ => "Ward 00"
+        };
+
+        private static string ScenarioLabel(string scenario) => scenario switch
+        {
+            "whatsapp-report" => "Analyze WhatsApp report",
+            "voice-note" => "Analyze voice-note transcript",
+            "citizen-response" => "Generate citizen response",
+            "department-brief" => "Generate department brief",
+            "area-alert" => "Recommend area alert",
+            "judge-summary" => "Generate judge summary",
+            _ => "Analyze latest resident report"
+        };
+
+        private static string ScenarioAlertRecommendation(string scenario, string fallback) => scenario == "area-alert"
+            ? "Recommend area alert review: cluster stormwater reports by suburb/ward, verify with dispatcher, then publish a human-approved area notice if duplicate reports continue."
+            : fallback;
+
+        private object BuildWhatsAppConnectorSnapshot(WhatsAppStatus status) => new
+        {
+            enabled = status.Enabled,
+            demoMode = status.DemoMode,
+            canSend = status.CanSend,
+            mode = status.Mode,
+            status = status.Status,
+            graphVersion = status.GraphVersion,
+            publicBaseUrlPresent = !string.IsNullOrWhiteSpace(status.PublicBaseUrl),
+            publicBaseUrl = status.PublicBaseUrl,
+            verifyTokenPresent = !string.IsNullOrWhiteSpace(_configuration["WHATSAPP_VERIFY_TOKEN"]),
+            accessTokenPresent = !string.IsNullOrWhiteSpace(_configuration["WHATSAPP_ACCESS_TOKEN"]),
+            phoneNumberIdPresent = !string.IsNullOrWhiteSpace(_configuration["WHATSAPP_PHONE_NUMBER_ID"]),
+            callbackUrl = string.IsNullOrWhiteSpace(status.PublicBaseUrl) ? null : $"{status.PublicBaseUrl.TrimEnd('/')}/webhooks/whatsapp"
+        };
+
     }
 
     // Request/Response models
@@ -414,5 +627,20 @@ namespace CivicOps.Controllers
     {
         public string Reason { get; set; } = string.Empty;
         public string? Author { get; set; }
+    }
+
+    public class AgentRunRequest
+    {
+        public string Scenario { get; set; } = string.Empty;
+        public string? Input { get; set; }
+        public string? Category { get; set; }
+        public string? Suburb { get; set; }
+        public string? Ward { get; set; }
+        public string? ContactName { get; set; }
+        public string? ContactPhone { get; set; }
+        public string? ContactEmail { get; set; }
+        public string? LocationNotes { get; set; }
+        public string? MediaMetadata { get; set; }
+        public string? AudioMetadata { get; set; }
     }
 }

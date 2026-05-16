@@ -42,12 +42,12 @@ namespace CivicOps.Services
                 CanSend = canSend,
                 GraphVersion = graphVersion,
                 PublicBaseUrl = publicBaseUrl,
-                Mode = enabled ? (demoMode ? "Demo-safe" : "Live-ready") : "Disabled/Demo",
+                Mode = canSend ? "Live Ready" : webhookReady ? "Webhook Ready" : enabled ? "Sandbox Active" : "Needs Environment Variables",
                 Status = canSend
-                    ? "Live send ready"
+                    ? "Live Ready — outbound send configured"
                     : webhookReady
-                        ? "Webhook verification ready; outbound send disabled until live credentials are enabled"
-                        : "Demo mode; configure verify token and public base URL for webhook readiness"
+                        ? "Webhook Ready — verification configured; outbound send waits for live credentials"
+                        : "Sandbox Active — configure Meta credentials and public URL for live readiness"
             };
         }
 

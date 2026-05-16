@@ -37,16 +37,20 @@ namespace CivicOps.Controllers
                     Suburb = simulation.Suburb,
                     Ward = simulation.Ward,
                     ContactPhone = simulation.PhoneNumber,
-                    CreatedBy = "WhatsApp Demo",
+                    LocationNotes = simulation.LocationNotes,
+                    MediaMetadata = simulation.MediaMetadata,
+                    CreatedBy = "WhatsApp Intake Sandbox",
                     ConnectorMetadata = new Dictionary<string, string>
                     {
-                        ["whatsapp_demo"] = "true",
-                        ["whatsapp_sender"] = simulation.SenderName ?? "Demo User",
-                        ["whatsapp_masked_phone"] = _whatsAppService.MaskPhone(simulation.PhoneNumber)
+                        ["whatsapp_sandbox"] = "true",
+                        ["whatsapp_sender"] = simulation.SenderName ?? "Resident",
+                        ["whatsapp_masked_phone"] = _whatsAppService.MaskPhone(simulation.PhoneNumber),
+                        ["whatsapp_connector_mode"] = _whatsAppService.GetStatus().Mode
                     }
                 });
 
                 var incident = result.Incident;
+                var whatsAppStatus = _whatsAppService.GetStatus();
                 return Ok(new
                 {
                     success = true,
@@ -57,7 +61,12 @@ namespace CivicOps.Controllers
                     priority = incident.Priority.ToString(),
                     citizenResponse = result.CitizenResponse,
                     alertRecommendation = result.AlertRecommendation,
-                    message = $"Thank you! Your reference number is {incident.ReferenceNumber}. The {incident.AssignedDepartment.GetDisplayName()} department has been notified."
+                    connectorMode = whatsAppStatus.Mode,
+                    whatsappStatus = whatsAppStatus.Status,
+                    realSendAttempted = false,
+                    metaMessageId = (string?)null,
+                    maskedPhone = _whatsAppService.MaskPhone(simulation.PhoneNumber),
+                    message = $"Thank you. Your CivicOps reference is {incident.ReferenceNumber}. The {incident.AssignedDepartment.GetDisplayName()} queue has received the report for human review."
                 });
             }
             catch (System.Exception ex)
@@ -94,6 +103,7 @@ namespace CivicOps.Controllers
                 });
 
                 var incident = result.Incident;
+                var whatsAppStatus = _whatsAppService.GetStatus();
                 return Ok(new
                 {
                     success = true,
@@ -122,6 +132,8 @@ namespace CivicOps.Controllers
         public string? PhoneNumber { get; set; }
         public string? Suburb { get; set; }
         public string? Ward { get; set; }
+        public string? LocationNotes { get; set; }
+        public string? MediaMetadata { get; set; }
     }
 
     public class VoiceNoteSimulation

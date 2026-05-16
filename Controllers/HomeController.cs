@@ -17,6 +17,7 @@ namespace CivicOps.Controllers
         private readonly IWeatherService _weatherService;
         private readonly IIncidentIntakeService _intakeService;
         private readonly IWhatsAppService _whatsAppService;
+        private readonly IConfiguration _configuration;
 
         public HomeController(
             IDataService dataService,
@@ -24,7 +25,8 @@ namespace CivicOps.Controllers
             IClassificationService classificationService,
             IWeatherService weatherService,
             IIncidentIntakeService intakeService,
-            IWhatsAppService whatsAppService)
+            IWhatsAppService whatsAppService,
+            IConfiguration configuration)
         {
             _dataService = dataService;
             _geminiService = geminiService;
@@ -32,6 +34,7 @@ namespace CivicOps.Controllers
             _weatherService = weatherService;
             _intakeService = intakeService;
             _whatsAppService = whatsAppService;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -213,7 +216,6 @@ namespace CivicOps.Controllers
             return RedirectToAction("Incident", new { id });
         }
 
-        [DemoAuthorize]
         public IActionResult Connectors()
         {
             var connectors = new[]
@@ -222,7 +224,7 @@ namespace CivicOps.Controllers
                 {
                     Name = "Gemini AI",
                     Status = _geminiService.Status,
-                    Mode = _geminiService.IsEnabled ? "Configured" : "Demo",
+                    Mode = _geminiService.IsEnabled ? "Live Connector Ready" : "Fallback Active",
                     Description = "AI-powered incident classification and routing",
                     EnvVars = "GEMINI_API_KEY, GEMINI_ENABLED, GEMINI_MODEL, GEMINI_MODE",
                     Documentation = "/docs/gemini-setup.md"
@@ -283,20 +285,36 @@ namespace CivicOps.Controllers
                 }
             };
 
+            ViewBag.GeminiStatus = _geminiService.Status;
+            ViewBag.GeminiEnabled = _geminiService.IsEnabled;
+            ViewBag.GeminiModel = _geminiService.Model;
+            ViewBag.GeminiMode = _geminiService.Mode;
+            ViewBag.GeminiApiKeyPresent = !string.IsNullOrWhiteSpace(_configuration["GEMINI_API_KEY"]);
+            var whatsApp = _whatsAppService.GetStatus();
+            ViewBag.WhatsApp = whatsApp;
+            ViewBag.WhatsAppVerifyTokenPresent = !string.IsNullOrWhiteSpace(_configuration["WHATSAPP_VERIFY_TOKEN"]);
+            ViewBag.WhatsAppAccessTokenPresent = !string.IsNullOrWhiteSpace(_configuration["WHATSAPP_ACCESS_TOKEN"]);
+            ViewBag.WhatsAppPhoneNumberIdPresent = !string.IsNullOrWhiteSpace(_configuration["WHATSAPP_PHONE_NUMBER_ID"]);
             return View(connectors);
         }
 
         public IActionResult Mobile()
         {
+            ViewBag.PwaReady = true;
             return View();
         }
 
-        [DemoAuthorize]
+        public IActionResult DemoTour()
+        {
+            return View();
+        }
+
         public IActionResult Agent()
         {
             ViewBag.GeminiStatus = _geminiService.Status;
             ViewBag.GeminiMode = _geminiService.IsEnabled ? "Gemini" : "Fallback";
             ViewBag.WhatsAppStatus = _whatsAppService.GetStatus().Status;
+            ViewBag.WhatsAppMode = _whatsAppService.GetStatus().Mode;
             return View();
         }
 

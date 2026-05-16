@@ -1,130 +1,29 @@
 @{
-    ViewData["Title"] = "Mobile & PWA";
+    ViewData["Title"] = "CivicOps Mobile & WhatsApp Access";
 }
 
-<div class="container">
-    <h1 style="color: #06b6d4; margin-bottom: 2rem;">📱 Mobile & PWA Readiness</h1>
-
-    <div class="card" style="margin-bottom: 2rem;">
-        <h2 class="card-title">CivicOps Mobile Access</h2>
-        <p style="color: #cbd5e1; line-height: 1.8;">
-            CivicOps is designed for mobile-first civic reporting. Access the platform through multiple channels:
-        </p>
+<div class="container py-4 civic-page mobile-hub">
+    <div class="hero-panel mb-4">
+        <span class="eyebrow">Public utility access hub</span>
+        <h1 class="display-6 fw-bold">CivicOps Mobile & WhatsApp Access</h1>
+        <p class="lead mb-0">A mobile-first reporting path for residents, field teams, and WhatsApp-first communities.</p>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">🌐 Progressive Web App (PWA)</h3>
-            <p style="color: #cbd5e1; line-height: 1.8; margin-bottom: 1rem;">
-                Access CivicOps directly from your mobile browser. The web interface is fully responsive and mobile-optimized.
-            </p>
-            <ul style="color: #94a3b8; line-height: 1.8;">
-                <li>No installation required</li>
-                <li>Works on any device</li>
-                <li>Mobile-optimized forms</li>
-                <li>Quick report submission</li>
-                <li>Status tracking</li>
-            </ul>
-            <a href="/Home/Report" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">
-                Report via Web
-            </a>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">📱 Android App</h3>
-            <p style="color: #cbd5e1; line-height: 1.8; margin-bottom: 1rem;">
-                Native Android app for enhanced mobile experience with offline support and push notifications.
-            </p>
-            <ul style="color: #94a3b8; line-height: 1.8;">
-                <li>Native mobile experience</li>
-                <li>Camera integration</li>
-                <li>Location services</li>
-                <li>Push notifications (future)</li>
-                <li>Offline draft support (future)</li>
-            </ul>
-            <div style="margin-top: 1rem; padding: 1rem; background: rgba(251, 191, 36, 0.1); border-radius: 0.5rem; border: 1px solid rgba(251, 191, 36, 0.3);">
-                <p style="color: #fbbf24; font-size: 0.875rem; margin: 0;">
-                    <strong>Development Build:</strong> Android app source available in /mobile/CivicOpsAndroid. Build with Android Studio.
-                </p>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">💬 WhatsApp Reporting</h3>
-            <p style="color: #cbd5e1; line-height: 1.8; margin-bottom: 1rem;">
-                Report issues directly via WhatsApp text messages. Simple and accessible for all residents.
-            </p>
-            <ul style="color: #94a3b8; line-height: 1.8;">
-                <li>Text-based reporting</li>
-                <li>No app installation needed</li>
-                <li>Works on any phone</li>
-                <li>Automatic classification</li>
-                <li>Reference number via reply</li>
-            </ul>
-            <a href="/demo/whatsapp" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">
-                Try WhatsApp Demo
-            </a>
-        </div>
-
-        <div class="card">
-            <h3 style="color: #06b6d4; margin-bottom: 1rem;">🎤 Voice Note Reporting</h3>
-            <p style="color: #cbd5e1; line-height: 1.8; margin-bottom: 1rem;">
-                Submit reports using voice notes for quick, hands-free reporting while on the go.
-            </p>
-            <ul style="color: #94a3b8; line-height: 1.8;">
-                <li>Voice-to-text transcription</li>
-                <li>Hands-free reporting</li>
-                <li>Quick submission</li>
-                <li>Automatic processing</li>
-                <li>Multi-language support (future)</li>
-            </ul>
-            <a href="/demo/voicenote" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">
-                Try Voice Note Demo
-            </a>
-        </div>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4"><div class="ops-card h-100"><span class="status-pill status-success">PWA Ready</span><h2 class="h4">Web/PWA app</h2><ul class="feature-list"><li>Report issue</li><li>Track reference</li><li>View alerts</li><li>Follow area</li></ul><a class="btn btn-primary" href="/Home/Report">Report issue</a></div></div>
+        <div class="col-lg-4"><div class="ops-card h-100"><span class="status-pill status-info">Android-ready</span><h2 class="h4">Android-ready app/source</h2><ul class="feature-list"><li>Report</li><li>Track</li><li>Alerts</li><li>Responder mode future</li></ul><a class="btn btn-outline-info" href="/docs/android-app.md">Android notes</a></div></div>
+        <div class="col-lg-4"><div class="ops-card h-100"><span class="status-pill status-warning">Sandbox / Live ready</span><h2 class="h4">WhatsApp-first reporting</h2><ul class="feature-list"><li>Report without installing app</li><li>Receive reference</li><li>Track status</li><li>Cloud API activates with Meta env vars</li></ul><a class="btn btn-success" href="/Demo/WhatsAppSimulator">Open WhatsApp Intake</a></div></div>
     </div>
 
-    <div class="card" style="margin-top: 2rem;">
-        <h2 class="card-title">Mobile Features</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-            <div style="padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">📝 Quick Reporting</h4>
-                <p style="color: #94a3b8; font-size: 0.875rem;">Submit civic issues in seconds from your mobile device</p>
-            </div>
-            <div style="padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">📍 Location Services</h4>
-                <p style="color: #94a3b8; font-size: 0.875rem;">Automatic location detection for accurate incident reporting</p>
-            </div>
-            <div style="padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">📷 Photo Upload</h4>
-                <p style="color: #94a3b8; font-size: 0.875rem;">Capture and attach photos directly from your camera</p>
-            </div>
-            <div style="padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">🔍 Status Tracking</h4>
-                <p style="color: #94a3b8; font-size: 0.875rem;">Track your reports and receive updates on the go</p>
-            </div>
-            <div style="padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">📢 Area Alerts</h4>
-                <p style="color: #94a3b8; font-size: 0.875rem;">Receive location-based alerts for your area</p>
-            </div>
-            <div style="padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">🔔 Notifications</h4>
-                <p style="color: #94a3b8; font-size: 0.875rem;">Push notifications for status updates (future)</p>
-            </div>
+    <div class="phone-shell mx-auto">
+        <div class="phone-status">CivicOps <span>09:41</span></div>
+        <div class="app-grid">
+            <a href="/Home/Report" class="app-tile"><i class="bi bi-plus-circle"></i><strong>Report Issue</strong><small>Photo/location ready</small></a>
+            <a href="/Home/Lookup" class="app-tile"><i class="bi bi-search"></i><strong>My References</strong><small>Track CIV-2026-0001</small></a>
+            <a href="/Home/Alerts" class="app-tile"><i class="bi bi-bell"></i><strong>Area Alerts</strong><small>Ward and suburb notices</small></a>
+            <a href="/Home/Weather" class="app-tile"><i class="bi bi-cloud-rain-heavy"></i><strong>Weather Risk</strong><small>Context for operations</small></a>
+            <a href="/Demo/WhatsAppSimulator" class="app-tile whatsapp"><i class="bi bi-whatsapp"></i><strong>WhatsApp Shortcut</strong><small>No install required</small></a>
+            <div class="app-tile emergency"><i class="bi bi-exclamation-triangle"></i><strong>Emergency disclaimer</strong><small>CivicOps is not an emergency services replacement.</small></div>
         </div>
-    </div>
-
-    <div class="card" style="margin-top: 2rem; background: rgba(6, 182, 212, 0.1); border-color: rgba(6, 182, 212, 0.3);">
-        <h3 style="color: #06b6d4; margin-bottom: 1rem;">For Responders</h3>
-        <p style="color: #cbd5e1; line-height: 1.8;">
-            Municipal department staff can access CivicOps on mobile devices to:
-        </p>
-        <ul style="color: #cbd5e1; line-height: 1.8;">
-            <li>View department incident queues</li>
-            <li>Update incident status in the field</li>
-            <li>Add notes and photos from site visits</li>
-            <li>Escalate urgent issues</li>
-            <li>Coordinate with other departments</li>
-        </ul>
     </div>
 </div>

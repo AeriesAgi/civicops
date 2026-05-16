@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Voice Note Simulator";
+    ViewData["Title"] = "Voice Note Sandbox";
 }
 
 <div class="container">
@@ -7,11 +7,11 @@
         <h1 class="card-title">🎤 Voice Note Reporting Simulator</h1>
         
         <div class="alert alert-warning">
-            <strong>Demo Mode:</strong> This is a simulator for testing voice note reporting. In production, this would use speech-to-text transcription.
+            <strong>Sandbox Mode:</strong> This is a simulator for testing voice note reporting. In production, this would use speech-to-text transcription.
         </div>
 
         <p style="color: #cbd5e1; margin-bottom: 2rem;">
-            Simulate submitting a voice note report. In production, audio would be transcribed automatically. For this demo, provide the transcript directly.
+            Simulate submitting a voice note report. In production, audio would be transcribed automatically. For this sandbox, provide the transcript directly.
         </p>
 
         <form id="voiceNoteForm">
@@ -43,7 +43,7 @@
                 <input type="number" class="form-control" id="durationSeconds" name="durationSeconds" 
                        placeholder="30" min="1" max="300" />
                 <small style="color: #94a3b8; font-size: 0.875rem;">
-                    Simulated audio length for demo purposes
+                    Simulated audio length for sandbox purposes
                 </small>
             </div>
 
@@ -95,7 +95,7 @@ document.getElementById('voiceNoteForm').addEventListener('submit', async (e) =>
     };
     
     try {
-        const response = await fetch('/demo/voicenote/submit', {
+        const response = await fetch('/sandbox/voicenote/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)

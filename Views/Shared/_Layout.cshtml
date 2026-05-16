@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/civicops-theme.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="manifest" href="~/manifest.json" />
+    <meta name="theme-color" content="#061826" />
     <style>
         * {
             margin: 0;
@@ -226,6 +228,9 @@
                         <a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="/Home/DemoTour"><i class="bi bi-map me-1"></i>Demo Tour</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/Home/Report"><i class="bi bi-file-earmark-plus me-1"></i>Report Issue</a>
                     </li>
                     <li class="nav-item">
@@ -311,7 +316,7 @@
             <div class="row">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                     <p class="mb-1">&copy; 2026 CivicOps - Civic Operations Platform</p>
-                    <p class="small mb-0">Integration-Ready Municipal Operations System</p>
+                    <p class="small mb-0">CivicOps uses synthetic scenario data for judging. Live integrations are activated through configured connector credentials.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <p class="mb-1">
@@ -332,5 +337,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+<script>if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js').catch(() => {})); }</script>
 </body>
 </html>

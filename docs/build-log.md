@@ -177,13 +177,13 @@ CivicOps/
 
 ```bash
 # Gemini AI (Optional)
-GEMINI_API_KEY=your_api_key_here
+GEMINI_API_KEY = your_api_key_here
 GEMINI_MODEL=gemini-1.5-flash
 GEMINI_ENABLED=false
 
 # WhatsApp Cloud API (Optional)
 WHATSAPP_VERIFY_TOKEN=your_verify_token
-WHATSAPP_ACCESS_TOKEN=your_access_token
+WHATSAPP_ACCESS_TOKEN = your_access_token
 WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
 ```
 
@@ -219,7 +219,7 @@ http://localhost:5000
 - **Authentication**: Simple demo auth, not production-ready
 - **Persistence**: JSON files, not suitable for production scale
 - **Gemini**: Disabled by default, requires API key
-- **WhatsApp**: Demo mode, requires Meta app setup
+- **WhatsApp**: Sandbox mode, requires Meta app setup
 - **Voice Transcription**: Placeholder, requires service integration
 - **SMS/Email**: Not implemented, requires service integration
 - **GIS/Mapping**: Not implemented, requires service integration

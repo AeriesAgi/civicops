@@ -1,76 +1,89 @@
 @model IEnumerable<CivicOps.Controllers.ConnectorInfo>
 @{
-    ViewData["Title"] = "Connector Status";
+    ViewData["Title"] = "Connector Readiness";
+    var whatsApp = ViewBag.WhatsApp as CivicOps.Services.WhatsAppStatus;
+    var webhookUrl = string.IsNullOrWhiteSpace(whatsApp?.PublicBaseUrl) ? string.Empty : $"{whatsApp.PublicBaseUrl.TrimEnd('/')}/webhooks/whatsapp";
 }
 
-<div class="container">
-    <h1 style="color: #06b6d4; margin-bottom: 2rem;">🔌 Connector Readiness</h1>
-
-    <div class="card" style="margin-bottom: 2rem;">
-        <p style="color: #cbd5e1; line-height: 1.8;">
-            CivicOps is built as an integration-ready platform. Each connector below shows its current status and what's needed to enable it in production.
-            Demo mode allows full functionality without external dependencies.
-        </p>
+<div class="container py-4 civic-page">
+    <div class="hero-panel mb-4">
+        <span class="eyebrow">Live connector ready · sandbox safe without secrets</span>
+        <h1 class="display-6 fw-bold">CivicOps Connector Readiness</h1>
+        <p class="lead mb-0">Truthful status for Gemini, WhatsApp Cloud API, and future pilot connectors. Secret values are never displayed.</p>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        @foreach (var connector in Model)
-        {
-            var statusColor = connector.Mode switch
-            {
-                "Configured" => "#22c55e",
-                "Demo" => "#fbbf24",
-                "Placeholder" => "#94a3b8",
-                _ => "#06b6d4"
-            };
-
-            var statusBg = connector.Mode switch
-            {
-                "Configured" => "rgba(34, 197, 94, 0.1)",
-                "Demo" => "rgba(251, 191, 36, 0.1)",
-                "Placeholder" => "rgba(148, 163, 184, 0.1)",
-                _ => "rgba(6, 182, 212, 0.1)"
-            };
-
-            <div class="card" style="border-left: 4px solid @statusColor;">
-                <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                    <div style="flex: 1;">
-                        <h3 style="color: #e0e7ff; margin-bottom: 0.5rem;">@connector.Name</h3>
-                        <p style="color: #94a3b8; margin-bottom: 1rem;">@connector.Description</p>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="ops-card h-100 connector-card">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <div class="card-kicker">AI classification connector</div>
+                        <h2 class="h4">Gemini AI</h2>
+                        <p class="text-muted-strong">Server-side classifier used by the shared IncidentIntakeService when credentials are configured.</p>
                     </div>
-                    <div style="display: inline-block; padding: 0.5rem 1rem; background: @statusBg; border: 1px solid @statusColor; border-radius: 0.5rem;">
-                        <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Status</div>
-                        <div style="font-weight: 600; color: @statusColor; margin-top: 0.25rem;">@connector.Mode</div>
+                    <span class="status-pill @(ViewBag.GeminiEnabled ? "status-success" : "status-warning")">@(ViewBag.GeminiEnabled ? "Live Ready" : "Fallback Active")</span>
+                </div>
+                <dl class="connector-list">
+                    <dt>Enabled</dt><dd>@(ViewBag.GeminiEnabled ? "Yes" : "No")</dd>
+                    <dt>API key present</dt><dd>@(ViewBag.GeminiApiKeyPresent ? "Yes" : "No")</dd>
+                    <dt>Model</dt><dd>@ViewBag.GeminiModel</dd>
+                    <dt>Mode</dt><dd>@ViewBag.GeminiMode</dd>
+                    <dt>Last known status</dt><dd>@ViewBag.GeminiStatus</dd>
+                    <dt>Source</dt><dd>@(ViewBag.GeminiEnabled ? "Gemini" : "Fallback")</dd>
+                </dl>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-primary" href="/api/connectors/gemini/test" target="_blank" rel="noopener"><i class="bi bi-activity me-1"></i>Run health test</a>
+                    <a class="btn btn-outline-info" href="/docs/gemini-setup.md">Setup notes</a>
+                </div>
+                <p class="small text-muted-strong mt-3 mb-0">Fallback active means deterministic classification remains available. Live Gemini activates only when <code>GEMINI_API_KEY</code> and <code>GEMINI_ENABLED=true</code> are configured.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="ops-card h-100 connector-card">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <div class="card-kicker">Resident messaging connector</div>
+                        <h2 class="h4">WhatsApp Cloud API</h2>
+                        <p class="text-muted-strong">Inbound webhook and outbound send readiness for WhatsApp-first reporting.</p>
+                    </div>
+                    <span class="status-pill @(whatsApp?.CanSend == true ? "status-success" : ViewBag.WhatsAppVerifyTokenPresent ? "status-info" : "status-warning")">@(whatsApp?.CanSend == true ? "Live Ready" : ViewBag.WhatsAppVerifyTokenPresent ? "Webhook Ready" : "Sandbox Active")</span>
+                </div>
+                <dl class="connector-list">
+                    <dt>WHATSAPP_ENABLED</dt><dd>@(whatsApp?.Enabled == true ? "True" : "False")</dd>
+                    <dt>WHATSAPP_DEMO_MODE</dt><dd>@(whatsApp?.DemoMode == true ? "True" : "False")</dd>
+                    <dt>Verify token present</dt><dd>@(ViewBag.WhatsAppVerifyTokenPresent ? "Yes" : "No")</dd>
+                    <dt>Access token present</dt><dd>@(ViewBag.WhatsAppAccessTokenPresent ? "Yes" : "No")</dd>
+                    <dt>Phone number id present</dt><dd>@(ViewBag.WhatsAppPhoneNumberIdPresent ? "Yes" : "No")</dd>
+                    <dt>Public base URL present</dt><dd>@(!string.IsNullOrWhiteSpace(whatsApp?.PublicBaseUrl) ? "Yes" : "No")</dd>
+                    <dt>Webhook verification status</dt><dd>@(ViewBag.WhatsAppVerifyTokenPresent && !string.IsNullOrWhiteSpace(whatsApp?.PublicBaseUrl) ? "Webhook Ready" : "Needs Environment Variables")</dd>
+                    <dt>Send status</dt><dd>@(whatsApp?.CanSend == true ? "Send Ready" : "Sandbox or credentials incomplete")</dd>
+                    <dt>Mode</dt><dd>@whatsApp?.Mode</dd>
+                </dl>
+                <div class="copy-box">
+                    <label class="form-label" for="webhookUrl">Copy webhook callback URL</label>
+                    <div class="input-group">
+                        <input id="webhookUrl" class="form-control" readonly value="@(string.IsNullOrWhiteSpace(webhookUrl) ? "Set WHATSAPP_PUBLIC_BASE_URL to your deployment URL." : webhookUrl)" />
+                        <button class="btn btn-outline-info" type="button" onclick="navigator.clipboard?.writeText(document.getElementById('webhookUrl').value)">Copy</button>
                     </div>
                 </div>
+                <p class="small text-muted-strong mt-3 mb-0">Sandbox mode uses the same intake pipeline. Live WhatsApp Cloud API activates when Meta environment variables are configured.</p>
+            </div>
+        </div>
+    </div>
 
-                <div style="display: grid; gap: 0.75rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
-                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.375rem;">
-                        <span style="color: #94a3b8; font-size: 0.875rem;">Current Status:</span>
-                        <span style="color: #e0e7ff; font-size: 0.875rem; font-weight: 600;">@connector.Status</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.375rem;">
-                        <span style="color: #94a3b8; font-size: 0.875rem;">Environment Variables:</span>
-                        <span style="color: #e0e7ff; font-size: 0.875rem; font-family: monospace;">@connector.EnvVars</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.375rem;">
-                        <span style="color: #94a3b8; font-size: 0.875rem;">Documentation:</span>
-                        <span style="color: #06b6d4; font-size: 0.875rem;">@connector.Documentation</span>
-                    </div>
+    <div class="row g-4">
+        @foreach (var connector in Model.Where(c => c.Name != "Gemini AI" && c.Name != "WhatsApp Cloud API"))
+        {
+            <div class="col-md-6 col-xl-4">
+                <div class="ops-card h-100">
+                    <span class="status-pill status-muted float-end">Future Connector</span>
+                    <h3 class="h5">@connector.Name</h3>
+                    <p class="text-muted-strong">@connector.Description</p>
+                    <p class="small mb-1"><strong>Environment path:</strong> @connector.EnvVars</p>
+                    <p class="small text-muted-strong mb-0">Pilot integration path only; not active in this submission build.</p>
                 </div>
             </div>
         }
-    </div>
-
-    <div class="card" style="margin-top: 2rem; background: rgba(6, 182, 212, 0.1); border-color: rgba(6, 182, 212, 0.3);">
-        <h3 style="color: #06b6d4; margin-bottom: 1rem;">Production Deployment Notes</h3>
-        <ul style="color: #cbd5e1; line-height: 1.8;">
-            <li>Set environment variables in your hosting environment (Azure, AWS, etc.)</li>
-            <li>Never commit API keys or secrets to the repository</li>
-            <li>Use .env files locally (already in .gitignore)</li>
-            <li>Test each connector individually before full deployment</li>
-            <li>Monitor connector health and fallback behavior</li>
-            <li>Review connector documentation in /docs folder</li>
-        </ul>
     </div>
 </div>

@@ -329,7 +329,7 @@ dotnet build
 - ⚠️ **Authentication**: Simple demo auth, not production-ready
 - ⚠️ **Persistence**: JSON files, not suitable for production scale
 - ⚠️ **Gemini**: Disabled by default, requires API key
-- ⚠️ **WhatsApp**: Demo mode, requires Meta app setup
+- ⚠️ **WhatsApp**: Sandbox mode, requires Meta app setup
 - ⚠️ **Voice Transcription**: Placeholder, requires service integration
 - ⚠️ **SMS/Email**: Not implemented, requires service integration
 - ⚠️ **GIS/Mapping**: Not implemented, requires service integration
