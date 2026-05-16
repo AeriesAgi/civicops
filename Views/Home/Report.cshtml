@@ -1,110 +1,31 @@
 @model CivicOps.Controllers.ReportViewModel
 @{
-    ViewData["Title"] = "Report an Issue";
+    ViewData["Title"] = "Report Issue";
 }
+<div class="container py-4 civic-page">
+    <section class="hero-panel mb-4">
+        <span class="eyebrow">Mobile-first civic intake</span>
+        <h1 class="display-5">Report a civic issue</h1>
+        <p class="lead">Submit a report through the web/PWA portal. CivicOps creates a public reference, runs Gemini/fallback analysis only on submit, and routes the ticket for human review.</p>
+        <div class="alert alert-warning mb-0">If there is immediate danger, contact emergency services directly. CivicOps supports civic reporting and routing; it does not replace emergency services.</div>
+    </section>
 
-<div class="container">
-    <div class="card" style="max-width: 800px; margin: 2rem auto;">
-        <h1 class="card-title">📝 Report a Civic Issue</h1>
-        
-        <div class="alert alert-warning">
-            <strong>⚠️ Emergency Disclaimer:</strong> If you or someone else is in immediate danger, please contact official emergency services directly (Police: 10111, Fire/EMS: 10177). This form is for non-emergency civic issues only.
+    <form asp-action="Report" method="post" class="ops-card">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Name</label><input asp-for="ContactName" class="form-control" placeholder="Your name" /></div>
+            <div class="col-md-6"><label class="form-label">Contact</label><input asp-for="ContactPhone" class="form-control" placeholder="Phone or WhatsApp number (optional)" /></div>
+            <div class="col-md-6"><label class="form-label">Email</label><input asp-for="ContactEmail" class="form-control" placeholder="you@example.com (optional)" /></div>
+            <div class="col-md-6"><label class="form-label">Area / suburb</label><input asp-for="Suburb" class="form-control" placeholder="e.g. Chatsworth" /></div>
+            <div class="col-md-6"><label class="form-label">City / municipality</label><input asp-for="CityMunicipality" class="form-control" placeholder="e.g. eThekwini" /></div>
+            <div class="col-md-6"><label class="form-label">Ward (optional)</label><input asp-for="Ward" class="form-control" placeholder="e.g. Ward 68" /></div>
+            <div class="col-md-6"><label class="form-label">Urgency</label><select asp-for="Urgency" class="form-select"><option>Normal civic issue</option><option>High impact</option><option>Urgent civic risk</option><option>Possible emergency - also contact emergency services</option></select></div>
+            <div class="col-md-6"><label class="form-label">Optional category</label><input asp-for="Category" class="form-control" placeholder="Water, electricity, road, waste..." /></div>
+            <div class="col-12"><label class="form-label">Location notes</label><input asp-for="LocationNotes" class="form-control" placeholder="Nearest landmark, street, intersection or facility" /></div>
+            <div class="col-12"><label class="form-label">Issue description</label><textarea asp-for="Description" class="form-control" rows="6" placeholder="Describe what happened, when it started, who is affected and any visible risks."></textarea></div>
+            <div class="col-12"><label class="form-label">Photo / media</label><div class="ops-card mb-0"><span class="badge bg-secondary">Placeholder</span> Media upload is connector-ready for pilot storage; do not upload sensitive material in this sandbox scenario.</div></div>
+            <div class="col-12"><div class="form-check"><input asp-for="ConsentAccepted" class="form-check-input" /><label class="form-check-label" asp-for="ConsentAccepted">I consent to CivicOps processing this synthetic/pilot report for routing and acknowledge it is not an emergency services replacement.</label><span asp-validation-for="ConsentAccepted" class="text-danger d-block"></span></div></div>
         </div>
-
-        <form method="post" asp-action="Report">
-            <div class="form-group">
-                <label class="form-label" for="Description">Issue Description *</label>
-                <textarea class="form-control" id="Description" name="Description" required 
-                          placeholder="Describe the issue in detail. For example: 'Burst water pipe on Main Road causing flooding' or 'Power outage in our area since this morning'"></textarea>
-                <span asp-validation-for="Description" style="color: #ef4444; font-size: 0.875rem;"></span>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="Category">Category (Optional)</label>
-                <select class="form-control" id="Category" name="Category">
-                    <option value="">-- Auto-detect from description --</option>
-                    <option value="Water Infrastructure">Water Infrastructure</option>
-                    <option value="Sanitation">Sanitation</option>
-                    <option value="Electricity">Electricity</option>
-                    <option value="Road Maintenance">Road Maintenance</option>
-                    <option value="Stormwater">Stormwater</option>
-                    <option value="Waste Collection">Waste Collection</option>
-                    <option value="Illegal Dumping">Illegal Dumping</option>
-                    <option value="Parks">Parks & Public Spaces</option>
-                    <option value="Fire Safety">Fire Safety</option>
-                    <option value="Public Safety">Public Safety</option>
-                    <option value="Environmental Hazard">Environmental Hazard</option>
-                    <option value="Housing">Housing</option>
-                    <option value="General">General Inquiry</option>
-                </select>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label class="form-label" for="Suburb">Suburb/Area</label>
-                    <input type="text" class="form-control" id="Suburb" name="Suburb" 
-                           placeholder="e.g., Chatsworth, Umlazi, Phoenix" />
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="Ward">Ward</label>
-                    <input type="text" class="form-control" id="Ward" name="Ward" 
-                           placeholder="e.g., Ward 73" />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="LocationNotes">Location Details (Optional)</label>
-                <input type="text" class="form-control" id="LocationNotes" name="LocationNotes" 
-                       placeholder="e.g., Near the traffic light, opposite the school" />
-            </div>
-
-            <h3 style="color: #06b6d4; margin: 2rem 0 1rem;">Contact Information (Optional)</h3>
-            <p style="color: #94a3b8; font-size: 0.875rem; margin-bottom: 1rem;">
-                Providing contact details helps us reach you for updates or clarification.
-            </p>
-
-            <div class="form-group">
-                <label class="form-label" for="ContactName">Your Name</label>
-                <input type="text" class="form-control" id="ContactName" name="ContactName" 
-                       placeholder="Optional" />
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label class="form-label" for="ContactPhone">Phone Number</label>
-                    <input type="tel" class="form-control" id="ContactPhone" name="ContactPhone" 
-                           placeholder="Optional" />
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="ContactEmail">Email Address</label>
-                    <input type="email" class="form-control" id="ContactEmail" name="ContactEmail" 
-                           placeholder="Optional" />
-                </div>
-            </div>
-
-            <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                <button type="submit" class="btn btn-primary">
-                    Submit Report
-                </button>
-                <a href="/" class="btn btn-secondary">
-                    Cancel
-                </a>
-            </div>
-        </form>
-
-        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
-            <h4 style="color: #cbd5e1; margin-bottom: 1rem;">Other Reporting Options</h4>
-            <ul style="color: #94a3b8; line-height: 1.8;">
-                <li>📱 <a href="/Home/Mobile" style="color: #06b6d4;">Download the Android app</a> for mobile reporting</li>
-                <li>💬 <a href="/demo/whatsapp" style="color: #06b6d4;">WhatsApp Intake Sandbox</a> (sandbox flow)</li>
-                <li>🎤 <a href="/demo/voicenote" style="color: #06b6d4;">Voice Note Sandbox</a> (sandbox flow)</li>
-            </ul>
-        </div>
-    </div>
+        <div class="d-flex gap-2 flex-wrap mt-4"><button type="submit" class="btn btn-primary btn-lg">Submit and create reference</button><a href="/Home/Lookup" class="btn btn-outline-info btn-lg">Track existing reference</a><a href="/Home/Mobile" class="btn btn-outline-light btn-lg">Open mobile hub</a></div>
+    </form>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

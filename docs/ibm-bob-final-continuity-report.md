@@ -519,3 +519,8 @@ This continuity session successfully stabilized and integrated the AI Agent Cons
 After the IBM Bob stabilization work, a final Codex pass polished and connected the submission experience without removing Bob evidence. The pass rebuilt the broken AI Agent view, added backend agent endpoints, improved global contrast, updated Connector/Mobile/WhatsApp pages, added the judge demo tour, and refreshed documentation to distinguish Bob's core acceleration from Codex's final pre-submission stabilization.
 
 The submission remains honest: synthetic data is used for judging, live Gemini and WhatsApp require configured credentials, no official municipal partnership is claimed, and CivicOps does not replace emergency services.
+
+
+## Final engineering polish note
+
+IBM Bob was used to build and accelerate the main CivicOps hackathon implementation. A final engineering polish pass may have been completed after Bob to improve UI consistency, mobile/PWA positioning, Gemini quota safety, connector readiness wording, smoke scripts and documentation. This note does not claim that post-Bob polish was performed by IBM Bob, and it does not invent unavailable Bob session history. Official export placeholders remain preserved where exports were not available.

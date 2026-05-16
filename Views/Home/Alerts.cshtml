@@ -2,91 +2,9 @@
 @{
     ViewData["Title"] = "Area Alerts";
 }
-
-<div class="container">
-    <h1 style="color: #06b6d4; margin-bottom: 2rem;">📢 Area Alerts</h1>
-
-    <div class="card" style="margin-bottom: 2rem;">
-        <h3 style="color: #cbd5e1; margin-bottom: 1rem;">Filter by Area</h3>
-        <form method="get" asp-action="Alerts" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: end;">
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="suburb">Suburb</label>
-                <input type="text" class="form-control" id="suburb" name="suburb" value="@ViewBag.Suburb" placeholder="e.g., Chatsworth" />
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label" for="ward">Ward</label>
-                <input type="text" class="form-control" id="ward" name="ward" value="@ViewBag.Ward" placeholder="e.g., Ward 73" />
-            </div>
-            <button type="submit" class="btn btn-primary">Filter</button>
-        </form>
-    </div>
-
-    @if (Model.Any())
-    {
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            @foreach (var alert in Model)
-            {
-                var severityColor = alert.Severity switch
-                {
-                    CivicOps.Models.AlertSeverity.Critical => "#ef4444",
-                    CivicOps.Models.AlertSeverity.Urgent => "#f97316",
-                    CivicOps.Models.AlertSeverity.Warning => "#fbbf24",
-                    _ => "#06b6d4"
-                };
-
-                var severityBg = alert.Severity switch
-                {
-                    CivicOps.Models.AlertSeverity.Critical => "rgba(239, 68, 68, 0.1)",
-                    CivicOps.Models.AlertSeverity.Urgent => "rgba(249, 115, 22, 0.1)",
-                    CivicOps.Models.AlertSeverity.Warning => "rgba(251, 191, 36, 0.1)",
-                    _ => "rgba(6, 182, 212, 0.1)"
-                };
-
-                <div class="card" style="background: @severityBg; border-left: 4px solid @severityColor;">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                        <div>
-                            <div style="display: inline-block; padding: 0.25rem 0.75rem; background: @severityBg; border: 1px solid @severityColor; border-radius: 1rem; color: @severityColor; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">
-                                @alert.Severity
-                            </div>
-                            <h3 style="color: #e0e7ff; margin-bottom: 0.5rem;">@alert.Title</h3>
-                            <div style="color: #94a3b8; font-size: 0.875rem;">
-                                @alert.Type • @alert.AffectedDepartment.GetDisplayName()
-                            </div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="color: #cbd5e1; font-weight: 600;">@alert.Suburb</div>
-                            <div style="color: #94a3b8; font-size: 0.875rem;">@alert.Ward</div>
-                        </div>
-                    </div>
-                    <p style="color: #e0e7ff; line-height: 1.6; margin-bottom: 1rem;">
-                        @alert.Description
-                    </p>
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid rgba(148, 163, 184, 0.2); font-size: 0.875rem; color: #94a3b8;">
-                        <span>Posted: @alert.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
-                        @if (alert.ExpiresAt.HasValue)
-                        {
-                            <span>Expires: @alert.ExpiresAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <div class="card" style="text-align: center; padding: 3rem;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
-            <h3 style="color: #cbd5e1; margin-bottom: 0.5rem;">No Active Alerts</h3>
-            <p style="color: #94a3b8;">
-                @if (!string.IsNullOrEmpty(ViewBag.Suburb) || !string.IsNullOrEmpty(ViewBag.Ward))
-                {
-                    <text>No alerts found for the selected area.</text>
-                }
-                else
-                {
-                    <text>There are currently no active alerts in your area.</text>
-                }
-            </p>
-        </div>
-    }
+<div class="container py-4 civic-page">
+  <section class="hero-panel mb-4"><span class="eyebrow">Public notices</span><h1 class="display-5">Area alerts</h1><p class="lead">Active synthetic civic notices by area, ward, severity and affected department. Public alerting remains human-reviewed.</p></section>
+  <form method="get" asp-action="Alerts" class="ops-card mb-4"><div class="row g-3 align-items-end"><div class="col-md-5"><label class="form-label">Suburb</label><input class="form-control" name="suburb" value="@ViewBag.Suburb" placeholder="Chatsworth" /></div><div class="col-md-5"><label class="form-label">Ward</label><input class="form-control" name="ward" value="@ViewBag.Ward" placeholder="Ward 68" /></div><div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div></div></form>
+  <div class="grid-auto">@foreach (var alert in Model) { <div class="ops-card"><span class="badge @(alert.Severity == CivicOps.Models.AlertSeverity.Critical ? "bg-danger" : alert.Severity == CivicOps.Models.AlertSeverity.Warning ? "bg-warning" : "bg-info")">@alert.Severity</span><h2 class="h5 mt-3">@alert.Title</h2><p>@alert.Description</p><p><strong>Area:</strong> @alert.Suburb · @alert.Ward</p><p><strong>Department:</strong> @alert.AffectedDepartment.GetDisplayName()</p><p class="small text-muted-strong">Created @alert.CreatedAt.ToString("MMM dd HH:mm") UTC</p></div> }</div>
+  @if (!Model.Any()) { <div class="alert alert-info">No active alerts found for this filter.</div> }
 </div>

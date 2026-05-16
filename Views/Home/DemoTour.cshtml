@@ -1,38 +1,40 @@
 @{
-    ViewData["Title"] = "Judge Demo Tour";
+    ViewData["Title"] = "Judge Tour";
     var steps = new[] {
-        new { Title="Home", Link="/", Click="Review the product story and CTAs.", See="CivicOps converts messy resident reports into civic intelligence.", Why="Sets the product frame." },
-        new { Title="Report Issue", Link="/Home/Report", Click="Submit or review the resident report form.", See="A structured CivicOps reference flow.", Why="Shows web intake." },
-        new { Title="WhatsApp Intake Sandbox", Link="/Demo/WhatsAppSimulator", Click="Send the prefilled resident message.", See="Reference, validation, department, priority, connector mode.", Why="Shows WhatsApp-ready intake without secrets." },
-        new { Title="Voice Note Sandbox", Link="/Demo/VoiceNoteSimulator", Click="Submit the transcript scenario.", See="Voice transcript becomes an incident.", Why="Shows accessibility channel." },
-        new { Title="AI Agent Command Centre", Link="/Home/Agent", Click="Run each agent action button.", See="Backend fetch results, pipeline output, audit trail.", Why="Main intelligence showcase." },
-        new { Title="Incident Detail", Link="/Home/Dashboard", Click="Open a recent incident from the dashboard.", See="Reference, status, internal notes, public updates.", Why="Shows traceability." },
-        new { Title="Dashboard", Link="/Home/Dashboard", Click="Review stats and queues.", See="Operational workload and department distribution.", Why="Shows staff view." },
-        new { Title="Alerts", Link="/Home/Alerts", Click="Review active area alerts.", See="Public notices by area/ward.", Why="Shows public communication." },
-        new { Title="Weather", Link="/Home/Weather", Click="Review weather risk context.", See="Synthetic operational weather context.", Why="Shows situational awareness." },
-        new { Title="Mobile/App Hub", Link="/Home/Mobile", Click="Scan the mobile panels.", See="PWA, Android-ready, and WhatsApp-first access.", Why="Shows public utility reach." },
-        new { Title="Connectors", Link="/Home/Connectors", Click="Run Gemini health test and copy webhook URL.", See="Live Ready, Webhook Ready, Sandbox Active, or Fallback Active statuses.", Why="Shows honest integration readiness." },
-        new { Title="Bob Evidence/Build Docs", Link="/docs/ibm-bob-final-continuity-report.md", Click="Open evidence docs in repo.", See="Bob continuity and final polish notes.", Why="Preserves build evidence." }
+        new { Title="1. Home / product story", Link="/", Click="Read the hero and primary channel explanation.", See="Mobile/PWA and web reporting are the main public channels.", Why="Frames CivicOps as a pilot-ready civic AI product.", Next="Report an issue" },
+        new { Title="2. Report an issue", Link="/Home/Report", Click="Submit the mobile-first report form or review its fields.", See="A reference number, citizen response, routing and status link.", Why="Proves web/PWA reporting works without WhatsApp.", Next="Open mobile app" },
+        new { Title="3. Mobile/PWA app hub", Link="/Home/Mobile", Click="Open the phone-like app tiles.", See="Report, track, alerts, weather and resident profile paths.", Why="Shows the main citizen channel.", Next="Run AI agent" },
+        new { Title="4. AI Agent Command Centre", Link="/Home/Agent", Click="Run each action button once.", See="Validation, department, priority, citizen response, alert recommendation and audit trail.", Why="Shows Gemini/fallback intelligence is event-triggered and quota-safe.", Next="Open dashboard" },
+        new { Title="5. Dashboard/control room", Link="/Home/Dashboard", Click="Review stats, queues and high-priority reports.", See="A civic operations view for staff review.", Why="Shows routing has operational value.", Next="Track a reference" },
+        new { Title="6. Incident/status lookup", Link="/Home/Lookup", Click="Enter a reference from a submitted ticket.", See="Status, department, timeline and latest update.", Why="Residents can self-serve status without calling staff.", Next="View alerts/weather" },
+        new { Title="7. Alerts/weather", Link="/Home/Alerts", Click="Review alert cards, then open weather context.", See="Area, ward, severity and sandbox weather signals.", Why="Connects individual reports to public resilience messaging.", Next="Optional WhatsApp" },
+        new { Title="8. Optional WhatsApp sandbox", Link="/Demo/WhatsAppSimulator", Click="Submit the sandbox message.", See="Masked intake and connector-ready copy.", Why="Shows WhatsApp readiness without making it the core dependency.", Next="Connector readiness" },
+        new { Title="9. Connector readiness", Link="/Home/Connectors", Click="Review Gemini diagnostics and WhatsApp environment gates.", See="Enabled/key-present/model/cooldown/fallback status without secrets.", Why="Demonstrates honest integration posture.", Next="Bob evidence" },
+        new { Title="10. Bob evidence/report docs", Link="/Home/BobEvidence", Click="Open the visible evidence route and source docs list.", See="Bob-assisted build and final polish caveats.", Why="Preserves hackathon build evidence honestly.", Next="Finish" }
     };
 }
-
 <div class="container py-4 civic-page">
-    <div class="hero-panel mb-4"><span class="eyebrow">Submission route</span><h1 class="display-6 fw-bold">CivicOps Judge Demo Tour</h1><p class="lead mb-0">A coordinated path through the product, sandbox data, connector readiness, and evidence docs.</p></div>
+    <section class="hero-panel mb-4">
+        <span class="eyebrow">3–5 minute guided evaluation path</span>
+        <h1 class="display-5">CivicOps judge tour</h1>
+        <p class="lead">Follow this route from public product story to intake, AI action, ticket tracking, control room, alerts, mobile app and connector readiness.</p>
+        <a class="btn btn-primary btn-lg" href="/Home/Report">Begin with a report</a>
+    </section>
     <div class="row g-3">
-        @{ var i = 1; }
-        @foreach (var step in steps)
+        @for (var i = 0; i < steps.Length; i++)
         {
+            var step = steps[i];
+            var next = i + 1 < steps.Length ? steps[i + 1].Link : "/";
             <div class="col-lg-6">
-                <div class="ops-card h-100 tour-step">
-                    <span class="step-number">@i</span>
-                    <h2 class="h5">@step.Title</h2>
+                <div class="tour-step h-100">
+                    <span class="badge bg-info mb-2">@step.Title</span>
+                    <h2 class="h5"><a href="@step.Link">@step.Link</a></h2>
                     <p><strong>What to click:</strong> @step.Click</p>
-                    <p><strong>What the judge should see:</strong> @step.See</p>
+                    <p><strong>What should happen:</strong> @step.See</p>
                     <p><strong>Why it matters:</strong> @step.Why</p>
-                    <a class="btn btn-primary" href="@step.Link">Open step</a>
+                    <div class="d-flex gap-2 flex-wrap"><a class="btn btn-primary" href="@step.Link">Open step</a><a class="btn btn-outline-info" href="@next">Next step</a></div>
                 </div>
             </div>
-            i++;
         }
     </div>
 </div>

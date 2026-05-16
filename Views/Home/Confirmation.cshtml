@@ -1,83 +1,8 @@
 @model CivicOps.Models.Incident
 @{
-    ViewData["Title"] = "Report Submitted";
+    ViewData["Title"] = "Report Confirmation";
 }
-
-<div class="container">
-    <div class="card" style="max-width: 800px; margin: 2rem auto;">
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
-            <h1 style="color: #22c55e; margin-bottom: 0.5rem;">Report Submitted Successfully</h1>
-            <p style="color: #cbd5e1;">Your civic issue has been received and assigned to the appropriate department.</p>
-        </div>
-
-        <div class="alert alert-success">
-            <h3 style="margin-bottom: 0.5rem;">Your Reference Number</h3>
-            <div style="font-size: 2rem; font-weight: bold; font-family: monospace; color: #22c55e;">
-                @Model.ReferenceNumber
-            </div>
-            <p style="margin-top: 0.5rem; font-size: 0.875rem;">
-                Save this number to track your report's progress.
-            </p>
-        </div>
-
-        <div style="display: grid; gap: 1rem; margin: 2rem 0;">
-            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <span style="color: #94a3b8;">Status:</span>
-                <span style="color: #06b6d4; font-weight: 600;">@Model.Status</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <span style="color: #94a3b8;">Assigned Department:</span>
-                <span style="color: #06b6d4; font-weight: 600;">@Model.AssignedDepartment.GetDisplayName()</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <span style="color: #94a3b8;">Category:</span>
-                <span style="color: #06b6d4; font-weight: 600;">@Model.Category</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <span style="color: #94a3b8;">Priority:</span>
-                <span style="color: #06b6d4; font-weight: 600;">@Model.Priority</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                <span style="color: #94a3b8;">Area:</span>
-                <span style="color: #06b6d4; font-weight: 600;">@Model.Suburb, @Model.Ward</span>
-            </div>
-        </div>
-
-        @if (Model.PublicUpdates.Any())
-        {
-            <div style="margin: 2rem 0;">
-                <h3 style="color: #cbd5e1; margin-bottom: 1rem;">Latest Update</h3>
-                <div style="padding: 1rem; background: rgba(6, 182, 212, 0.1); border-left: 4px solid #06b6d4; border-radius: 0.5rem;">
-                    <p style="color: #e0e7ff;">@Model.PublicUpdates.Last()</p>
-                </div>
-            </div>
-        }
-
-        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
-            <h3 style="color: #cbd5e1; margin-bottom: 1rem;">What Happens Next?</h3>
-            <ol style="color: #94a3b8; line-height: 1.8; padding-left: 1.5rem;">
-                <li>The @Model.AssignedDepartment.GetDisplayName() department will review your report</li>
-                <li>They will investigate and take appropriate action</li>
-                <li>You can track progress using your reference number</li>
-                <li>You'll receive updates as the status changes</li>
-            </ol>
-        </div>
-
-        <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-            <a href="/Home/Lookup" class="btn btn-primary">
-                Track This Report
-            </a>
-            <a href="/Home/Report" class="btn btn-secondary">
-                Report Another Issue
-            </a>
-            <a href="/" class="btn btn-secondary">
-                Back to Home
-            </a>
-        </div>
-
-        <div class="alert alert-warning" style="margin-top: 2rem;">
-            <strong>Important:</strong> If this is an emergency or someone is in immediate danger, please contact official emergency services directly (Police: 10111, Fire/EMS: 10177).
-        </div>
-    </div>
+<div class="container py-4 civic-page">
+  <section class="hero-panel mb-4"><span class="eyebrow">Reference created</span><h1 class="display-5">Thank you — @Model.ReferenceNumber</h1><p class="lead">Your report has been validated, classified and routed for human review.</p><div class="d-flex gap-2 flex-wrap"><a class="btn btn-primary" href="/Home/Lookup">Track status</a><a class="btn btn-outline-info" href="/Home/Report">Submit another report</a><a class="btn btn-outline-light" href="/Home/Mobile">Open mobile hub</a></div></section>
+  <div class="row g-4"><div class="col-lg-6"><div class="ops-card"><h2 class="h4">Routing</h2><dl><dt>Department</dt><dd>@Model.AssignedDepartment.GetDisplayName()</dd><dt>Category</dt><dd>@Model.Category</dd><dt>Priority</dt><dd>@Model.Priority</dd><dt>AI source</dt><dd>@Model.ClassificationMethod</dd></dl></div></div><div class="col-lg-6"><div class="ops-card"><h2 class="h4">Citizen response</h2><p>@(Model.PublicUpdates.LastOrDefault()?.Content ?? "Your report has been received.")</p><p class="small text-muted-strong">CivicOps does not replace emergency services.</p></div></div></div>
 </div>
