@@ -60,9 +60,9 @@ namespace CivicOps.Controllers
 
         // POST: /Resident/Signup
         [HttpPost]
-        public async Task<IActionResult> Signup(string email, string password, string confirmPassword, string fullName, string? phoneNumber = null)
+        public async Task<IActionResult> Signup(string email, string password, string? confirmPassword, string fullName, string? phoneNumber = null, string? areaSuburb = null, string? followedWard = null, string? whatsappNumber = null, bool whatsappConsent = false)
         {
-            if (password != confirmPassword)
+            if (!string.IsNullOrEmpty(confirmPassword) && password != confirmPassword)
             {
                 ViewBag.Error = "Passwords do not match";
                 return View();
@@ -71,6 +71,14 @@ namespace CivicOps.Controllers
             try
             {
                 var user = await _residentAuthService.CreateUserAsync(email, password, fullName, phoneNumber);
+                user.AreaSuburb = areaSuburb;
+                user.PrimaryWard = followedWard;
+                user.WhatsAppNumber = whatsappNumber;
+                user.WhatsAppConsent = whatsappConsent;
+                user.WhatsAppStatus = whatsappConsent ? "Consent Captured" : "Not Linked";
+                if (!string.IsNullOrWhiteSpace(areaSuburb)) user.FollowedSuburbs.Add(areaSuburb);
+                if (!string.IsNullOrWhiteSpace(followedWard)) user.FollowedWards.Add(followedWard);
+                await _residentAuthService.UpdateUserAsync(user);
                 
                 // Set session
                 HttpContext.Session.SetString("ResidentUserId", user.Id);
@@ -169,7 +177,7 @@ namespace CivicOps.Controllers
 
         // POST: /Resident/UpdateProfile
         [HttpPost]
-        public async Task<IActionResult> UpdateProfile(string fullName, string? phoneNumber, bool emailNotifications, bool smsNotifications, bool alertNotifications)
+        public async Task<IActionResult> UpdateProfile(string fullName, string? phoneNumber, string? areaSuburb, string? primaryWard, string? whatsappNumber, bool whatsappConsent, string? whatsappStatus, bool emailNotifications, bool smsNotifications, bool alertNotifications)
         {
             var userId = HttpContext.Session.GetString("ResidentUserId");
             if (string.IsNullOrEmpty(userId))
@@ -185,6 +193,11 @@ namespace CivicOps.Controllers
 
             user.FullName = fullName;
             user.PhoneNumber = phoneNumber;
+            user.AreaSuburb = areaSuburb;
+            user.PrimaryWard = primaryWard;
+            user.WhatsAppNumber = whatsappNumber;
+            user.WhatsAppConsent = whatsappConsent;
+            user.WhatsAppStatus = string.IsNullOrWhiteSpace(whatsappStatus) ? (whatsappConsent ? "Consent Captured" : "Not Linked") : whatsappStatus;
             user.EmailNotifications = emailNotifications;
             user.SMSNotifications = smsNotifications;
             user.AlertNotifications = alertNotifications;

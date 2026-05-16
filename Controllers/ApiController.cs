@@ -321,14 +321,7 @@ namespace CivicOps.Controllers
                 success = true,
                 agentStatus = "Operational",
                 intakePipelineStatus = "Unified IncidentIntakeService online",
-                gemini = new
-                {
-                    enabled = _geminiService.IsEnabled,
-                    status = _geminiService.IsEnabled ? "Live connector ready" : _geminiService.Status,
-                    mode = _geminiService.Mode,
-                    model = _geminiService.Model,
-                    source = _geminiService.IsEnabled ? "Gemini" : "Deterministic fallback"
-                },
+                gemini = BuildGeminiDiagnosticsSnapshot(),
                 whatsapp = BuildWhatsAppConnectorSnapshot(whatsApp),
                 scenarios = new[]
                 {
@@ -358,7 +351,7 @@ namespace CivicOps.Controllers
                     action = "Gemini health test",
                     sourceChannel = "Connector",
                     geminiAssisted = health.Success,
-                    aiSource = health.Success ? "Gemini" : "Deterministic fallback",
+                    aiSource = health.Success ? $"Gemini: {health.Model}" : "Local deterministic fallback",
                     validation = health.Success ? "Live Gemini connector responded." : "Fallback active — live Gemini activates when GEMINI_API_KEY and GEMINI_ENABLED=true are configured.",
                     department = "CivicOps platform",
                     priority = health.Success ? "Ready" : "Fallback",
@@ -384,7 +377,7 @@ namespace CivicOps.Controllers
                 action,
                 sourceChannel = incident.SourceChannel.ToString(),
                 geminiAssisted = incident.IsGeminiProcessed,
-                aiSource = incident.IsGeminiProcessed ? "Gemini assisted" : "Deterministic fallback",
+                aiSource = incident.IsGeminiProcessed ? incident.ClassificationMethod : "Local deterministic fallback",
                 validation = result.Validation,
                 department = incident.AssignedDepartment.GetDisplayName(),
                 priority = incident.Priority.ToString(),
@@ -399,7 +392,7 @@ namespace CivicOps.Controllers
                 {
                     $"Created via shared IncidentIntakeService from {incident.SourceChannel}.",
                     $"Classification method: {incident.ClassificationMethod}.",
-                    incident.IsGeminiProcessed ? "Gemini assisted classification was used." : "Fallback active — live Gemini activates when GEMINI_API_KEY and GEMINI_ENABLED=true are configured.",
+                    incident.IsGeminiProcessed ? $"Gemini classification source: {incident.ClassificationMethod}." : "Fallback active — live Gemini activates only for event/action-triggered calls when GEMINI_API_KEY and GEMINI_ENABLED=true are configured.",
                     whatsAppStatus.CanSend ? "WhatsApp Cloud API send ready." : "Sandbox WhatsApp flow active — Cloud API activates through env vars.",
                     "Human-in-the-loop review remains required before field dispatch or public alerting."
                 },
@@ -425,8 +418,21 @@ namespace CivicOps.Controllers
         }
 
         [HttpGet("connectors/gemini/test")]
-        public async Task<IActionResult> TestGeminiConnector()
+        public async Task<IActionResult> TestGeminiConnector([FromQuery] bool live = false)
         {
+            if (!live)
+            {
+                return Ok(new
+                {
+                    success = true,
+                    status = "Diagnostics only - no live Gemini call made",
+                    model = _geminiService.Model,
+                    mode = _geminiService.Mode,
+                    message = "Quota-safe endpoint default. Add ?live=true or use the Agent health action to perform one explicit live test when credentials are configured.",
+                    diagnostics = BuildGeminiDiagnosticsSnapshot()
+                });
+            }
+
             var result = await _geminiService.TestConnectionAsync();
             return Ok(new
             {
@@ -434,7 +440,8 @@ namespace CivicOps.Controllers
                 status = result.Status,
                 model = result.Model,
                 mode = result.Mode,
-                message = result.Message
+                message = result.Message,
+                diagnostics = BuildGeminiDiagnosticsSnapshot()
             });
         }
 
@@ -574,6 +581,28 @@ namespace CivicOps.Controllers
         private static string ScenarioAlertRecommendation(string scenario, string fallback) => scenario == "area-alert"
             ? "Recommend area alert review: cluster stormwater reports by suburb/ward, verify with dispatcher, then publish a human-approved area notice if duplicate reports continue."
             : fallback;
+
+        private object BuildGeminiDiagnosticsSnapshot()
+        {
+            var diagnostics = _geminiService.GetDiagnostics();
+            return new
+            {
+                enabled = diagnostics.Enabled,
+                keyPresent = diagnostics.KeyPresent,
+                primaryModel = diagnostics.PrimaryModel,
+                routineModel = diagnostics.RoutineModel,
+                fallbackModels = diagnostics.FallbackModels,
+                mode = diagnostics.Mode,
+                callsSinceAppStart = diagnostics.CallsSinceAppStart,
+                lastCallAction = diagnostics.LastCallAction,
+                lastModelUsed = diagnostics.LastModelUsed,
+                lastResult = diagnostics.LastResult,
+                quotaLimited = diagnostics.QuotaLimited,
+                fallbackActive = diagnostics.FallbackActive,
+                manualTestCooldownSeconds = diagnostics.ManualTestCooldownSeconds,
+                quotaCooldownMinutes = diagnostics.QuotaCooldownMinutes
+            };
+        }
 
         private object BuildWhatsAppConnectorSnapshot(WhatsAppStatus status) => new
         {

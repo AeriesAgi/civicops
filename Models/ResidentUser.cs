@@ -10,6 +10,11 @@ namespace CivicOps.Models
         public string Password { get; set; } = string.Empty; // Demo only - plain text
         public string FullName { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
+        public string? AreaSuburb { get; set; }
+        public string? PrimaryWard { get; set; }
+        public string? WhatsAppNumber { get; set; }
+        public bool WhatsAppConsent { get; set; } = false;
+        public string WhatsAppStatus { get; set; } = "Not Linked";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastLoginAt { get; set; } = DateTime.UtcNow;
         

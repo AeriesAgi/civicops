@@ -1,88 +1,51 @@
 @model IEnumerable<CivicOps.Controllers.ConnectorInfo>
 @{
     ViewData["Title"] = "Connector Readiness";
+    var diagnostics = ViewBag.GeminiDiagnostics as CivicOps.Services.GeminiDiagnostics;
     var whatsApp = ViewBag.WhatsApp as CivicOps.Services.WhatsAppStatus;
-    var webhookUrl = string.IsNullOrWhiteSpace(whatsApp?.PublicBaseUrl) ? string.Empty : $"{whatsApp.PublicBaseUrl.TrimEnd('/')}/webhooks/whatsapp";
 }
-
 <div class="container py-4 civic-page">
-    <div class="hero-panel mb-4">
-        <span class="eyebrow">Live connector ready · sandbox safe without secrets</span>
-        <h1 class="display-6 fw-bold">CivicOps Connector Readiness</h1>
-        <p class="lead mb-0">Truthful status for Gemini, WhatsApp Cloud API, and future pilot connectors. Secret values are never displayed.</p>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-lg-6">
-            <div class="ops-card h-100 connector-card">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                    <div>
-                        <div class="card-kicker">AI classification connector</div>
-                        <h2 class="h4">Gemini AI</h2>
-                        <p class="text-muted-strong">Server-side classifier used by the shared IncidentIntakeService when credentials are configured.</p>
-                    </div>
-                    <span class="status-pill @(ViewBag.GeminiEnabled ? "status-success" : "status-warning")">@(ViewBag.GeminiEnabled ? "Live Ready" : "Fallback Active")</span>
-                </div>
-                <dl class="connector-list">
-                    <dt>Enabled</dt><dd>@(ViewBag.GeminiEnabled ? "Yes" : "No")</dd>
-                    <dt>API key present</dt><dd>@(ViewBag.GeminiApiKeyPresent ? "Yes" : "No")</dd>
-                    <dt>Model</dt><dd>@ViewBag.GeminiModel</dd>
-                    <dt>Mode</dt><dd>@ViewBag.GeminiMode</dd>
-                    <dt>Last known status</dt><dd>@ViewBag.GeminiStatus</dd>
-                    <dt>Source</dt><dd>@(ViewBag.GeminiEnabled ? "Gemini" : "Fallback")</dd>
-                </dl>
-                <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-primary" href="/api/connectors/gemini/test" target="_blank" rel="noopener"><i class="bi bi-activity me-1"></i>Run health test</a>
-                    <a class="btn btn-outline-info" href="/docs/gemini-setup.md">Setup notes</a>
-                </div>
-                <p class="small text-muted-strong mt-3 mb-0">Fallback active means deterministic classification remains available. Live Gemini activates only when <code>GEMINI_API_KEY</code> and <code>GEMINI_ENABLED=true</code> are configured.</p>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="ops-card h-100 connector-card">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                    <div>
-                        <div class="card-kicker">Resident messaging connector</div>
-                        <h2 class="h4">WhatsApp Cloud API</h2>
-                        <p class="text-muted-strong">Inbound webhook and outbound send readiness for WhatsApp-first reporting.</p>
-                    </div>
-                    <span class="status-pill @(whatsApp?.CanSend == true ? "status-success" : ViewBag.WhatsAppVerifyTokenPresent ? "status-info" : "status-warning")">@(whatsApp?.CanSend == true ? "Live Ready" : ViewBag.WhatsAppVerifyTokenPresent ? "Webhook Ready" : "Sandbox Active")</span>
-                </div>
-                <dl class="connector-list">
-                    <dt>WHATSAPP_ENABLED</dt><dd>@(whatsApp?.Enabled == true ? "True" : "False")</dd>
-                    <dt>WHATSAPP_DEMO_MODE</dt><dd>@(whatsApp?.DemoMode == true ? "True" : "False")</dd>
-                    <dt>Verify token present</dt><dd>@(ViewBag.WhatsAppVerifyTokenPresent ? "Yes" : "No")</dd>
-                    <dt>Access token present</dt><dd>@(ViewBag.WhatsAppAccessTokenPresent ? "Yes" : "No")</dd>
-                    <dt>Phone number id present</dt><dd>@(ViewBag.WhatsAppPhoneNumberIdPresent ? "Yes" : "No")</dd>
-                    <dt>Public base URL present</dt><dd>@(!string.IsNullOrWhiteSpace(whatsApp?.PublicBaseUrl) ? "Yes" : "No")</dd>
-                    <dt>Webhook verification status</dt><dd>@(ViewBag.WhatsAppVerifyTokenPresent && !string.IsNullOrWhiteSpace(whatsApp?.PublicBaseUrl) ? "Webhook Ready" : "Needs Environment Variables")</dd>
-                    <dt>Send status</dt><dd>@(whatsApp?.CanSend == true ? "Send Ready" : "Sandbox or credentials incomplete")</dd>
-                    <dt>Mode</dt><dd>@whatsApp?.Mode</dd>
-                </dl>
-                <div class="copy-box">
-                    <label class="form-label" for="webhookUrl">Copy webhook callback URL</label>
-                    <div class="input-group">
-                        <input id="webhookUrl" class="form-control" readonly value="@(string.IsNullOrWhiteSpace(webhookUrl) ? "Set WHATSAPP_PUBLIC_BASE_URL to your deployment URL." : webhookUrl)" />
-                        <button class="btn btn-outline-info" type="button" onclick="navigator.clipboard?.writeText(document.getElementById('webhookUrl').value)">Copy</button>
-                    </div>
-                </div>
-                <p class="small text-muted-strong mt-3 mb-0">Sandbox mode uses the same intake pipeline. Live WhatsApp Cloud API activates when Meta environment variables are configured.</p>
-            </div>
-        </div>
-    </div>
-
+    <section class="hero-panel mb-4">
+        <span class="eyebrow">Pilot-ready architecture</span>
+        <h1 class="display-5">Connector readiness</h1>
+        <p class="lead">CivicOps runs without secrets by using local deterministic fallback, and activates live connectors only through environment configuration and explicit actions.</p>
+        <div class="alert alert-info mb-0">WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp. Residents can report, track, and receive alerts through the mobile/PWA app and web portal.</div>
+    </section>
     <div class="row g-4">
-        @foreach (var connector in Model.Where(c => c.Name != "Gemini AI" && c.Name != "WhatsApp Cloud API"))
-        {
-            <div class="col-md-6 col-xl-4">
-                <div class="ops-card h-100">
-                    <span class="status-pill status-muted float-end">Future Connector</span>
-                    <h3 class="h5">@connector.Name</h3>
-                    <p class="text-muted-strong">@connector.Description</p>
-                    <p class="small mb-1"><strong>Environment path:</strong> @connector.EnvVars</p>
-                    <p class="small text-muted-strong mb-0">Pilot integration path only; not active in this submission build.</p>
+        <div class="col-lg-6">
+            <div class="ops-card h-100">
+                <h2 class="h4">Gemini diagnostics</h2>
+                <div class="grid-auto">
+                    <div><span class="badge bg-info">Enabled</span><p>@(diagnostics?.Enabled == true ? "Yes" : "No")</p></div>
+                    <div><span class="badge bg-info">Key present</span><p>@(diagnostics?.KeyPresent == true ? "Yes" : "No")</p></div>
+                    <div><span class="badge bg-info">Primary</span><p>@(diagnostics?.PrimaryModel ?? ViewBag.GeminiModel)</p></div>
+                    <div><span class="badge bg-info">Routine</span><p>@(diagnostics?.RoutineModel ?? "gemini-3.1-flash-lite")</p></div>
+                    <div><span class="badge bg-warning">Quota limited</span><p>@(diagnostics?.QuotaLimited == true ? "Yes" : "No")</p></div>
+                    <div><span class="badge bg-success">Fallback active</span><p>@(diagnostics?.FallbackActive == true ? "Yes" : "Ready")</p></div>
                 </div>
+                <p><strong>Fallback models:</strong> @string.Join(", ", diagnostics?.FallbackModels ?? Array.Empty<string>())</p>
+                <p><strong>Last action:</strong> @(diagnostics?.LastCallAction ?? "None") · <strong>Last model:</strong> @(diagnostics?.LastModelUsed ?? "None") · <strong>Last result:</strong> @(diagnostics?.LastResult ?? "No calls yet")</p>
+                <a class="btn btn-outline-warning" href="/api/connectors/gemini/test?live=true">Run live Gemini health test (manual)</a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="ops-card h-100">
+                <h2 class="h4">WhatsApp Intake Sandbox / Connector Readiness</h2>
+                <p>Production use requires WhatsApp Business setup, opt-in/templates, billing and approved recipients. Sandbox mode limits live recipients and masks numbers in CivicOps outputs.</p>
+                <dl><dt>Status</dt><dd>@(whatsApp?.Status ?? "Sandbox")</dd><dt>Mode</dt><dd>@(whatsApp?.Mode ?? "Connector-ready")</dd><dt>Webhook verify</dt><dd><code>/webhooks/whatsapp</code></dd></dl>
+                <a class="btn btn-outline-info" href="/Demo/WhatsAppSimulator">Open WhatsApp sandbox</a>
+            </div>
+        </div>
+    </div>
+    <div class="grid-auto mt-4">
+        @foreach (var connector in Model)
+        {
+            <div class="ops-card">
+                <h3 class="h5">@connector.Name</h3>
+                <p><span class="badge bg-info">@connector.Mode</span></p>
+                <p>@connector.Description</p>
+                <p class="small text-muted-strong"><strong>Configuration:</strong> @connector.EnvVars</p>
+                <p class="small"><strong>Docs:</strong> @connector.Documentation</p>
             </div>
         }
     </div>
