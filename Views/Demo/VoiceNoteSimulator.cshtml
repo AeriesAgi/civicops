@@ -1,146 +1,20 @@
 @{
-    ViewData["Title"] = "Voice Note Sandbox";
+    ViewData["Title"] = "Voice-note Transcript Sandbox";
 }
-
-<div class="container">
-    <div class="card" style="max-width: 800px; margin: 2rem auto;">
-        <h1 class="card-title">🎤 Voice Note Reporting Simulator</h1>
-        
-        <div class="alert alert-warning">
-            <strong>Sandbox Mode:</strong> This is a simulator for testing voice note reporting. In production, this would use speech-to-text transcription.
-        </div>
-
-        <p style="color: #cbd5e1; margin-bottom: 2rem;">
-            Simulate submitting a voice note report. In production, audio would be transcribed automatically. For this sandbox, provide the transcript directly.
-        </p>
-
-        <form id="voiceNoteForm">
-            <div class="form-group">
-                <label class="form-label" for="transcript">Voice Note Transcript *</label>
-                <textarea class="form-control" id="transcript" name="transcript" required rows="4"
-                          placeholder="Enter what you would say in a voice note. For example: 'Hi, I want to report a burst water pipe on Main Road in Chatsworth. There's water flooding the street and it's been like this since this morning.'"></textarea>
-                <small style="color: #94a3b8; font-size: 0.875rem;">
-                    In production, this would be automatically transcribed from your audio recording.
-                </small>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label class="form-label" for="suburb">Suburb (Optional)</label>
-                    <input type="text" class="form-control" id="suburb" name="suburb" 
-                           placeholder="e.g., Chatsworth" />
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="ward">Ward (Optional)</label>
-                    <input type="text" class="form-control" id="ward" name="ward" 
-                           placeholder="e.g., Ward 73" />
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="durationSeconds">Audio Duration (seconds)</label>
-                <input type="number" class="form-control" id="durationSeconds" name="durationSeconds" 
-                       placeholder="30" min="1" max="300" />
-                <small style="color: #94a3b8; font-size: 0.875rem;">
-                    Simulated audio length for sandbox purposes
-                </small>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
-                Submit Voice Note
-            </button>
-        </form>
-
-        <div id="result" style="margin-top: 2rem; display: none;"></div>
-
-        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(148, 163, 184, 0.2);">
-            <h4 style="color: #cbd5e1; margin-bottom: 1rem;">How Voice Note Integration Works</h4>
-            <ol style="color: #94a3b8; line-height: 1.8; padding-left: 1.5rem;">
-                <li>Resident records a voice note describing the civic issue</li>
-                <li>Audio is uploaded to CivicOps (via app or WhatsApp)</li>
-                <li>Speech-to-text service transcribes the audio</li>
-                <li>CivicOps processes and classifies the transcribed text</li>
-                <li>An incident is created with the audio metadata</li>
-                <li>Resident receives their reference number</li>
-            </ol>
-            <p style="color: #94a3b8; margin-top: 1rem;">
-                <strong>Note:</strong> Production deployment requires integration with a speech-to-text service (e.g., Google Speech-to-Text, Azure Speech, etc.).
-                This is a connector-ready feature documented in the integration readiness guide.
-            </p>
-        </div>
-
-        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(6, 182, 212, 0.1); border-radius: 0.5rem; border: 1px solid rgba(6, 182, 212, 0.3);">
-            <h4 style="color: #06b6d4; margin-bottom: 0.5rem;">Benefits of Voice Note Reporting</h4>
-            <ul style="color: #cbd5e1; line-height: 1.8;">
-                <li>Hands-free reporting while on the go</li>
-                <li>Faster than typing on mobile</li>
-                <li>Accessible for users with limited literacy</li>
-                <li>Natural language description</li>
-                <li>Multi-language support (future)</li>
-            </ul>
-        </div>
+<div class="container py-4 civic-page">
+    <section class="hero-panel mb-4">
+        <span class="eyebrow">Accessibility intake scenario</span>
+        <h1 class="display-5">Voice-note Transcript Sandbox</h1>
+        <p class="lead">Submit a transcript as if it came from a voice note. CivicOps analyzes it only on submit and creates a routed incident with fallback available.</p>
+    </section>
+    <div class="row g-4">
+        <div class="col-lg-5"><form id="voiceForm" class="ops-card"><h2 class="h4">Transcript</h2><label class="form-label">Area</label><input name="suburb" class="form-control mb-3" value="Umlazi" /><label class="form-label">Ward</label><input name="ward" class="form-control mb-3" value="Ward 80" /><label class="form-label">Duration seconds</label><input name="durationSeconds" class="form-control mb-3" value="34" /><label class="form-label">Transcript</label><textarea name="transcript" rows="7" class="form-control mb-3">There is a fallen electricity cable sparking near the community hall after the rain. People are walking close to it and the street lights are out.</textarea><button class="btn btn-primary btn-lg" type="submit">Analyze voice-note transcript</button></form></div>
+        <div class="col-lg-7"><div class="ops-card"><h2 class="h4">Result</h2><div id="voiceResult" class="alert alert-info">Submit the transcript to create a civic incident.</div></div></div>
     </div>
 </div>
-
 <script>
-document.getElementById('voiceNoteForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        transcript: document.getElementById('transcript').value,
-        suburb: document.getElementById('suburb').value,
-        ward: document.getElementById('ward').value,
-        durationSeconds: parseInt(document.getElementById('durationSeconds').value) || null
-    };
-    
-    try {
-        const response = await fetch('/sandbox/voicenote/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        });
-        
-        const result = await response.json();
-        const resultDiv = document.getElementById('result');
-        
-        if (result.success) {
-            resultDiv.innerHTML = `
-                <div class="alert alert-success">
-                    <h3 style="margin-bottom: 1rem;">✅ Voice Note Processed</h3>
-                    <div style="font-family: monospace; font-size: 1.5rem; color: #22c55e; margin-bottom: 1rem;">
-                        ${result.referenceNumber}
-                    </div>
-                    <p style="margin-bottom: 0.5rem;"><strong>Department:</strong> ${result.department}</p>
-                    <p style="margin-bottom: 0.5rem;"><strong>Category:</strong> ${result.category}</p>
-                    <p style="margin-bottom: 0.5rem;"><strong>Priority:</strong> ${result.priority}</p>
-                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(15, 23, 42, 0.6); border-radius: 0.5rem;">
-                        <strong style="color: #94a3b8;">Transcript:</strong>
-                        <p style="color: #e0e7ff; margin-top: 0.5rem;">${result.transcript}</p>
-                    </div>
-                    <div style="margin-top: 1rem;">
-                        <a href="/Home/Lookup" class="btn btn-primary">Track This Report</a>
-                    </div>
-                </div>
-            `;
-        } else {
-            resultDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <strong>Error:</strong> ${result.message}
-                </div>
-            `;
-        }
-        
-        resultDiv.style.display = 'block';
-        resultDiv.scrollIntoView({ behavior: 'smooth' });
-    } catch (error) {
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = `
-            <div class="alert alert-danger">
-                <strong>Error:</strong> ${error.message}
-            </div>
-        `;
-        resultDiv.style.display = 'block';
-    }
-});
+(() => {
+ const form=document.getElementById('voiceForm'), result=document.getElementById('voiceResult');
+ form.addEventListener('submit', async e => { e.preventDefault(); result.className='alert alert-warning'; result.textContent='Analyzing transcript...'; const data=Object.fromEntries(new FormData(form).entries()); data.durationSeconds=parseInt(data.durationSeconds||'0',10); try { const res=await fetch('/demo/voicenote/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); const json=await res.json(); if(!res.ok) throw new Error(json.message||'Voice note failed'); result.className='alert alert-success'; result.innerHTML=`<strong>Reference:</strong> ${json.referenceNumber}<br><strong>Department:</strong> ${json.department}<br><strong>Category:</strong> ${json.category}<br><strong>Priority:</strong> ${json.priority}<br><strong>Citizen response:</strong> ${json.citizenResponse}<br><strong>Alert recommendation:</strong> ${json.alertRecommendation}`; } catch(err){ result.className='alert alert-danger'; result.textContent=err.message; }});
+})();
 </script>

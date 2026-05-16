@@ -1,493 +1,70 @@
-# CivicOps - Integration-Ready Civic Operations Platform
+# CivicOps
 
-**Version**: 1.0 (Hackathon Submission-Ready)<br>
-**Built with**: IBM Bob AI Agent accelerated the main hackathon implementation; this final Codex cleanup completed connector readiness and stability.<br>
-**Framework**: ASP.NET Core MVC (.NET 10)<br>
-**Status**: Build-ready when .NET 10 SDK is installed
+CivicOps is a polished, mobile-first civic AI platform for AI-powered civic reporting, routing and public alerts. It is designed as a pilot-ready architecture for municipalities, ward offices, civic response teams, NGOs, public utilities or disaster-management-adjacent teams.
 
----
+## Core flow
 
-## Overview
+Landing page → report issue → Gemini/fallback AI agent → ticket/reference → dashboard/control room → status lookup → alerts/weather → mobile/PWA app → connector readiness.
 
-CivicOps is an integration-ready civic operations platform that transforms how municipalities handle citizen reporting, incident routing, and public service delivery. The platform provides multi-channel intake (Web, Android, WhatsApp, voice notes), AI-powered classification, department workflows, and transparent public tracking.
+## Primary citizen channels
 
-**Key Features**:
-- 🌐 Multi-channel citizen reporting (Web, Android, WhatsApp, voice notes)
-- 🤖 AI-powered incident classification (Gemini AI + deterministic fallback)
-- 🏛️ 13 municipal departments with dedicated workflows
-- 📊 Professional operations dashboard with KPI tracking
-- 🔐 Role-based access control (Admin, Dispatcher, Department Responder, Viewer)
-- 📱 Mobile-responsive design
-- 🔌 Integration-ready architecture (WhatsApp, Gemini, SMS, GIS, ERP)
-- ⚡ Real-time status tracking with public timeline
-- 🚨 Area-based alert system
+1. Mobile/PWA citizen app (`/Home/Mobile` and `/app`)
+2. Web reporting portal (`/Home/Report`)
+3. Public reference/status lookup (`/Home/Lookup`)
+4. Area alerts/weather notices (`/Home/Alerts`, `/Home/Weather`)
+5. Optional WhatsApp connector-ready integration (`/Demo/WhatsAppSimulator`)
 
----
+WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp. Residents can report, track, and receive alerts through the mobile/PWA app and web portal.
 
-## Important Disclaimers
+## Gemini AI agent layer
 
-⚠️ **Sandbox Platform**: CivicOps is a demonstration platform showcasing integration-ready civic operations technology.
+Gemini is openly embedded but event/action-triggered and quota-safe. Gemini does **not** run on startup, public page load, dashboard load, connector page load, weather/alerts page load, mobile app opening, refreshes, background timers or smoke tests.
 
-⚠️ **Not Official**: Not affiliated with any official municipal government.
+Gemini may run only when a resident report is submitted, a voice-note transcript is analyzed, an optional WhatsApp inbound report is processed, or staff/judges click an AI Agent action.
 
-⚠️ **Not Emergency Services**: CivicOps does not replace official emergency services. For emergencies, always contact:
-- **Police**: 10111
-- **Fire/EMS**: 10177
+Default configuration:
 
-⚠️ **Demo Authentication**: Current authentication is for demonstration only. Production deployment requires proper identity management.
-
-⚠️ **Live Integrations**: Gemini AI, WhatsApp, and other connectors require environment variable configuration and service setup.
-
----
-
-## Quick Start
-
-### Prerequisites
-
-- .NET 10 SDK
-- Git
-
-### Installation
-
-```bash
-# Clone repository
-git clone <repository-url>
-cd civicops
-
-# Restore dependencies
-dotnet restore
-
-# Build project
-dotnet build
-
-# Run application
-dotnet run
-```
-
-### Access Application
-
-- **URL**: http://localhost:5000
-- **Landing Page**: `/`
-- **Login**: `/Auth/Login`
-
----
-
-## Demo Credentials
-
-| Role | Email | Password | Access |
-|------|-------|----------|--------|
-| Admin | admin@civicops.demo | CivicOps2026! | Full system access |
-| Dispatcher | dispatcher@civicops.demo | CivicOps2026! | Incident management |
-| Water Dept | water@civicops.demo | CivicOps2026! | Water & Sanitation queue |
-| Electricity Dept | electricity@civicops.demo | CivicOps2026! | Electricity queue |
-| Roads Dept | roads@civicops.demo | CivicOps2026! | Roads & Stormwater queue |
-
----
-
-## Key Routes
-
-### Public Routes (No Login Required)
-
-- `/` - Market-ready landing page
-- `/Home/Report` - Submit incident report
-- `/Home/Lookup` - Track report by reference number
-- `/Home/Alerts` - View area alerts
-- `/Home/Mobile` - Mobile app information
-- `/Home/Status?reference={ref}` - Report status page
-
-### Protected Routes (Login Required)
-
-- `/Home/Dashboard` - Operations dashboard with KPIs
-- `/Home/Department?dept={dept}` - Department-specific queue
-- `/Home/Incident?id={id}` - Incident detail and management
-- `/Home/Connectors` - Connector status and configuration
-
-### Authentication Routes
-
-- `/Auth/Login` - Demo login page
-- `/Auth/Logout` - Logout (POST)
-- `/Auth/AccessDenied` - Access denied page
-
-### API Routes
-
-- `POST /api/reports` - Submit new report
-- `GET /api/reports/{reference}` - Get report by reference
-- `GET /api/alerts` - Get area alerts
-- `GET /api/departments` - List departments
-- `GET /api/departments/{dept}/queue` - Get department queue
-- `GET /api/incidents/{id}` - Get incident details
-- `POST /api/incidents/{id}/status` - Update incident status
-- `POST /api/incidents/{id}/note` - Add incident note
-- `POST /api/incidents/{id}/escalate` - Escalate incident
-- `GET /api/connectors/status` - Get connector status
-- `GET /api/connectors/gemini/test` - Server-side Gemini live/fallback health test
-
-### Demo Routes
-
-- `/demo/whatsapp` and `/Demo/WhatsAppSimulator` - WhatsApp message simulator
-- `/demo/voicenote` and `/Demo/VoiceNoteSimulator` - Voice note simulator
-- `GET /webhooks/whatsapp` - WhatsApp Cloud API verification endpoint
-- `POST /webhooks/whatsapp` - WhatsApp Cloud API inbound message webhook
-
----
-
-## Environment Variables
-
-### Gemini AI (Optional)
-
-```bash
-GEMINI_API_KEY = your_api_key_here
-GEMINI_ENABLED=true
+```text
+GEMINI_ENABLED=false
 GEMINI_MODEL=gemini-2.5-flash
+GEMINI_ROUTINE_MODEL=gemini-3.1-flash-lite
+GEMINI_FALLBACK_MODELS=gemini-3.1-flash-lite,gemini-2.5-flash-lite,gemini-2.0-flash-lite,gemini-2.0-flash
+GEMINI_AUTO_RUN_AGENT_PAGE=false
+GEMINI_MANUAL_TEST_COOLDOWN_SECONDS=60
+GEMINI_QUOTA_COOLDOWN_MINUTES=30
 GEMINI_MODE=Hybrid
 ```
 
-### WhatsApp Cloud API (Optional)
+Do not commit `GEMINI_API_KEY`, WhatsApp tokens, phone numbers or credentials.
+
+## Judge route
+
+Open `/Home/DemoTour` and follow the 3–5 minute route: home, report, mobile app, AI Agent, dashboard, lookup, alerts/weather, optional WhatsApp sandbox, connector readiness and Bob evidence.
+
+## Local verification
 
 ```bash
-WHATSAPP_ENABLED=true
-WHATSAPP_DEMO_MODE=false
-WHATSAPP_VERIFY_TOKEN=your_verify_token
-WHATSAPP_ACCESS_TOKEN = your_access_token
-WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
-WHATSAPP_GRAPH_VERSION=v22.0
-WHATSAPP_PUBLIC_BASE_URL=https://your-public-host.example
-```
-
-**Note**: Without these environment variables, the system uses deterministic fallback and the WhatsApp demo simulator. Do not claim live Gemini or live WhatsApp operation unless the deployment environment is configured. CivicOps does not claim official municipal partnerships and is not an emergency service replacement.
-
----
-
-## Project Structure
-
-```
-CivicOps/
-├── Controllers/
-│   ├── ApiController.cs          # REST API endpoints
-│   ├── AuthController.cs         # Demo authentication
-│   ├── DemoController.cs         # Demo simulators
-│   ├── HomeController.cs         # Main application routes
-│   └── WhatsAppController.cs     # WhatsApp webhook
-├── Models/
-│   ├── Alert.cs                  # Area alert model
-│   ├── Department.cs             # Department enum (13 departments)
-│   ├── DemoUser.cs               # Demo auth user model
-│   ├── Incident.cs               # Core incident model
-│   ├── IncidentStatusHistory.cs  # Status change tracking
-│   ├── MediaAttachment.cs        # Media metadata
-│   └── PublicUpdate.cs           # Public update model
-├── Services/
-│   ├── DemoAuthService.cs        # Demo authentication
-│   ├── DeterministicClassificationService.cs # Fallback classifier
-│   ├── GeminiService.cs          # Server-side Gemini integration
-│   ├── IncidentIntakeService.cs  # Unified intake pipeline
-│   ├── WhatsAppService.cs        # WhatsApp Cloud API readiness/send guard
-│   └── JsonDataService.cs        # JSON persistence
-├── Filters/
-│   └── DemoAuthorizationFilter.cs # RBAC filter
-├── Views/
-│   ├── Auth/                     # Login, access denied
-│   ├── Home/                     # All application views
-│   └── Shared/                   # Layout, error
-├── wwwroot/
-│   ├── css/
-│   │   ├── civicops-theme.css    # Professional theme
-│   │   └── site.css              # Additional styles
-│   └── lib/                      # Bootstrap, jQuery
-├── Data/                         # JSON persistence
-├── docs/                         # Documentation
-└── mobile/CivicOpsAndroid/       # Android app structure
-```
-
----
-
-## Features
-
-### 1. Multi-Channel Intake
-
-- **Web Form**: Professional incident reporting form
-- **Android App**: Mobile app structure (backend APIs ready)
-- **WhatsApp**: Text message intake with webhook support
-- **Voice Notes**: Audio metadata support (transcription-ready)
-
-### 2. AI-Powered Classification
-
-- **Gemini AI**: Optional AI classification and routing
-- **Deterministic Fallback**: Rule-based classifier (always works)
-- **Automatic Routing**: Assigns incidents to correct department
-- **Priority Assignment**: Sets urgency level automatically
-
-### 3. Department Workflows
-
-**13 Departments**:
-- Water & Sanitation
-- Electricity
-- Roads & Stormwater
-- Waste Management
-- Parks & Public Spaces
-- Housing/Informal Settlements
-- Environmental Health
-- Disaster Management
-- Fire & Rescue
-- Metro Police/Public Safety
-- SAPS Liaison/Police Referral
-- EMS/Medical Referral
-- Ward Councillor/Ward Committee
-
-**Workflow Features**:
-- Department-specific queues
-- Status updates (New, Triaged, Assigned, InProgress, Escalated, Resolved, Closed)
-- Internal notes (staff-only)
-- Public updates (resident-visible)
-- Escalation support
-- Timeline/audit trail
-
-### 4. Operations Dashboard
-
-- **KPI Cards**: Total, New, InProgress, Escalated, Resolved incidents
-- **Department Breakdown**: Incidents by department (clickable)
-- **Source Channel Breakdown**: Web, Android, WhatsApp, Voice, Demo
-- **High Priority List**: Urgent incidents requiring attention
-- **Recent Incidents**: Latest submissions
-- **System Status**: Gemini AI, alerts, connectors
-
-### 5. Public Transparency
-
-- **Reference Tracking**: Unique reference numbers (CIV-2026-XXXX)
-- **Status Page**: Current status, timeline, public updates
-- **Area Alerts**: Suburb/ward-based alerts
-- **Emergency Disclaimer**: Prominent on all pages
-
-### 6. Role-Based Access Control
-
-**Roles**:
-- **Admin**: Full system access, user management, configuration
-- **Dispatcher**: Incident management, status updates, escalation
-- **Department Responder**: Department-specific queue, incident updates
-- **Viewer**: Read-only access to incidents and reports
-
-### 7. Integration Readiness
-
-**Connector Interfaces**:
-- Gemini AI (classification, summarization)
-- WhatsApp Cloud API (message intake)
-- Voice Transcription (audio-to-text)
-- SMS Notifications (resident updates)
-- Email Notifications (staff alerts)
-- GIS/Geocoding (location mapping)
-- Municipal ERP (ticketing integration)
-- Media Storage (file uploads)
-- Authentication (identity providers)
-- Audit Logging (compliance)
-
----
-
-## Demo Data
-
-### Incidents (18 total)
-
-- Burst water pipe (High priority, InProgress)
-- Power outage (High priority, Assigned)
-- Pothole (Medium priority, New)
-- Illegal dumping (Medium priority, Triaged)
-- Blocked storm drain (Medium priority, New)
-- Fire hazard (Urgent priority, Escalated)
-- Sewage leak (High priority, InProgress)
-- Broken playground equipment (Medium priority, Assigned)
-- Refuse not collected (Medium priority, Resolved)
-- Public safety concern (High priority, InProgress)
-- Street light not working (Low priority, Assigned)
-- Missing manhole cover (Urgent priority, Escalated)
-- Low water pressure (Medium priority, InProgress)
-- Fallen tree (High priority, Resolved)
-- Graffiti (Low priority, New)
-- Stray dogs (Medium priority, Triaged)
-- Noise complaint (Low priority, Assigned)
-- Flooding (Urgent priority, Escalated)
-
-### Area Alerts (8 total)
-
-- Planned water maintenance (Warning)
-- Load shedding (Urgent)
-- Road closure (Warning)
-- Waste collection delay (Info)
-- Increased patrols (Warning)
-- Flood warning (Urgent)
-- Air quality advisory (Warning)
-- Severe weather warning (Critical)
-
----
-
-## Documentation
-
-- **docs/build-log.md** - Complete build documentation, routes, features
-- **docs/bob-report.md** - Comprehensive transformation report
-- **docs/demo-script.md** - 3-5 minute demo presentation script
-- **docs/integration-readiness.md** - Connector setup guides
-- **docs/whatsapp-setup.md** - WhatsApp Business API setup
-- **docs/gemini-setup.md** - Gemini AI configuration
-- **docs/android-app.md** - Android app documentation
-
----
-
-## Production Deployment
-
-### Database Migration
-
-**Current**: JSON files in `Data/` directory  
-**Production**: SQLite, PostgreSQL, or SQL Server
-
-**Steps**:
-1. Install Entity Framework Core
-2. Create DbContext and migrations
-3. Update IDataService implementation
-4. Configure connection string
-5. Run migrations
-
-### Authentication
-
-**Current**: Demo authentication with session-based auth  
-**Production**: ASP.NET Core Identity or external provider
-
-**Options**:
-- ASP.NET Core Identity (built-in)
-- Azure Active Directory
-- Auth0
-- Okta
-- Custom OAuth2/OIDC provider
-
-### Gemini AI Setup
-
-1. Obtain Gemini API key from Google AI Studio
-2. Set environment variable: `GEMINI_API_KEY = your_key`
-3. Set `GEMINI_ENABLED=true`
-4. Configure model: `GEMINI_MODEL=gemini-2.5-flash`
-5. Optional live/fallback test: `GET /api/connectors/gemini/test`
-
-### WhatsApp Setup
-
-1. Create Meta Business Account
-2. Set up WhatsApp Business API
-3. Configure webhook URL: `/webhooks/whatsapp`
-4. Set environment variables:
-   - `WHATSAPP_ENABLED`
-   - `WHATSAPP_DEMO_MODE`
-   - `WHATSAPP_VERIFY_TOKEN`
-   - `WHATSAPP_ACCESS_TOKEN`
-   - `WHATSAPP_PHONE_NUMBER_ID`
-   - `WHATSAPP_GRAPH_VERSION`
-   - `WHATSAPP_PUBLIC_BASE_URL`
-
-### Deployment Options
-
-- **Azure App Service**: Recommended for .NET applications
-- **AWS Elastic Beanstalk**: Cross-platform deployment
-- **Docker**: Containerized deployment
-- **On-Premises IIS**: Windows Server deployment
-
----
-
-## Testing
-
-### Manual Testing
-
-```bash
-# Run application
+dotnet restore
+dotnet build
 dotnet run
-
-# Test public routes
-curl http://localhost:5000/
-curl http://localhost:5000/Home/Alerts
-
-# Test API endpoints
-curl -X POST http://localhost:5000/api/reports \
-  -H "Content-Type: application/json" \
-  -d '{"description":"Test incident","category":"Other"}'
+./scripts/smoke-test.sh http://localhost:5000
+./scripts/api-check.sh http://localhost:5000
 ```
 
-### Automated Testing (Future)
+The scripts are designed to pass in fallback/sandbox mode and do not require live Gemini or WhatsApp credentials.
 
-- Unit tests for services
-- Integration tests for controllers
-- E2E tests for workflows
+## Safety and honesty
 
----
+CivicOps uses synthetic civic data for sandbox scenarios. It does not claim official municipal partnerships, does not replace emergency services, and keeps humans in the loop for dispatch or public alert decisions.
 
-## Security Considerations
+## IBM Bob evidence
 
-### Current (Sandbox Mode)
+IBM Bob was used to build and accelerate the main CivicOps hackathon implementation. Preserved evidence docs include:
 
-- ⚠️ Simple session-based authentication
-- ⚠️ No password hashing (plain text for demo)
-- ⚠️ No HTTPS enforcement
-- ⚠️ No rate limiting
-- ⚠️ No input sanitization beyond basic validation
+- `docs/bob-report.md`
+- `docs/build-log.md`
+- `docs/ibm-bob-session-report.md`
+- `docs/ibm-bob-final-continuity-report.md`
+- `docs/evidence/`
 
-### Production Requirements
-
-- ✅ ASP.NET Core Identity with password hashing
-- ✅ HTTPS enforcement
-- ✅ CORS policies
-- ✅ Rate limiting
-- ✅ Input validation and sanitization
-- ✅ SQL injection prevention (parameterized queries)
-- ✅ XSS prevention (Razor encoding)
-- ✅ CSRF protection (anti-forgery tokens)
-- ✅ Audit logging
-- ✅ Secrets management (Azure Key Vault, AWS Secrets Manager)
-
----
-
-## Contributing
-
-This is a demonstration platform built with IBM Bob AI Agent. For production deployment or customization:
-
-1. Review docs/build-log.md for architecture details
-2. Review docs/bob-report.md for transformation notes
-3. Follow production deployment guide above
-4. Implement security hardening
-5. Add comprehensive testing
-6. Configure monitoring and logging
-
----
-
-## License
-
-[Specify license here]
-
----
-
-## Support
-
-For questions or issues:
-- Review documentation in `docs/` directory
-- Check build log: `docs/build-log.md`
-- Review Bob report: `docs/bob-report.md`
-
----
-
-## Acknowledgments
-
-**Built with**: IBM Bob AI Agent  
-**Framework**: ASP.NET Core MVC (.NET 10)<br>
-**UI**: Bootstrap 5 + Custom CSS  
-**AI**: Google Gemini (optional)  
-**Messaging**: WhatsApp Cloud API (optional)
-
----
-
-**Last Updated**: 2026-05-15  
-**Build Status**: ✅ SUCCESS (12.1s)  
-**Version**: 1.0 (Pilot-Ready)
-
-## Final Product Polish Pass (Codex)
-
-The final pre-submission pass stabilizes CivicOps as a coordinated hackathon product:
-
-- Main judge route: `/Home/DemoTour`
-- AI Agent Command Centre: `/Home/Agent` with backend-powered buttons through `/api/agent/*`
-- Gemini connector readiness: `/api/connectors/gemini/test` and `/Home/Connectors`
-- WhatsApp Cloud API readiness: `/webhooks/whatsapp` plus `/Demo/WhatsAppSimulator` sandbox console
-- Mobile/PWA hub: `/Home/Mobile` with manifest and service worker shell
-
-CivicOps uses synthetic civic operations scenarios for judging. Live Gemini requires `GEMINI_API_KEY` and `GEMINI_ENABLED=true`. Live WhatsApp requires Meta Cloud API variables including verify token, access token, phone number id, public base URL, and live mode. No official municipal partnership is claimed, and CivicOps is not an emergency services replacement.
+Final engineering polish may have been completed after Bob and is not falsely claimed as Bob work.

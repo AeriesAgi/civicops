@@ -228,7 +228,7 @@
                         <a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/Home/DemoTour"><i class="bi bi-map me-1"></i>Demo Tour</a>
+                        <a class="nav-link" href="/Home/DemoTour"><i class="bi bi-map me-1"></i>Judge Tour</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/Home/Report"><i class="bi bi-file-earmark-plus me-1"></i>Report Issue</a>
@@ -245,6 +245,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/Home/Agent"><i class="bi bi-robot me-1"></i>AI Agent</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Home/Connectors"><i class="bi bi-plug me-1"></i>Connectors</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                     @if (Context.Session.GetString("UserEmail") != null)
@@ -252,11 +255,8 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/Home/Dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Home/Connectors"><i class="bi bi-plug me-1"></i>Connectors</a>
-                        </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="/Home/Dashboard" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle me-1"></i>@Context.Session.GetString("UserEmail")
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -279,7 +279,7 @@
                             <a class="nav-link" href="/Resident/MyAlerts"><i class="bi bi-bell me-1"></i>My Alerts</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="residentDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="/Resident/Profile" id="residentDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle me-1"></i>@Context.Session.GetString("ResidentUserName")
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -316,7 +316,7 @@
             <div class="row">
                 <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                     <p class="mb-1">&copy; 2026 CivicOps - Civic Operations Platform</p>
-                    <p class="small mb-0">CivicOps uses synthetic scenario data for judging. Live integrations are activated through configured connector credentials.</p>
+                    <p class="small mb-0">CivicOps uses synthetic civic data and connector-ready architecture. It is not an emergency services replacement and makes no official municipal partnership claim.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <p class="mb-1">

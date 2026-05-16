@@ -1,85 +1,43 @@
 @{
-    ViewData["Title"] = "WhatsApp Intake Sandbox";
+    ViewData["Title"] = "WhatsApp Intake Sandbox / Connector Readiness";
 }
-
 <div class="container py-4 civic-page">
-    <div class="hero-panel mb-4">
-        <span class="eyebrow">WhatsApp-first resident intake</span>
-        <h1 class="display-6 fw-bold">WhatsApp Intake Sandbox</h1>
-        <p class="lead mb-0">Send a resident-style message through the same IncidentIntakeService pipeline used by the live WhatsApp webhook.</p>
-    </div>
-
+    <section class="hero-panel mb-4">
+        <span class="eyebrow">Optional connector</span>
+        <h1 class="display-5">WhatsApp Intake Sandbox / Connector Readiness</h1>
+        <p class="lead">WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. Production use requires WhatsApp Business setup, opt-in/templates, and billing.</p>
+        <div class="alert alert-info mb-0">CivicOps does not depend on WhatsApp; residents can report through Web/PWA/mobile immediately.</div>
+    </section>
     <div class="row g-4">
         <div class="col-lg-5">
-            <div class="ops-card h-100">
-                <h2 class="h4">Resident message</h2>
-                <form id="whatsappForm">
-                    <label class="form-label" for="message">Message text</label>
-                    <textarea class="form-control mb-3" id="message" rows="5" required>Water is flooding the corner of Quarry Road near the taxi stop. It has been running since early morning and traffic is backing up.</textarea>
-
-                    <div class="row g-3">
-                        <div class="col-md-6"><label class="form-label" for="senderName">Sender label</label><input class="form-control" id="senderName" value="Resident A" /></div>
-                        <div class="col-md-6"><label class="form-label" for="phoneNumber">Phone masked</label><input class="form-control" id="phoneNumber" value="+27821234567" /></div>
-                        <div class="col-md-6"><label class="form-label" for="suburb">Suburb/area</label><input class="form-control" id="suburb" value="Chatsworth" /></div>
-                        <div class="col-md-6"><label class="form-label" for="ward">Ward</label><input class="form-control" id="ward" value="Ward 73" /></div>
-                        <div class="col-12"><label class="form-label" for="locationNotes">Location notes</label><input class="form-control" id="locationNotes" value="Near taxi stop and low-lying curb" /></div>
-                        <div class="col-12"><label class="form-label" for="mediaMetadata">Optional voice/media metadata</label><input class="form-control" id="mediaMetadata" value="voice-note: 18s; image: flooded-road.jpg" /></div>
-                    </div>
-                    <button class="btn btn-primary w-100 mt-4" type="submit"><i class="bi bi-send me-1"></i>Send through intake pipeline</button>
-                </form>
-                <div class="alert alert-info mt-4 mb-0">Sandbox mode uses the same intake pipeline. Live WhatsApp Cloud API activates when Meta env vars are configured.</div>
-            </div>
+            <form id="waForm" class="ops-card">
+                <h2 class="h4">Sandbox inbound message</h2>
+                <label class="form-label">Sender name</label><input name="senderName" class="form-control mb-3" value="Sandbox Resident" />
+                <label class="form-label">Masked phone</label><input name="phoneNumber" class="form-control mb-3" value="+27 82 *** 4567" />
+                <label class="form-label">Area</label><input name="suburb" class="form-control mb-3" value="Chatsworth" />
+                <label class="form-label">Ward</label><input name="ward" class="form-control mb-3" value="Ward 68" />
+                <label class="form-label">Message</label><textarea name="message" rows="6" class="form-control mb-3">There is a burst water pipe flooding the road near the clinic entrance. The water is running into homes and children are walking through it.</textarea>
+                <button class="btn btn-primary btn-lg" type="submit">Send sandbox report</button>
+            </form>
         </div>
-        <div class="col-lg-7">
-            <div class="ops-card h-100">
-                <h2 class="h4">Pipeline result</h2>
-                <div id="result" class="result-panel"><p class="text-muted-strong mb-0">Submit a message to create a CivicOps reference and view connector mode.</p></div>
-            </div>
-        </div>
+        <div class="col-lg-7"><div class="ops-card"><h2 class="h4">Result</h2><div id="waResult" class="alert alert-info">Submit the sandbox message to create a CivicOps incident via the shared IncidentIntakeService.</div></div></div>
     </div>
 </div>
-
-@section Scripts {
 <script>
 (() => {
-    const form = document.getElementById('whatsappForm');
-    const resultDiv = document.getElementById('result');
-    const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        resultDiv.innerHTML = '<div class="loading-panel"><div class="spinner-border text-info" role="status"></div><span>Processing WhatsApp intake…</span></div>';
-        const payload = {
-            message: document.getElementById('message').value,
-            senderName: document.getElementById('senderName').value,
-            phoneNumber: document.getElementById('phoneNumber').value,
-            suburb: document.getElementById('suburb').value,
-            ward: document.getElementById('ward').value,
-            locationNotes: document.getElementById('locationNotes').value,
-            mediaMetadata: document.getElementById('mediaMetadata').value
-        };
-        try {
-            const response = await fetch('/demo/whatsapp/inbound', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            const result = await response.json();
-            if (!response.ok || !result.success) throw new Error(result.message || 'WhatsApp intake failed');
-            resultDiv.innerHTML = `
-                <div class="success-banner mb-3"><i class="bi bi-check-circle me-1"></i>WhatsApp message processed through CivicOps intake</div>
-                <dl class="connector-list">
-                    <dt>Reference number</dt><dd><code>${esc(result.referenceNumber)}</code></dd>
-                    <dt>Validation</dt><dd>${esc(result.validation)}</dd>
-                    <dt>Department</dt><dd>${esc(result.department)}</dd>
-                    <dt>Priority</dt><dd>${esc(result.priority)}</dd>
-                    <dt>Citizen reply</dt><dd>${esc(result.citizenResponse)}</dd>
-                    <dt>WhatsApp connector mode</dt><dd>${esc(result.connectorMode)}</dd>
-                    <dt>Real send attempted</dt><dd>${result.realSendAttempted ? 'Yes' : 'No — sandbox console only'}</dd>
-                    <dt>Meta message id</dt><dd>${esc(result.metaMessageId || 'Not available in sandbox')}</dd>
-                    <dt>Masked phone</dt><dd>${esc(result.maskedPhone)}</dd>
-                </dl>
-                <div class="d-flex gap-2 flex-wrap"><a class="btn btn-primary" href="/Home/Lookup">Track reference</a><a class="btn btn-outline-info" href="/Home/Agent">Open AI Agent</a></div>`;
-        } catch (error) {
-            resultDiv.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${esc(error.message)}</div>`;
-        }
-    });
+  const form = document.getElementById('waForm');
+  const result = document.getElementById('waResult');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    result.className='alert alert-warning'; result.textContent='Processing one sandbox inbound report...';
+    const data = Object.fromEntries(new FormData(form).entries());
+    try {
+      const response = await fetch('/demo/whatsapp/inbound', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || 'Sandbox request failed');
+      result.className='alert alert-success';
+      result.innerHTML = `<strong>Reference:</strong> ${json.referenceNumber}<br><strong>Department:</strong> ${json.department}<br><strong>Priority:</strong> ${json.priority}<br><strong>Source:</strong> ${json.aiSource || 'Local deterministic fallback'}<br>${json.citizenResponse || ''}`;
+    } catch (error) { result.className='alert alert-danger'; result.textContent=error.message; }
+  });
 })();
 </script>
-}

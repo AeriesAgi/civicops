@@ -1,29 +1,36 @@
 @{
-    ViewData["Title"] = "CivicOps Mobile & WhatsApp Access";
+    ViewData["Title"] = "CivicOps Mobile Citizen App";
+    var pwaReady = ViewBag.PwaReady == true;
 }
-
-<div class="container py-4 civic-page mobile-hub">
-    <div class="hero-panel mb-4">
-        <span class="eyebrow">Public utility access hub</span>
-        <h1 class="display-6 fw-bold">CivicOps Mobile & WhatsApp Access</h1>
-        <p class="lead mb-0">A mobile-first reporting path for residents, field teams, and WhatsApp-first communities.</p>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <div class="col-lg-4"><div class="ops-card h-100"><span class="status-pill status-success">PWA Ready</span><h2 class="h4">Web/PWA app</h2><ul class="feature-list"><li>Report issue</li><li>Track reference</li><li>View alerts</li><li>Follow area</li></ul><a class="btn btn-primary" href="/Home/Report">Report issue</a></div></div>
-        <div class="col-lg-4"><div class="ops-card h-100"><span class="status-pill status-info">Android-ready</span><h2 class="h4">Android-ready app/source</h2><ul class="feature-list"><li>Report</li><li>Track</li><li>Alerts</li><li>Responder mode future</li></ul><a class="btn btn-outline-info" href="/docs/android-app.md">Android notes</a></div></div>
-        <div class="col-lg-4"><div class="ops-card h-100"><span class="status-pill status-warning">Sandbox / Live ready</span><h2 class="h4">WhatsApp-first reporting</h2><ul class="feature-list"><li>Report without installing app</li><li>Receive reference</li><li>Track status</li><li>Cloud API activates with Meta env vars</li></ul><a class="btn btn-success" href="/Demo/WhatsAppSimulator">Open WhatsApp Intake</a></div></div>
-    </div>
-
-    <div class="phone-shell mx-auto">
-        <div class="phone-status">CivicOps <span>09:41</span></div>
-        <div class="app-grid">
-            <a href="/Home/Report" class="app-tile"><i class="bi bi-plus-circle"></i><strong>Report Issue</strong><small>Photo/location ready</small></a>
-            <a href="/Home/Lookup" class="app-tile"><i class="bi bi-search"></i><strong>My References</strong><small>Track CIV-2026-0001</small></a>
-            <a href="/Home/Alerts" class="app-tile"><i class="bi bi-bell"></i><strong>Area Alerts</strong><small>Ward and suburb notices</small></a>
-            <a href="/Home/Weather" class="app-tile"><i class="bi bi-cloud-rain-heavy"></i><strong>Weather Risk</strong><small>Context for operations</small></a>
-            <a href="/Demo/WhatsAppSimulator" class="app-tile whatsapp"><i class="bi bi-whatsapp"></i><strong>WhatsApp Shortcut</strong><small>No install required</small></a>
-            <div class="app-tile emergency"><i class="bi bi-exclamation-triangle"></i><strong>Emergency disclaimer</strong><small>CivicOps is not an emergency services replacement.</small></div>
+<div class="container py-4 civic-page">
+    <section class="hero-panel mb-4">
+        <span class="eyebrow">Primary public channel</span>
+        <h1 class="display-5">CivicOps Mobile Citizen App</h1>
+        <p class="lead">A PWA-first citizen hub for reporting issues, tracking references, following areas, viewing alerts and checking weather-risk context.</p>
+        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">@(pwaReady ? "Installable PWA ready" : "PWA shell available")</span><span class="badge bg-info">Service worker registered</span><span class="badge bg-info">Manifest + app icon present</span></div>
+    </section>
+    <div class="row g-4 align-items-start">
+        <div class="col-lg-5">
+            <div class="mobile-phone"><div class="mobile-screen">
+                <div class="d-flex justify-content-between align-items-center mb-3"><strong>CivicOps</strong><span class="badge bg-success">Fallback active</span></div>
+                <h2 class="h4">How can we help?</h2>
+                <a class="app-tile" href="/Home/Report"><span><i class="bi bi-plus-circle me-2"></i>Report Issue</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Home/Lookup"><span><i class="bi bi-search me-2"></i>Track Reference</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Resident/MyReports"><span><i class="bi bi-list-check me-2"></i>My Reports</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Home/Alerts"><span><i class="bi bi-bell me-2"></i>Area Alerts</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Home/Weather"><span><i class="bi bi-cloud-sun me-2"></i>Weather / Area Conditions</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Resident/Profile"><span><i class="bi bi-geo-alt me-2"></i>Follow My Area</span><i class="bi bi-chevron-right"></i></a>
+                <div class="alert alert-warning mt-3 small">Emergency disclaimer: contact emergency services directly for immediate danger.</div>
+                <a class="app-tile" href="/Demo/WhatsAppSimulator"><span><i class="bi bi-whatsapp me-2"></i>Optional WhatsApp connector info</span><i class="bi bi-chevron-right"></i></a>
+            </div></div>
+        </div>
+        <div class="col-lg-7">
+            <div class="grid-auto">
+                <div class="ops-card"><h3 class="h5">Install copy</h3><p>Use the browser install prompt or “Add to Home Screen”. The PWA starts at <code>/app</code> and caches core public pages.</p></div>
+                <div class="ops-card"><h3 class="h5">Working flows</h3><p>Every tile links to a server route: reporting, lookup, alerts, weather, resident profile or the optional WhatsApp sandbox.</p></div>
+                <div class="ops-card"><h3 class="h5">AI behavior</h3><p>Opening the mobile app does not call Gemini. AI runs only on report submission or explicit staff/judge action.</p></div>
+                <div class="ops-card"><h3 class="h5">WhatsApp status</h3><p>WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp.</p></div>
+            </div>
         </div>
     </div>
 </div>

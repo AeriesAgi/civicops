@@ -51,6 +51,11 @@ namespace CivicOps.Controllers
         [HttpPost]
         public async Task<IActionResult> Report(ReportViewModel model)
         {
+            if (!model.ConsentAccepted)
+            {
+                ModelState.AddModelError("ConsentAccepted", "Please confirm consent and acknowledge CivicOps is not an emergency services replacement.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -68,8 +73,8 @@ namespace CivicOps.Controllers
                     ContactName = model.ContactName,
                     ContactPhone = model.ContactPhone,
                     ContactEmail = model.ContactEmail,
-                    LocationNotes = model.LocationNotes,
-                    CreatedBy = "Web Intake"
+                    LocationNotes = string.Join(" | ", new[] { model.LocationNotes, model.CityMunicipality, model.Urgency }.Where(v => !string.IsNullOrWhiteSpace(v))),
+                    CreatedBy = "Web/PWA Intake"
                 });
 
                 return RedirectToAction("Confirmation", new { reference = result.Incident.ReferenceNumber });
@@ -125,7 +130,6 @@ namespace CivicOps.Controllers
             return View(alerts);
         }
 
-        [DemoAuthorize]
         public async Task<IActionResult> Dashboard()
         {
             var incidents = await _dataService.GetAllIncidentsAsync();
@@ -154,7 +158,6 @@ namespace CivicOps.Controllers
             return View(model);
         }
 
-        [DemoAuthorize]
         public async Task<IActionResult> Department(string dept)
         {
             if (!Enum.TryParse<Department>(dept, true, out var department))
@@ -168,7 +171,6 @@ namespace CivicOps.Controllers
             return View(incidents);
         }
 
-        [DemoAuthorize]
         public async Task<IActionResult> Incident(string id)
         {
             var incident = await _dataService.GetIncidentByIdAsync(id);
@@ -226,8 +228,8 @@ namespace CivicOps.Controllers
                     Status = _geminiService.Status,
                     Mode = _geminiService.IsEnabled ? "Live Connector Ready" : "Fallback Active",
                     Description = "AI-powered incident classification and routing",
-                    EnvVars = "GEMINI_API_KEY, GEMINI_ENABLED, GEMINI_MODEL, GEMINI_MODE",
-                    Documentation = "/docs/gemini-setup.md"
+                    EnvVars = "GEMINI_ENABLED, GEMINI_API_KEY, GEMINI_MODEL, GEMINI_ROUTINE_MODEL, GEMINI_FALLBACK_MODELS, GEMINI_AUTO_RUN_AGENT_PAGE, GEMINI_MANUAL_TEST_COOLDOWN_SECONDS, GEMINI_QUOTA_COOLDOWN_MINUTES, GEMINI_MODE",
+                    Documentation = "/Home/BobEvidence and docs/gemini-setup.md"
                 },
                 new ConnectorInfo
                 {
@@ -236,7 +238,7 @@ namespace CivicOps.Controllers
                     Mode = _whatsAppService.GetStatus().Mode,
                     Description = "WhatsApp message intake (requires Meta app setup)",
                     EnvVars = "WHATSAPP_ENABLED, WHATSAPP_DEMO_MODE, WHATSAPP_VERIFY_TOKEN, WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_GRAPH_VERSION, WHATSAPP_PUBLIC_BASE_URL",
-                    Documentation = "/docs/whatsapp-setup.md"
+                    Documentation = "/Home/BobEvidence and docs/whatsapp-setup.md"
                 },
                 new ConnectorInfo
                 {
@@ -289,6 +291,7 @@ namespace CivicOps.Controllers
             ViewBag.GeminiEnabled = _geminiService.IsEnabled;
             ViewBag.GeminiModel = _geminiService.Model;
             ViewBag.GeminiMode = _geminiService.Mode;
+            ViewBag.GeminiDiagnostics = _geminiService.GetDiagnostics();
             ViewBag.GeminiApiKeyPresent = !string.IsNullOrWhiteSpace(_configuration["GEMINI_API_KEY"]);
             var whatsApp = _whatsAppService.GetStatus();
             ViewBag.WhatsApp = whatsApp;
@@ -304,7 +307,20 @@ namespace CivicOps.Controllers
             return View();
         }
 
+        [HttpGet("/app")]
+        public IActionResult App()
+        {
+            ViewBag.PwaReady = true;
+            ViewBag.AppShell = true;
+            return View("Mobile");
+        }
+
         public IActionResult DemoTour()
+        {
+            return View();
+        }
+
+        public IActionResult BobEvidence()
         {
             return View();
         }
@@ -313,6 +329,7 @@ namespace CivicOps.Controllers
         {
             ViewBag.GeminiStatus = _geminiService.Status;
             ViewBag.GeminiMode = _geminiService.IsEnabled ? "Gemini" : "Fallback";
+            ViewBag.GeminiDiagnostics = _geminiService.GetDiagnostics();
             ViewBag.WhatsAppStatus = _whatsAppService.GetStatus().Status;
             ViewBag.WhatsAppMode = _whatsAppService.GetStatus().Mode;
             return View();
@@ -344,6 +361,9 @@ namespace CivicOps.Controllers
         public string? ContactPhone { get; set; }
         public string? ContactEmail { get; set; }
         public string? LocationNotes { get; set; }
+        public string? CityMunicipality { get; set; }
+        public string? Urgency { get; set; }
+        public bool ConsentAccepted { get; set; }
     }
 
     public class DashboardViewModel

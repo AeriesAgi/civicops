@@ -24,9 +24,10 @@ namespace CivicOps.Services
         public async Task<IncidentIntakeResult> ProcessAsync(IncidentIntakeRequest request)
         {
             var validation = Validate(request.Description);
-            var classification = _geminiService.IsEnabled
-                ? await _geminiService.ClassifyWithGeminiAsync(request.Description, request.Category)
-                : await _classificationService.ClassifyIncidentAsync(request.Description, request.Category);
+            // Event-triggered AI path: this method is called only from report submission,
+            // inbound connector processing, voice transcript submission, or explicit agent actions.
+            // GeminiService itself decides whether to make one live call or use local fallback.
+            var classification = await _geminiService.ClassifyWithGeminiAsync(request.Description, request.Category, $"{request.SourceChannel}-intake");
 
             var incident = new Incident
             {
