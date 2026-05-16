@@ -26,7 +26,7 @@ CivicOps is an integration-ready civic operations platform that transforms how m
 
 ## Important Disclaimers
 
-⚠️ **Demo Platform**: CivicOps is a demonstration platform showcasing integration-ready civic operations technology.
+⚠️ **Sandbox Platform**: CivicOps is a demonstration platform showcasing integration-ready civic operations technology.
 
 ⚠️ **Not Official**: Not affiliated with any official municipal government.
 
@@ -136,7 +136,7 @@ dotnet run
 ### Gemini AI (Optional)
 
 ```bash
-GEMINI_API_KEY=your_api_key_here
+GEMINI_API_KEY = your_api_key_here
 GEMINI_ENABLED=true
 GEMINI_MODEL=gemini-2.5-flash
 GEMINI_MODE=Hybrid
@@ -148,7 +148,7 @@ GEMINI_MODE=Hybrid
 WHATSAPP_ENABLED=true
 WHATSAPP_DEMO_MODE=false
 WHATSAPP_VERIFY_TOKEN=your_verify_token
-WHATSAPP_ACCESS_TOKEN=your_access_token
+WHATSAPP_ACCESS_TOKEN = your_access_token
 WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
 WHATSAPP_GRAPH_VERSION=v22.0
 WHATSAPP_PUBLIC_BASE_URL=https://your-public-host.example
@@ -359,7 +359,7 @@ CivicOps/
 ### Gemini AI Setup
 
 1. Obtain Gemini API key from Google AI Studio
-2. Set environment variable: `GEMINI_API_KEY=your_key`
+2. Set environment variable: `GEMINI_API_KEY = your_key`
 3. Set `GEMINI_ENABLED=true`
 4. Configure model: `GEMINI_MODEL=gemini-2.5-flash`
 5. Optional live/fallback test: `GET /api/connectors/gemini/test`
@@ -415,7 +415,7 @@ curl -X POST http://localhost:5000/api/reports \
 
 ## Security Considerations
 
-### Current (Demo Mode)
+### Current (Sandbox Mode)
 
 - ⚠️ Simple session-based authentication
 - ⚠️ No password hashing (plain text for demo)
@@ -479,3 +479,15 @@ For questions or issues:
 **Last Updated**: 2026-05-15  
 **Build Status**: ✅ SUCCESS (12.1s)  
 **Version**: 1.0 (Pilot-Ready)
+
+## Final Product Polish Pass (Codex)
+
+The final pre-submission pass stabilizes CivicOps as a coordinated hackathon product:
+
+- Main judge route: `/Home/DemoTour`
+- AI Agent Command Centre: `/Home/Agent` with backend-powered buttons through `/api/agent/*`
+- Gemini connector readiness: `/api/connectors/gemini/test` and `/Home/Connectors`
+- WhatsApp Cloud API readiness: `/webhooks/whatsapp` plus `/Demo/WhatsAppSimulator` sandbox console
+- Mobile/PWA hub: `/Home/Mobile` with manifest and service worker shell
+
+CivicOps uses synthetic civic operations scenarios for judging. Live Gemini requires `GEMINI_API_KEY` and `GEMINI_ENABLED=true`. Live WhatsApp requires Meta Cloud API variables including verify token, access token, phone number id, public base URL, and live mode. No official municipal partnership is claimed, and CivicOps is not an emergency services replacement.

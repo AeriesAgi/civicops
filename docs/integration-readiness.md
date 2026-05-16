@@ -11,7 +11,7 @@ CivicOps is architected as an integration-ready platform with clear interfaces f
 ### Design Principles
 
 1. **Interface-Based Design:** Each connector has a clear interface
-2. **Demo Mode:** All connectors work locally without external dependencies
+2. **Sandbox Mode:** All connectors work locally without external dependencies
 3. **Environment Variables:** No hardcoded secrets or credentials
 4. **Graceful Degradation:** System works even if connectors fail
 5. **Status Monitoring:** Real-time connector health visibility
@@ -37,7 +37,7 @@ AI-powered incident classification, routing, and summarization with automatic fa
 
 **Environment Variables:**
 ```bash
-GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_API_KEY = your_gemini_api_key_here
 GEMINI_MODEL=gemini-2.0-flash-exp
 GEMINI_ENABLED=true
 ```
@@ -58,7 +58,7 @@ GEMINI_ENABLED=true
 POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent
 ```
 
-### Demo Mode
+### Sandbox Mode
 When `GEMINI_ENABLED=false` or `GEMINI_API_KEY` is not set, the system automatically uses deterministic keyword-based classification.
 
 ### Production Setup
@@ -74,7 +74,7 @@ When `GEMINI_ENABLED=false` or `GEMINI_API_KEY` is not set, the system automatic
 
 3. **Enable Service:**
    ```bash
-   export GEMINI_API_KEY="your_key_here"
+   export GEMINI_API_KEY = "your_key_here"
    export GEMINI_ENABLED=true
    ```
 
@@ -104,7 +104,7 @@ Enable residents to report civic issues via WhatsApp text messages and voice not
 **Environment Variables:**
 ```bash
 WHATSAPP_VERIFY_TOKEN=your_custom_verify_token
-WHATSAPP_ACCESS_TOKEN=your_whatsapp_access_token
+WHATSAPP_ACCESS_TOKEN = your_whatsapp_access_token
 WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id
 WHATSAPP_DEMO_MODE=true
 ```
@@ -139,7 +139,7 @@ WHATSAPP_DEMO_MODE=true
 4. **Set Environment Variables:**
    ```bash
    export WHATSAPP_VERIFY_TOKEN="your_verify_token"
-   export WHATSAPP_ACCESS_TOKEN="your_access_token"
+   export WHATSAPP_ACCESS_TOKEN = "your_access_token"
    export WHATSAPP_PHONE_NUMBER_ID="your_phone_id"
    export WHATSAPP_DEMO_MODE=false
    ```
@@ -209,7 +209,7 @@ VOICE_LANGUAGE=en-ZA
    - Transcribe to text
    - Process as normal text report
 
-### Demo Mode
+### Sandbox Mode
 Currently accepts transcript text directly. In production, would transcribe audio automatically.
 
 ---
@@ -678,3 +678,22 @@ This repository preserves the IBM Bob hackathon implementation and evidence docs
 - A shared intake pipeline for web, WhatsApp demo, real WhatsApp webhook, voice-note transcript, and mobile/API reports.
 
 No official municipal partnership is claimed. Live Gemini and WhatsApp operation require deployment-time environment variables. CivicOps is not an emergency service replacement.
+
+## Final connector state language
+
+CivicOps now uses product-ready, honest connector language:
+
+- Live
+- Live Ready
+- Webhook Ready
+- Send Ready
+- Sandbox Active
+- Fallback Active
+- Needs Environment Variables
+- Future Connector
+
+The app intentionally avoids displaying secret values. It shows only presence/absence booleans for API keys, tokens, phone number ids, and verify tokens.
+
+## Final polish attribution
+
+IBM Bob accelerated and stabilized the core hackathon build and evidence trail. The final Codex pass polished the product UI, rebuilt the AI Agent page, connected judge-facing actions to backend pipeline endpoints, added the judge tour, improved the mobile/PWA story, and aligned connector documentation with runtime behavior.

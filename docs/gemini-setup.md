@@ -7,13 +7,13 @@ CivicOps is connector-ready for server-side Gemini classification. The browser n
 Set these in the server environment, not in frontend code:
 
 ```bash
-GEMINI_API_KEY=your_google_ai_studio_key
+GEMINI_API_KEY = your_google_ai_studio_key
 GEMINI_ENABLED=true
 GEMINI_MODEL=gemini-2.5-flash
 GEMINI_MODE=Hybrid
 ```
 
-Safe defaults in `appsettings.json` keep demo mode working without a key:
+Safe defaults in `appsettings.json` keep sandbox mode working without a key:
 
 - `GEMINI_ENABLED=false`
 - `GEMINI_MODEL=gemini-2.5-flash`
@@ -51,3 +51,7 @@ With valid environment variables, the endpoint performs a small live classificat
 ## Submission note
 
 IBM Bob built and accelerated the main hackathon implementation. This final Codex cleanup completed the live Gemini readiness path and stability pass. Do not claim live Gemini operation unless the deployment has the required environment variables configured.
+
+## Final UI behavior
+
+The Connectors page labels Gemini as **Live Ready** only when the server detects both an API key and `GEMINI_ENABLED=true`. Without that configuration it labels **Fallback Active** and continues deterministic routing. The AI Agent Command Centre shows whether each action was Gemini assisted or fallback processed.

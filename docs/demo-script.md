@@ -286,3 +286,17 @@ Full production deployment: 2-3 months depending on integration complexity."
 **Demo Prepared By**: IBM Bob  
 **Last Updated**: 2026-05-15  
 **Version**: 1.0 (Pilot-Ready)
+
+## Final Judge Tour Route
+
+Use `/Home/DemoTour` as the submission path. It links to Home, Report Issue, WhatsApp Intake Sandbox, Voice Note Sandbox, AI Agent Command Centre, Incident Detail/Dashboard, Alerts, Weather, Mobile/App Hub, Connectors, and Bob evidence/build docs.
+
+Recommended click sequence:
+
+1. Start at `/` and explain the product story.
+2. Open `/Home/DemoTour` and follow the ordered steps.
+3. In `/Demo/WhatsAppSimulator`, send the prefilled resident report and show the reference, validation, department, priority, citizen reply, and WhatsApp connector mode.
+4. In `/Home/Agent`, click each backend-powered action: latest report, WhatsApp report, voice-note transcript, Gemini health test, citizen response, department brief, area alert, and judge summary.
+5. In `/Home/Connectors`, show Live Ready/Webhook Ready/Sandbox Active/Fallback Active status without exposing secrets.
+
+Use the terms sandbox scenario, synthetic operational data, live connector ready, fallback active, and human-in-the-loop. Avoid claiming an official municipal deployment or emergency-services replacement.

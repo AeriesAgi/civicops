@@ -219,7 +219,7 @@ All code is maintainable, understandable, and follows ASP.NET Core MVC best prac
 - ✅ Inbound text creates incident
 - ✅ Media/voice metadata support
 - ✅ Environment variables documented
-- ✅ Demo mode default
+- ✅ Sandbox mode default
 - ✅ No hardcoded secrets
 - ✅ Incident source shows WhatsApp
 - ✅ Real Meta WhatsApp setup documented
@@ -347,7 +347,7 @@ All code is maintainable, understandable, and follows ASP.NET Core MVC best prac
 
 **Documentation**:
 - ✅ docs/build-log.md - Complete build documentation
-- ✅ Current demo mode clearly explained
+- ✅ Current sandbox mode clearly explained
 - ✅ What works now
 - ✅ What is connector-ready
 - ✅ What is needed for pilot
@@ -472,7 +472,7 @@ dotnet build - SUCCESS (12.1s, 0 errors)
 2. **Complete Workflows**: End-to-end citizen and staff workflows
 3. **Realistic Demo Data**: 18 incidents covering real civic issues
 4. **Clear Value Proposition**: Landing page explains problem, solution, and integration readiness
-5. **Honest Positioning**: No false claims, clear demo mode labeling
+5. **Honest Positioning**: No false claims, clear sandbox mode labeling
 6. **Integration Architecture**: Clean interfaces for production connectors
 7. **Role-Based Access**: Proper separation of public and staff functionality
 8. **Audit Trail**: Complete incident timeline with public/internal separation

@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Judge Demo Tour";
+    var steps = new[] {
+        new { Title="Home", Link="/", Click="Review the product story and CTAs.", See="CivicOps converts messy resident reports into civic intelligence.", Why="Sets the product frame." },
+        new { Title="Report Issue", Link="/Home/Report", Click="Submit or review the resident report form.", See="A structured CivicOps reference flow.", Why="Shows web intake." },
+        new { Title="WhatsApp Intake Sandbox", Link="/Demo/WhatsAppSimulator", Click="Send the prefilled resident message.", See="Reference, validation, department, priority, connector mode.", Why="Shows WhatsApp-ready intake without secrets." },
+        new { Title="Voice Note Sandbox", Link="/Demo/VoiceNoteSimulator", Click="Submit the transcript scenario.", See="Voice transcript becomes an incident.", Why="Shows accessibility channel." },
+        new { Title="AI Agent Command Centre", Link="/Home/Agent", Click="Run each agent action button.", See="Backend fetch results, pipeline output, audit trail.", Why="Main intelligence showcase." },
+        new { Title="Incident Detail", Link="/Home/Dashboard", Click="Open a recent incident from the dashboard.", See="Reference, status, internal notes, public updates.", Why="Shows traceability." },
+        new { Title="Dashboard", Link="/Home/Dashboard", Click="Review stats and queues.", See="Operational workload and department distribution.", Why="Shows staff view." },
+        new { Title="Alerts", Link="/Home/Alerts", Click="Review active area alerts.", See="Public notices by area/ward.", Why="Shows public communication." },
+        new { Title="Weather", Link="/Home/Weather", Click="Review weather risk context.", See="Synthetic operational weather context.", Why="Shows situational awareness." },
+        new { Title="Mobile/App Hub", Link="/Home/Mobile", Click="Scan the mobile panels.", See="PWA, Android-ready, and WhatsApp-first access.", Why="Shows public utility reach." },
+        new { Title="Connectors", Link="/Home/Connectors", Click="Run Gemini health test and copy webhook URL.", See="Live Ready, Webhook Ready, Sandbox Active, or Fallback Active statuses.", Why="Shows honest integration readiness." },
+        new { Title="Bob Evidence/Build Docs", Link="/docs/ibm-bob-final-continuity-report.md", Click="Open evidence docs in repo.", See="Bob continuity and final polish notes.", Why="Preserves build evidence." }
+    };
+}
+
+<div class="container py-4 civic-page">
+    <div class="hero-panel mb-4"><span class="eyebrow">Submission route</span><h1 class="display-6 fw-bold">CivicOps Judge Demo Tour</h1><p class="lead mb-0">A coordinated path through the product, sandbox data, connector readiness, and evidence docs.</p></div>
+    <div class="row g-3">
+        @{ var i = 1; }
+        @foreach (var step in steps)
+        {
+            <div class="col-lg-6">
+                <div class="ops-card h-100 tour-step">
+                    <span class="step-number">@i</span>
+                    <h2 class="h5">@step.Title</h2>
+                    <p><strong>What to click:</strong> @step.Click</p>
+                    <p><strong>What the judge should see:</strong> @step.See</p>
+                    <p><strong>Why it matters:</strong> @step.Why</p>
+                    <a class="btn btn-primary" href="@step.Link">Open step</a>
+                </div>
+            </div>
+            i++;
+        }
+    </div>
+</div>

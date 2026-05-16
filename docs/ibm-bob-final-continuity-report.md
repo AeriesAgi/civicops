@@ -275,7 +275,7 @@ Not re-run (changes were minimal and safe)
 - ✅ No hardcoded secrets in code
 - ✅ No committed .env files
 - ✅ Environment variables documented
-- ✅ Demo mode clearly labeled
+- ✅ Sandbox mode clearly labeled
 - ✅ Emergency disclaimers present
 
 ### Documentation
@@ -328,7 +328,7 @@ Not re-run (changes were minimal and safe)
 - Demo authentication (not production-ready)
 - JSON persistence (database migration needed)
 - Gemini AI optional (deterministic fallback works)
-- WhatsApp demo mode (Meta app setup needed)
+- WhatsApp sandbox mode (Meta app setup needed)
 - Not emergency services replacement
 - No official municipal partnerships
 - Pilot-ready, not production-deployed
@@ -513,3 +513,9 @@ This continuity session successfully stabilized and integrated the AI Agent Cons
 - Created comprehensive documentation
 
 **This Session**: Continuity and stabilization only, no major feature additions.
+
+## Final Codex Product Polish Continuity Note
+
+After the IBM Bob stabilization work, a final Codex pass polished and connected the submission experience without removing Bob evidence. The pass rebuilt the broken AI Agent view, added backend agent endpoints, improved global contrast, updated Connector/Mobile/WhatsApp pages, added the judge demo tour, and refreshed documentation to distinguish Bob's core acceleration from Codex's final pre-submission stabilization.
+
+The submission remains honest: synthetic data is used for judging, live Gemini and WhatsApp require configured credentials, no official municipal partnership is claimed, and CivicOps does not replace emergency services.

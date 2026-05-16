@@ -506,3 +506,14 @@ The platform showcases how AI agents can transform public service delivery, maki
 **Document Version:** 1.0  
 **Last Updated:** May 15, 2026  
 **Submission Type:** AI Agent Hackathon
+
+## Final AI Agent Command Centre
+
+The final `/Home/Agent` page was rebuilt to remove truncated JavaScript and dead controls. Each button now calls backend endpoints with `fetch()`:
+
+- `GET /api/agent/scenarios`
+- `POST /api/agent/run`
+- `POST /api/agent/generate-response`
+- `POST /api/agent/recommend-alert`
+
+The agent uses the shared `IncidentIntakeService`, so web, WhatsApp sandbox, WhatsApp webhook, voice transcript, mobile/API, and agent scenarios all create CivicOps results through one pipeline. Gemini is used when configured; otherwise deterministic fallback is explicitly labeled. WhatsApp status is shown as live ready, webhook ready, sandbox active, or needing environment variables. Human review remains required before dispatch, alerting, or external escalation.
