@@ -293,6 +293,11 @@ namespace CivicOps.Controllers
             if (actionType == "generate-brief") incident.DepartmentBrief = $"Department brief generated for {incident.AssignedDepartment.GetDisplayName()}: {incident.Category} in {incident.NormalizedArea}. Priority {incident.Priority}; {incident.AffectedCount} affected confirmations. Next step: acknowledge, assign crew/resources, and post public update.";
             if (actionType == "generate-citizen-response") incident.CitizenResponse = $"Reference {incident.ReferenceNumber}: your report is {FormatStatus(incident.Status)} with {incident.AssignedDepartment.GetDisplayName()}. We will post public updates as the department acts.";
 
+            var defaultPublicUpdate = BuildDefaultPublicUpdate(actionType, incident);
+            var defaultInternalNote = BuildDefaultInternalNote(actionType, incident);
+            if (string.IsNullOrWhiteSpace(publicNote)) publicNote = defaultPublicUpdate;
+            if (string.IsNullOrWhiteSpace(internalNote)) internalNote = defaultInternalNote;
+
             if (!string.IsNullOrWhiteSpace(internalNote) || !string.IsNullOrWhiteSpace(actionType))
             {
                 incident.InternalNotes.Add(new IncidentNote
@@ -316,6 +321,27 @@ namespace CivicOps.Controllers
             await _dataService.UpdateIncidentAsync(incident);
             return RedirectToAction("Incident", new { id });
         }
+
+        private static string BuildDefaultPublicUpdate(string? actionType, Incident incident) => actionType switch
+        {
+            "acknowledge" => $"{incident.AssignedDepartment.GetDisplayName()} has acknowledged report {incident.ReferenceNumber} and is reviewing the next operational step.",
+            "in-progress" => $"Work is now in progress for {incident.ReferenceNumber}. The assigned department will post updates as field information is confirmed.",
+            "request-info" => $"More information is required for {incident.ReferenceNumber}. Please add location details or respond through the Citizen App if requested.",
+            "escalate" => $"Report {incident.ReferenceNumber} has been escalated for urgent municipal attention.",
+            "recommend-alert" => $"An area alert has been recommended for {incident.NormalizedArea}. It will be published after human review.",
+            "resolve" => $"Report {incident.ReferenceNumber} has been marked resolved. Thank you for helping improve civic visibility.",
+            "close" => $"Report {incident.ReferenceNumber} has been closed after municipal review.",
+            "generate-citizen-response" => incident.CitizenResponse,
+            _ => null
+        };
+
+        private static string BuildDefaultInternalNote(string? actionType, Incident incident) => actionType switch
+        {
+            "generate-brief" => $"Generated department brief for {incident.AssignedDepartment.GetDisplayName()} using current incident context and affected confirmations.",
+            "generate-citizen-response" => "Drafted citizen response from current status, department and public-update context.",
+            "recommend-alert" => $"Recommended area alert review for {incident.NormalizedArea}; dispatcher approval still required before publication.",
+            _ => string.IsNullOrWhiteSpace(actionType) ? string.Empty : $"Workflow action completed: {actionType}."
+        };
 
         private static string FormatStatus(IncidentStatus status) => status switch
         {

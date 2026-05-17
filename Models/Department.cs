@@ -24,18 +24,18 @@ namespace CivicOps.Models
             return department switch
             {
                 Department.WaterAndSanitation => "Water & Sanitation",
-                Department.Electricity => "Electricity",
-                Department.RoadsAndStormwater => "Roads & Stormwater",
+                Department.Electricity => "Electricity & Power",
+                Department.RoadsAndStormwater => "Roads & Infrastructure",
                 Department.WasteManagement => "Waste Management",
                 Department.ParksAndPublicSpaces => "Parks & Public Spaces",
-                Department.HousingInformalSettlements => "Housing/Informal Settlements",
+                Department.HousingInformalSettlements => "Housing Services",
                 Department.EnvironmentalHealth => "Environmental Health",
                 Department.DisasterManagement => "Disaster Management",
                 Department.FireAndRescue => "Fire & Rescue",
-                Department.MetroPolicePublicSafety => "Metro Police/Public Safety",
+                Department.MetroPolicePublicSafety => "Public Safety",
                 Department.SAPSLiaisonPoliceReferral => "SAPS Liaison/Police Referral",
                 Department.EMSMedicalReferral => "EMS/Medical Referral",
-                Department.WardCouncillorWardCommittee => "Ward Councillor/Ward Committee",
+                Department.WardCouncillorWardCommittee => "Community Liaison",
                 _ => department.ToString()
             };
         }

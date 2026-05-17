@@ -1,16 +1,88 @@
 @model CivicOps.Controllers.DashboardViewModel
 @{
-    ViewData["Title"] = "Operations Dashboard";
+    ViewData["Title"] = "Municipal Operations Dashboard";
     string PriorityLabel(CivicOps.Models.IncidentPriority p) => p == CivicOps.Models.IncidentPriority.Urgent ? "Critical" : p.ToString();
     string StatusLabel(CivicOps.Models.IncidentStatus s) => s switch { CivicOps.Models.IncidentStatus.InProgress => "In Progress", CivicOps.Models.IncidentStatus.WaitingForCitizen => "Waiting for Citizen", CivicOps.Models.IncidentStatus.AlertRecommended => "Alert Recommended", _ => s.ToString() };
 }
-<div class="container py-4 civic-page">
-  <section class="hero-panel mb-4"><span class="eyebrow">Civic control room</span><h1 class="display-5">Operations Dashboard</h1><p class="lead">Synthetic civic workload, department queues, high-priority issues and AI recommendations for human review.</p>@if (ViewBag.QueueScope != null) { <div class="alert alert-info">@ViewBag.QueueScope</div> }<span class="badge bg-success">System online</span> <span class="badge bg-info">@Model.GeminiStatus</span></section>
-  <div class="grid-auto mb-4">
-    <div class="ops-card"><div class="metric">@Model.TotalIncidents</div><p>Total incidents</p></div><div class="ops-card"><div class="metric text-info">@Model.NewIncidents</div><p>New</p></div><div class="ops-card"><div class="metric text-warning">@Model.InProgressIncidents</div><p>In progress</p></div><div class="ops-card"><div class="metric text-danger">@Model.EscalatedIncidents</div><p>Escalated</p></div><div class="ops-card"><div class="metric text-success">@Model.ActiveAlerts</div><p>Active alerts</p></div>
-  </div>
-  <div class="row g-4">
-    <div class="col-lg-7"><div class="ops-card"><h2 class="h4">Recent reports</h2><div class="table-responsive"><table class="table"><thead><tr><th>Reference</th><th>Area</th><th>Department</th><th>Priority</th><th>Status</th></tr></thead><tbody>@foreach (var i in Model.RecentIncidents) { <tr><td><a href="/Home/Incident?id=@i.Id">@i.ReferenceNumber</a></td><td>@i.Suburb</td><td>@i.AssignedDepartment.GetDisplayName()</td><td><span class="badge bg-warning">@PriorityLabel(i.Priority)</span></td><td><span class="badge bg-info">@StatusLabel(i.Status)</span></td></tr> }</tbody></table></div></div></div>
-    <div class="col-lg-5"><div class="ops-card mb-4"><h2 class="h4">Department queues</h2>@foreach (var d in Model.IncidentsByDepartment) { <div class="d-flex justify-content-between border-bottom border-secondary py-2"><a href="/Home/Department?dept=@d.Department">@d.Department.GetDisplayName()</a><strong>@d.Count</strong></div> }</div><div class="ops-card"><h2 class="h4">AI recommendations</h2><p>Use the Agent Command Centre to generate citizen responses, department briefs and area-alert recommendations on demand.</p><a class="btn btn-primary" href="/Home/Agent">Open AI Agent</a></div></div>
-  </div>
+<div class="container-fluid px-lg-4 py-4 civic-page ops-dashboard-page">
+    <section class="hero-panel mb-4 dashboard-command-hero">
+        <div class="row g-4 align-items-center">
+            <div class="col-xl-7">
+                <span class="eyebrow">Municipal command centre</span>
+                <h1 class="display-5 mb-3">CivicOps Operations Dashboard</h1>
+                <p class="lead mb-3">Role-based incident queue, department workload, priority triage, area alert recommendations and auditable municipal actions.</p>
+                @if (ViewBag.QueueScope != null) { <div class="alert alert-info mb-3">@ViewBag.QueueScope</div> }
+                <div class="d-flex flex-wrap gap-2"><span class="badge bg-success">System online</span><span class="badge bg-info">@Model.GeminiStatus</span><span class="badge bg-secondary">Human approval required</span></div>
+            </div>
+            <div class="col-xl-5">
+                <div class="command-map-large">
+                    <div class="map-grid"></div>
+                    <span class="map-node" style="left:18%; top:31%"></span><span class="map-node" style="left:42%; top:22%"></span><span class="map-node" style="left:67%; top:38%"></span><span class="map-node" style="left:56%; top:68%"></span><span class="map-node" style="left:28%; top:72%"></span>
+                    <div class="map-overlay-card"><strong>eThekwini operational picture</strong><small>Citizen signals → AI triage → department action → public updates</small></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ops-kpi-grid mb-4">
+        <div class="ops-kpi"><span>Total incidents</span><strong>@Model.TotalIncidents</strong><small>All scoped reports</small></div>
+        <div class="ops-kpi"><span>New intake</span><strong>@Model.NewIncidents</strong><small>Needs acknowledgement</small></div>
+        <div class="ops-kpi"><span>In progress</span><strong>@Model.InProgressIncidents</strong><small>Active department work</small></div>
+        <div class="ops-kpi danger"><span>Escalated</span><strong>@Model.EscalatedIncidents</strong><small>Command attention</small></div>
+        <div class="ops-kpi success"><span>Active alerts</span><strong>@Model.ActiveAlerts</strong><small>Public area notices</small></div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="ops-card command-table-card">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div><span class="eyebrow">Live incident queue</span><h2 class="h4 mb-0">Reports requiring municipal action</h2></div>
+                    <a class="btn btn-outline-info btn-sm" href="/Home/Agent">Open AI Agent</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table command-table align-middle">
+                        <thead><tr><th>Reference</th><th>Area / Ward</th><th>Department</th><th>Priority</th><th>Status</th><th>Next action</th></tr></thead>
+                        <tbody>
+                        @foreach (var i in Model.RecentIncidents)
+                        {
+                            <tr>
+                                <td><a class="ref-link" href="/Home/Incident/@i.Id">@i.ReferenceNumber</a><br /><small>@i.Category</small></td>
+                                <td>@(string.IsNullOrWhiteSpace(i.NormalizedArea) ? i.Suburb : i.NormalizedArea)<br /><small>@i.Ward</small></td>
+                                <td>@i.AssignedDepartment.GetDisplayName()</td>
+                                <td><span class="badge bg-warning">@PriorityLabel(i.Priority)</span></td>
+                                <td><span class="badge bg-info">@StatusLabel(i.Status)</span></td>
+                                <td><a class="btn btn-sm btn-primary" href="/Home/Incident/@i.Id">Open action panel</a></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="ops-card mb-4 department-load-card">
+                <span class="eyebrow">Department workload</span>
+                <h2 class="h4">Queues by role</h2>
+                @foreach (var d in Model.IncidentsByDepartment.Take(10))
+                {
+                    var width = Model.TotalIncidents == 0 ? 0 : Math.Max(8, (int)Math.Round((double)d.Count / Model.TotalIncidents * 100));
+                    <a class="dept-load-row" href="/Home/Department?dept=@d.Department">
+                        <span><strong>@d.Department.GetDisplayName()</strong><small>@d.Count open reports</small></span>
+                        <em style="width:@width%"></em>
+                    </a>
+                }
+            </div>
+            <div class="ops-card alert-recommendation-card">
+                <span class="eyebrow">Alert recommendation panel</span>
+                <h2 class="h4">Human-reviewed alerting</h2>
+                <p>High-impact clusters are routed for dispatcher approval before any public area alert is issued.</p>
+                <div class="d-grid gap-2">
+                    @foreach (var i in Model.HighPriorityIncidents.Take(3))
+                    {
+                        <a class="alert-rec" href="/Home/Incident/@i.Id"><strong>@i.NormalizedArea</strong><span>@i.Category · @PriorityLabel(i.Priority)</span></a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
