@@ -1,6 +1,6 @@
 @{
     var appShell = ViewBag.AppShell == true;
-    ViewData["Title"] = appShell ? "Open Citizen App" : "Download / Install Citizen App";
+    ViewData["Title"] = appShell ? "CivicOps Citizen App" : "Citizen App Download / Install Hub";
     var pwaReady = ViewBag.PwaReady == true;
     var apkExists = ViewBag.ApkExists == true;
 }
@@ -8,34 +8,32 @@
 @if (appShell)
 {
     <section class="hero-panel mb-4">
-        <span class="eyebrow">Citizen App shell</span>
-        <h1 class="display-5">CivicOps Citizen App</h1>
-        <p class="lead">Report civic issues, track references, follow suburbs/wards, view alerts, join community threads and ask Gemini Copilot through explicit backend actions.</p>
-        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">Installable PWA</span><span class="badge bg-info">Backend-connected</span><span class="badge bg-info">No Gemini secrets on device</span><span class="badge bg-secondary">Optional APK @(apkExists ? "available" : "workflow-ready")</span></div>
+        <span class="eyebrow">Citizen App</span>
+        <h1 class="display-5">CivicOps Citizen Companion</h1>
+        <p class="lead">A mobile-first citizen experience for reporting, tracking, local alerts, followed areas, Copilot support and incident discussion — backed by the same CivicOps API and staff control room.</p>
+        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">Installable PWA</span><span class="badge bg-info">Android WebView shell</span><span class="badge bg-info">Backend API connected</span><span class="badge bg-secondary">Gemini server-side only</span></div>
     </section>
     <div class="row g-4 align-items-start">
         <div class="col-lg-5">
             <div class="mobile-phone"><div class="mobile-screen">
-                <div class="d-flex justify-content-between align-items-center mb-3"><strong>CivicOps</strong><span class="badge bg-success">Citizen App</span></div>
-                <div class="app-profile mb-3"><div class="small text-muted-strong">Resident profile</div><strong>Public user / Resident demo</strong><div class="small">Sign in for My Reports or submit publicly with a reference.</div><a class="btn btn-sm btn-outline-info mt-2" href="/Resident/Login">Login / Resident Profile</a></div>
-                <a class="app-tile" href="/Home/Report"><span><i class="bi bi-plus-circle me-2"></i>Submit Ticket / Report Issue</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Resident/MyReports"><span><i class="bi bi-list-check me-2"></i>View My Tickets</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Lookup"><span><i class="bi bi-search me-2"></i>Track Reference</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Alerts"><span><i class="bi bi-bell me-2"></i>Area Alerts</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Resident/Profile"><span><i class="bi bi-geo-alt me-2"></i>Search / Follow Areas, Suburbs, Wards</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Agent"><span><i class="bi bi-stars me-2"></i>Gemini Copilot</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Weather"><span><i class="bi bi-cloud-sun me-2"></i>Weather / Area Risk</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/app/area/Chatsworth/thread"><span><i class="bi bi-chat-dots me-2"></i>Community Thread / Local Updates</span><i class="bi bi-chevron-right"></i></a>
-                <div class="alert alert-warning mt-3 small">Emergency disclaimer: CivicOps does not replace emergency services. Contact emergency services directly for immediate danger.</div>
-                <a class="app-tile secondary" href="/Demo/WhatsAppSimulator"><span><i class="bi bi-whatsapp me-2"></i>Optional WhatsApp connector info</span><i class="bi bi-chevron-right"></i></a>
+                <div class="d-flex justify-content-between align-items-center mb-3"><strong><i class="bi bi-command me-2"></i>CivicOps</strong><span class="badge bg-success">Citizen</span></div>
+                <div class="app-profile mb-3"><div class="small text-muted-strong">Resident profile</div><strong>Resident demo / public user</strong><div class="small">Sign in for My Reports and followed areas, or submit publicly and track by reference.</div><a class="btn btn-sm btn-outline-info mt-2" href="/Resident/Login">Resident Login</a></div>
+                <a class="app-tile" href="/Home/Report"><span><i class="bi bi-plus-circle me-2"></i>Submit report / ticket</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Resident/MyReports"><span><i class="bi bi-list-check me-2"></i>My reports</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Home/Lookup"><span><i class="bi bi-search me-2"></i>Public reference tracking</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Home/Alerts"><span><i class="bi bi-bell me-2"></i>Area alerts</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Resident/Profile"><span><i class="bi bi-geo-alt me-2"></i>Follow suburbs / wards</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Home/Agent"><span><i class="bi bi-stars me-2"></i>Copilot / AI assistant</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/app/area/Chatsworth/thread"><span><i class="bi bi-chat-dots me-2"></i>Community incident thread</span><i class="bi bi-chevron-right"></i></a>
+                <div class="alert alert-warning mt-3 small mb-0">For immediate danger, contact emergency services directly. CivicOps is civic reporting support, not emergency dispatch.</div>
             </div></div>
         </div>
         <div class="col-lg-7">
-            <div class="grid-auto">
-                <div class="ops-card"><h2 class="h5">AI enrichment on explicit actions</h2><p>Opening the app does not call Gemini. Report submission, Copilot buttons, voice-note transcript analysis, alert recommendation and staff/judge actions call the backend, which returns Gemini or local fallback source.</p></div>
-                <div class="ops-card"><h2 class="h5">Messy report ready</h2><p>Try area <strong>Chatworth</strong> with “Blocked drain near school water pooling badly after rain”. CivicOps normalizes Chatsworth, estimates a ward, routes Roads & Stormwater and creates a status reference.</p><a class="btn btn-primary" href="/Home/Report">Submit demo report</a></div>
-                <div class="ops-card"><h2 class="h5">Local confirmation</h2><p>Community threads combine official updates, resident confirmations and “affected too” context without becoming a full social network.</p><a class="btn btn-outline-info" href="/app/area/Phoenix/thread">Open Phoenix thread</a></div>
-                <div class="ops-card"><h2 class="h5">Install / Download</h2><p>Use the install page for PWA instructions and optional APK status.</p><a class="btn btn-outline-light" href="/Home/Mobile">Download / Install App</a></div>
+            <div class="grid-auto mb-4">
+                <div class="ops-card"><h2 class="h5">Real app capabilities</h2><p>Login, submit report, location notes, media placeholder, voice-note readiness, reference tracking, area alerts, followed areas, profile/settings and Copilot actions.</p></div>
+                <div class="ops-card"><h2 class="h5">Community confirmation</h2><p>Lightweight threads let residents confirm local impacts and see related tickets without turning CivicOps into a noisy social network.</p><a class="btn btn-outline-info" href="/app/area/Phoenix/thread">Open Phoenix thread</a></div>
+                <div class="ops-card"><h2 class="h5">API-backed shell</h2><p>The PWA and Android shell use web/backend routes and keep Gemini keys on the server. The app does not duplicate municipal logic.</p></div>
+                <div class="ops-card"><h2 class="h5">Install options</h2><p>PWA install is ready. Android APK builds from <code>mobile/CivicOpsAndroid</code> and publishes to <code>wwwroot/downloads</code> when toolchain is available.</p><a class="btn btn-primary" href="/citizen-app">Download / Install</a></div>
             </div>
         </div>
     </div>
@@ -43,17 +41,17 @@
 else
 {
     <section class="hero-panel mb-4">
-        <span class="eyebrow">Download App / Install App</span>
+        <span class="eyebrow">Download App / Install Hub</span>
         <h1 class="display-5">Install the CivicOps Citizen App</h1>
-        <p class="lead">Use CivicOps as an installable PWA today. Optional Android APK packaging is supported only when a safe build artifact exists.</p>
-        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">@(pwaReady ? "Installable PWA ready" : "PWA shell available")</span><span class="badge bg-info">Starts at /app</span><span class="badge bg-info">Backend Gemini/fallback only</span><span class="badge bg-secondary">Optional APK @(apkExists ? "available" : "not bundled")</span></div>
-        <div class="d-flex gap-2 flex-wrap mt-3"><a class="btn btn-primary" href="/app">Open Citizen App</a><a class="btn btn-outline-info" href="/Home/Report">Report Issue</a><a class="btn btn-outline-light" href="/Home/Lookup">Track Reference</a>@if (apkExists) { <a class="btn btn-outline-warning" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download APK</a> }</div>
+        <p class="lead">The citizen app is the primary public channel: report issues, track status, follow areas, review alerts, open Copilot and join local incident threads from a polished installable shell.</p>
+        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">@(pwaReady ? "PWA ready" : "PWA shell available")</span><span class="badge bg-info">Android project scaffolded</span><span class="badge bg-info">Starts at /app</span><span class="badge bg-secondary">APK @(apkExists ? "available" : "build artifact pending")</span></div>
+        <div class="command-strip mt-4"><a class="btn btn-primary btn-lg" href="/app">Open Citizen App</a><a class="btn btn-outline-info btn-lg" href="/Home/Report">Report Issue</a><a class="btn btn-outline-light btn-lg" href="/Home/Lookup">Track Reference</a>@if (apkExists) { <a class="btn btn-outline-warning btn-lg" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download Android APK</a> }</div>
     </section>
     <div class="row g-4">
-        <div class="col-lg-4"><div class="ops-card"><h2 class="h5">Install PWA</h2><ol><li>Open <code>/app</code> in Chrome, Edge or Safari.</li><li>Choose Install or Add to Home Screen.</li><li>Use Report Issue, Track Reference, Area Alerts and Gemini Copilot.</li></ol></div></div>
-        <div class="col-lg-4"><div class="ops-card"><h2 class="h5">Demo login details</h2><p>Resident: <code>resident@civicops.demo</code><br/>Staff examples: <code>electricity@civicops.demo</code>, <code>admin@civicops.demo</code><br/>Password: <code>CivicOps2026!</code></p><a class="btn btn-outline-info" href="/Auth/Login">Open staff login</a></div></div>
-        <div class="col-lg-4"><div class="ops-card"><h2 class="h5">No secrets on device</h2><p>The PWA/APK wrapper stores no Gemini keys, WhatsApp tokens, backend credentials or bearer tokens. Gemini runs server-side only after explicit user/staff actions.</p></div></div>
-        <div class="col-lg-12"><div class="ops-card"><h2 class="h5">Optional APK status</h2>@if (apkExists) { <p>APK artifact is exposed from <code>/downloads/CivicOpsCitizenCompanion-debug.apk</code>.</p> } else { <p>No APK binary is bundled in this repository state. The Android WebView wrapper lives under <code>mobile/CivicOpsAndroid</code>; PWA install is the ready public channel.</p> }</div></div>
+        <div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Option 1</span><h2 class="h4">Install as PWA</h2><ol><li>Open <code>/app</code> in Chrome, Edge or Safari.</li><li>Select <strong>Install</strong> or <strong>Add to Home Screen</strong>.</li><li>Use Report Issue, Track Reference, Area Alerts, Copilot and Threads.</li></ol></div></div>
+        <div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Option 2</span><h2 class="h4">Download APK</h2>@if (apkExists) { <p>The debug APK is available at <code>/downloads/CivicOpsCitizenCompanion-debug.apk</code>.</p><a class="btn btn-primary" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download APK</a> } else { <p>The Android project is complete under <code>mobile/CivicOpsAndroid</code>. Build with <code>./gradlew assembleDebug</code>, then copy the APK to <code>wwwroot/downloads/CivicOpsCitizenCompanion-debug.apk</code>.</p> }</div></div>
+        <div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Demo access</span><h2 class="h4">Quick credentials</h2><p>Resident: <code>resident@civicops.demo</code><br/>Staff: <code>admin@civicops.demo</code>, <code>dispatcher@civicops.demo</code>, <code>electricity@civicops.demo</code><br/>Password: <code>CivicOps2026!</code></p><a class="btn btn-outline-info" href="/Resident/Login">Resident Login</a></div></div>
+        <div class="col-lg-12"><div class="ops-card"><h2 class="h4">What the app demonstrates</h2><div class="d-flex flex-wrap"><span class="area-chip">Resident login/profile</span><span class="area-chip">Submit ticket</span><span class="area-chip">Photo placeholder</span><span class="area-chip">Voice-note placeholder</span><span class="area-chip">Track own reports</span><span class="area-chip">Reference lookup</span><span class="area-chip">Area alerts</span><span class="area-chip">Follow suburbs/wards</span><span class="area-chip">Copilot</span><span class="area-chip">Incident discussions</span><span class="area-chip">Related local activity</span></div></div></div>
     </div>
 }
 </div>

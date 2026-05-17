@@ -3,7 +3,7 @@
 CivicOps is pilot-ready architecture, not an official municipal deployment.
 
 Primary channels:
-1. Mobile/PWA citizen app
+1. Citizen App/PWA citizen app
 2. Web reporting portal
 3. Public reference/status lookup
 4. Area alerts/weather notices

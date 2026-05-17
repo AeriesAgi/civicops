@@ -1,22 +1,13 @@
 {
-  "name": "CivicOps Mobile Citizen App",
+  "name": "CivicOps Citizen App",
   "short_name": "CivicOps",
   "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#06131f",
-  "theme_color": "#0f766e",
-  "description": "Mobile-first CivicOps citizen reporting, status tracking, area alerts and weather-risk context.",
+  "background_color": "#02070d",
+  "theme_color": "#02070d",
+  "description": "Installable CivicOps citizen reporting, status tracking, area alerts, Copilot and community incident threads.",
   "icons": [
-    {
-      "src": "/icons/civicops-icon.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
-    },
-    {
-      "src": "/icons/civicops-icon.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml"
-    }
-  ],
-  "scope": "/"
+    { "src": "/icons/civicops-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
 }

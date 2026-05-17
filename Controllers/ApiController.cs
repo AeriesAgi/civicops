@@ -370,7 +370,8 @@ namespace CivicOps.Controllers
                     alertRecommendation = "No public alert generated from connector health check.",
                     auditNotes = new[] { health.Status, $"Model: {health.Model}", $"Mode: {health.Mode}" },
                     whatsapp = BuildWhatsAppConnectorSnapshot(_whatsAppService.GetStatus()),
-                    timestamp = DateTime.UtcNow
+                    timestamp = DateTime.UtcNow,
+                    diagnostics = BuildGeminiDiagnosticsSnapshot()
                 });
             }
 
@@ -411,7 +412,8 @@ namespace CivicOps.Controllers
                     "Human-in-the-loop review remains required before field dispatch or public alerting."
                 },
                 whatsapp = BuildWhatsAppConnectorSnapshot(whatsAppStatus),
-                timestamp = DateTime.UtcNow
+                timestamp = DateTime.UtcNow,
+                diagnostics = BuildGeminiDiagnosticsSnapshot()
             });
         }
 

@@ -4,7 +4,7 @@ Use the term **sandbox scenario** or **synthetic civic data** rather than implyi
 
 1. Open `/` and explain: “AI-powered civic reporting, routing and public alerts.” Residents report through mobile/PWA/web; Gemini/fallback structures reports; humans remain in control.
 2. Open `/Home/Report`, submit a civic issue, and show the reference confirmation.
-3. Open `/Home/Mobile` or `/app` to show the PWA citizen hub as the main public channel.
+3. Open `/citizen-app` or `/app` to show the PWA citizen hub as the main public channel.
 4. Open `/Home/Agent` and run: latest report, WhatsApp sandbox report, voice-note transcript, citizen response, department brief, alert recommendation and judge summary.
 5. Open `/Home/Dashboard` to show queues and control-room cards.
 6. Open `/Home/Lookup` and track a reference.

@@ -136,7 +136,7 @@ CivicOps/
 - `/Home/Report` - Report issue
 - `/Home/Lookup` - Track report
 - `/Home/Alerts` - View alerts
-- `/Home/Mobile` - Citizen App install page
+- `/citizen-app` - Citizen App install page
 - `/Home/Status?reference={ref}` - Report status
 - `/Home/Confirmation?reference={ref}` - Submission confirmation
 
