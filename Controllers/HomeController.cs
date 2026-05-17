@@ -390,6 +390,27 @@ namespace CivicOps.Controllers
             return View("Mobile");
         }
 
+        [HttpGet("/app/incident/{reference}")]
+        public async Task<IActionResult> AppIncident(string reference)
+        {
+            var incident = await _dataService.GetIncidentByReferenceAsync(reference.Trim());
+            ViewBag.CanSeeAudit = false;
+            ViewBag.Reference = reference;
+            return View("Status", incident);
+        }
+
+        [HttpGet("/app/area/{area}/thread")]
+        public async Task<IActionResult> AppAreaThread(string area)
+        {
+            var normalizedArea = Uri.UnescapeDataString(area).Trim();
+            var incidents = (await _dataService.GetAllIncidentsAsync())
+                .Where(i => i.NormalizedArea.Equals(normalizedArea, StringComparison.OrdinalIgnoreCase) || i.Suburb.Equals(normalizedArea, StringComparison.OrdinalIgnoreCase))
+                .Take(12)
+                .ToList();
+            ViewBag.Area = normalizedArea;
+            return View("AreaThread", incidents);
+        }
+
         public IActionResult DemoTour()
         {
             return View();

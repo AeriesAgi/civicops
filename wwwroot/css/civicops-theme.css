@@ -118,3 +118,6 @@ p, li, td, th, label, .form-text { color: var(--civic-soft); }
   .navbar .nav-link { border-radius: 12px; }
   .civic-page { padding-left: .8rem !important; padding-right: .8rem !important; }
 }
+.app-profile { padding: 1rem; border-radius: 18px; background: rgba(15, 23, 42, .72); border: 1px solid rgba(183, 200, 217, .18); }
+.app-tile.secondary { opacity: .82; background: rgba(148, 163, 184, .08); border-color: rgba(148, 163, 184, .18); }
+.list-group-item.bg-transparent:hover { background: rgba(34,211,238,.10) !important; color: #fff !important; }

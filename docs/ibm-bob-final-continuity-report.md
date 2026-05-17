@@ -189,7 +189,7 @@ The AI Agent Console (`/Home/Agent`) is a comprehensive visualization of the Civ
 - ✅ `/Home/Report` - Report issue
 - ✅ `/Home/Lookup` - Track report
 - ✅ `/Home/Alerts` - View alerts
-- ✅ `/Home/Mobile` - Mobile info
+- ✅ `/Home/Mobile` - Download / Install Citizen App
 - ✅ `/Home/Weather` - Weather/area conditions
 
 ### Protected Routes (Login Required)
@@ -532,3 +532,17 @@ IBM Bob was used to build and accelerate the main CivicOps hackathon implementat
 - Bob-side build notes identify final CivicOps commit `68a8cc7` and a Bob-reported `dotnet build` pass in 15.2s with 0 errors and 0 warnings.
 - Evidence remains surfaced through `/Home/BobEvidence`, `docs/bob-report.md`, `docs/build-log.md`, `docs/ibm-bob-session-report.md`, and this continuity report.
 - CivicOps was built with IBM Bob assistance and finalized into a working hackathon submission with verification, packaging and polish. Final verification/polish may have happened after Bob and should not be represented as Bob-generated work.
+
+
+## Final CivicOps submission QA notes
+
+- Citizen App / Installable PWA (`/app`) is the main public channel for reporting, tracking references, My Reports, Area Alerts, Weather/Area Risk, followed suburbs/wards, Gemini Copilot actions and lightweight Community Threads.
+- Gemini is the civic AI agent layer and runs server-side only from explicit app/staff/judge actions: report submission, Copilot/AI Agent button click, voice-note transcript analysis, optional WhatsApp sandbox processing, generated citizen response, department brief or alert recommendation.
+- Gemini/fallback enrichment cleans messy report text, corrects common area spellings such as Chatworth to Chatsworth and Pheonix to Phoenix, assigns category/department/priority, creates citizen responses and department briefs, and records audit notes.
+- Ward values are synthetic estimates for the eThekwini scenario. If a ward cannot be inferred, CivicOps must show a ward estimate or Needs ward confirmation rather than pretending certainty.
+- Department responders see only their own queues; Admin and Dispatcher can see broader operational views.
+- Community Threads are lightweight local confirmation/update areas, not a full social network.
+- The data set is synthetic eThekwini scenario data for hackathon judging. CivicOps does not claim live municipal data, an official municipal partnership, emergency-service replacement, or production WhatsApp approval.
+- WhatsApp is optional connector-ready only for future pilots/live-test messaging; the Citizen App/PWA is the primary demo path.
+- Production requires real identity, municipal integrations, privacy/security hardening, approved communications channels, and authoritative GIS/ward data.
+- CivicOps was built with IBM Bob assistance and finalized into a working hackathon submission with verification, packaging and polish.
