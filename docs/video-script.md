@@ -9,3 +9,26 @@ The dashboard gives civic teams a control-room view of open incidents, high-prio
 WhatsApp is connector-ready for sandbox/live-test and future pilots, but CivicOps does not depend on WhatsApp. The main public channel is the installable mobile/PWA app.
 
 IBM Bob helped build and accelerate the hackathon implementation; final engineering polish is documented separately. CivicOps uses synthetic civic data, makes no official municipal partnership claim, and does not replace emergency services.
+
+## Final submission positioning
+
+- Citizen App / Installable PWA is the main public channel. Reports, tracking, My Reports, Area Alerts, Weather/Area Risk, Follow My Area and Profile work without WhatsApp.
+- Gemini is the civic AI agent layer for event-triggered enrichment only: report submission, voice-note transcript analysis, optional WhatsApp inbound processing, explicit AI Agent/staff/judge action, alert recommendation and department brief generation.
+- Gemini/fallback cleans messy descriptions, corrects common area spelling such as Chatworth→Chatsworth and Pheonix→Phoenix, normalizes eThekwini demo suburbs, estimates synthetic wards where available, and flags “Needs ward confirmation” when uncertain.
+- Department users see only incidents assigned to their department; admins and dispatchers can see all queues.
+- The platform uses synthetic eThekwini scenario data and does not claim live municipal data, official municipal partnership, emergency-service replacement or production WhatsApp approval.
+- WhatsApp is optional connector-ready only for future pilots/live-test messaging.
+- Local deterministic fallback keeps classification, routing, citizen response, department brief and alert recommendations working if Gemini is disabled, quota-limited or missing a key.
+- Production would require real identity, municipal integrations, privacy/security hardening, approved communication channels and authoritative GIS/ward data.
+
+## Final 90-second video flow
+
+1. Resident opens the Citizen App / Installable PWA.
+2. Resident submits a messy report with a misspelled area, for example “Chatworth” and a blocked drain description.
+3. Gemini/fallback normalizes the area to Chatsworth, estimates the ward or flags uncertainty, classifies the issue and routes it to Roads & Stormwater.
+4. A department user signs in and sees only their queue.
+5. The public tracks the reference on the status page.
+6. Area Alerts and Weather/Area Risk provide public context.
+7. Admin dashboard shows eThekwini-wide synthetic workload.
+8. Bob Evidence page shows IBM Bob assistance and continuity notes.
+9. WhatsApp is shown only as optional connector-ready.

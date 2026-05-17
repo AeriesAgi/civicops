@@ -54,11 +54,18 @@ namespace CivicOps.Services
                 {
                     Email = "roads@civicops.demo",
                     Password = "CivicOps2026!",
-                    DisplayName = "Roads Department",
+                    DisplayName = "Roads & Stormwater Department",
                     Role = UserRole.DepartmentResponder,
                     AssignedDepartment = Department.RoadsAndStormwater,
                     IsActive = true
-                }
+                },
+                new DemoUser { Email = "waste@civicops.demo", Password = "CivicOps2026!", DisplayName = "Waste Management Department", Role = UserRole.DepartmentResponder, AssignedDepartment = Department.WasteManagement, IsActive = true },
+                new DemoUser { Email = "parks@civicops.demo", Password = "CivicOps2026!", DisplayName = "Parks & Public Spaces Department", Role = UserRole.DepartmentResponder, AssignedDepartment = Department.ParksAndPublicSpaces, IsActive = true },
+                new DemoUser { Email = "health@civicops.demo", Password = "CivicOps2026!", DisplayName = "Environmental Health Department", Role = UserRole.DepartmentResponder, AssignedDepartment = Department.EnvironmentalHealth, IsActive = true },
+                new DemoUser { Email = "disaster@civicops.demo", Password = "CivicOps2026!", DisplayName = "Disaster Management Department", Role = UserRole.DepartmentResponder, AssignedDepartment = Department.DisasterManagement, IsActive = true },
+                new DemoUser { Email = "fire@civicops.demo", Password = "CivicOps2026!", DisplayName = "Fire & Rescue Department", Role = UserRole.DepartmentResponder, AssignedDepartment = Department.FireAndRescue, IsActive = true },
+                new DemoUser { Email = "safety@civicops.demo", Password = "CivicOps2026!", DisplayName = "Metro Police/Public Safety Department", Role = UserRole.DepartmentResponder, AssignedDepartment = Department.MetroPolicePublicSafety, IsActive = true },
+                new DemoUser { Email = "resident@civicops.demo", Password = "CivicOps2026!", DisplayName = "Resident Demo", Role = UserRole.Viewer, IsActive = true }
             });
 
             return Task.CompletedTask;
@@ -129,14 +136,19 @@ namespace CivicOps.Services
                 return false;
             }
 
-            // Admin has access to everything
+            // Admin has access to everything. Dispatchers can perform dispatcher-level routing.
             if (session.Role == UserRole.Admin)
             {
                 return true;
             }
 
-            // Check role hierarchy
-            return session.Role >= requiredRole;
+            return requiredRole switch
+            {
+                UserRole.Dispatcher => session.Role == UserRole.Dispatcher,
+                UserRole.DepartmentResponder => session.Role == UserRole.Dispatcher || session.Role == UserRole.DepartmentResponder,
+                UserRole.Viewer => true,
+                _ => session.Role == requiredRole
+            };
         }
 
         public Task<DemoUser?> GetUserByEmailAsync(string email)

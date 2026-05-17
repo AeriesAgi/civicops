@@ -9,7 +9,7 @@
         <span class="eyebrow">Pilot-ready architecture</span>
         <h1 class="display-5">Connector readiness</h1>
         <p class="lead">CivicOps runs without secrets by using local deterministic fallback, and activates live connectors only through environment configuration and explicit actions.</p>
-        <div class="alert alert-info mb-0">WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp. Residents can report, track, and receive alerts through the mobile/PWA app and web portal.</div>
+        <div class="alert alert-info mb-0">WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp. Residents can report, track, and receive alerts through the Citizen App / Installable PWA and web portal.</div>
     </section>
     <div class="row g-4">
         <div class="col-lg-6">
@@ -20,7 +20,8 @@
                     <div><span class="badge bg-info">Key present</span><p>@(diagnostics?.KeyPresent == true ? "Yes" : "No")</p></div>
                     <div><span class="badge bg-info">Primary</span><p>@(diagnostics?.PrimaryModel ?? ViewBag.GeminiModel)</p></div>
                     <div><span class="badge bg-info">Routine</span><p>@(diagnostics?.RoutineModel ?? "gemini-3.1-flash-lite")</p></div>
-                    <div><span class="badge bg-warning">Quota limited</span><p>@(diagnostics?.QuotaLimited == true ? "Yes" : "No")</p></div>
+                    <div><span class="badge bg-warning">Quota/model error</span><p>@(diagnostics?.QuotaLimited == true ? "Quota cooldown active" : diagnostics?.LastResult ?? "No calls yet")</p></div>
+                    <div><span class="badge bg-success">Calls this session</span><p>@(diagnostics?.CallsSinceAppStart ?? 0)</p></div>
                     <div><span class="badge bg-success">Fallback active</span><p>@(diagnostics?.FallbackActive == true ? "Yes" : "Ready")</p></div>
                 </div>
                 <p><strong>Fallback models:</strong> @string.Join(", ", diagnostics?.FallbackModels ?? Array.Empty<string>())</p>
@@ -30,10 +31,10 @@
         </div>
         <div class="col-lg-6">
             <div class="ops-card h-100">
-                <h2 class="h4">WhatsApp Intake Sandbox / Connector Readiness</h2>
+                <h2 class="h4">Optional WhatsApp connector readiness</h2>
                 <p>Production use requires WhatsApp Business setup, opt-in/templates, billing and approved recipients. Sandbox mode limits live recipients and masks numbers in CivicOps outputs.</p>
                 <dl><dt>Status</dt><dd>@(whatsApp?.Status ?? "Sandbox")</dd><dt>Mode</dt><dd>@(whatsApp?.Mode ?? "Connector-ready")</dd><dt>Webhook verify</dt><dd><code>/webhooks/whatsapp</code></dd></dl>
-                <a class="btn btn-outline-info" href="/Demo/WhatsAppSimulator">Open WhatsApp sandbox</a>
+                <a class="btn btn-outline-info" href="/Demo/WhatsAppSimulator">Open optional WhatsApp sandbox</a>
             </div>
         </div>
     </div>

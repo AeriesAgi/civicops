@@ -1,13 +1,14 @@
 @{
-    ViewData["Title"] = "CivicOps Mobile Citizen App";
+    ViewData["Title"] = "CivicOps Citizen App";
     var pwaReady = ViewBag.PwaReady == true;
+    var apkExists = ViewBag.ApkExists == true;
 }
 <div class="container py-4 civic-page">
     <section class="hero-panel mb-4">
         <span class="eyebrow">Primary public channel</span>
-        <h1 class="display-5">CivicOps Mobile Citizen App</h1>
+        <h1 class="display-5">CivicOps Citizen App</h1>
         <p class="lead">A PWA-first citizen hub for reporting issues, tracking references, following areas, viewing alerts and checking weather-risk context.</p>
-        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">@(pwaReady ? "Installable PWA ready" : "PWA shell available")</span><span class="badge bg-info">Service worker registered</span><span class="badge bg-info">Manifest + app icon present</span></div>
+        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">@(pwaReady ? "Installable PWA ready" : "PWA shell available")</span><span class="badge bg-info">Service worker registered</span><span class="badge bg-info">Manifest + app icon present</span><span class="badge bg-secondary">Optional APK @(apkExists ? "available" : "not bundled")</span></div><div class="d-flex gap-2 flex-wrap mt-3"><a class="btn btn-primary" href="/app">Open Citizen App</a><a class="btn btn-outline-info" href="/Home/Report">Report Issue</a><a class="btn btn-outline-light" href="/Home/Lookup">Track Reference</a>@if (apkExists) { <a class="btn btn-outline-warning" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download APK</a> }</div>
     </section>
     <div class="row g-4 align-items-start">
         <div class="col-lg-5">
@@ -18,8 +19,9 @@
                 <a class="app-tile" href="/Home/Lookup"><span><i class="bi bi-search me-2"></i>Track Reference</span><i class="bi bi-chevron-right"></i></a>
                 <a class="app-tile" href="/Resident/MyReports"><span><i class="bi bi-list-check me-2"></i>My Reports</span><i class="bi bi-chevron-right"></i></a>
                 <a class="app-tile" href="/Home/Alerts"><span><i class="bi bi-bell me-2"></i>Area Alerts</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Weather"><span><i class="bi bi-cloud-sun me-2"></i>Weather / Area Conditions</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Home/Weather"><span><i class="bi bi-cloud-sun me-2"></i>Weather / Area Risk</span><i class="bi bi-chevron-right"></i></a>
                 <a class="app-tile" href="/Resident/Profile"><span><i class="bi bi-geo-alt me-2"></i>Follow My Area</span><i class="bi bi-chevron-right"></i></a>
+                <a class="app-tile" href="/Resident/Profile"><span><i class="bi bi-person me-2"></i>Profile</span><i class="bi bi-chevron-right"></i></a>
                 <div class="alert alert-warning mt-3 small">Emergency disclaimer: contact emergency services directly for immediate danger.</div>
                 <a class="app-tile" href="/Demo/WhatsAppSimulator"><span><i class="bi bi-whatsapp me-2"></i>Optional WhatsApp connector info</span><i class="bi bi-chevron-right"></i></a>
             </div></div>
@@ -28,7 +30,7 @@
             <div class="grid-auto">
                 <div class="ops-card"><h3 class="h5">Install copy</h3><p>Use the browser install prompt or “Add to Home Screen”. The PWA starts at <code>/app</code> and caches core public pages.</p></div>
                 <div class="ops-card"><h3 class="h5">Working flows</h3><p>Every tile links to a server route: reporting, lookup, alerts, weather, resident profile or the optional WhatsApp sandbox.</p></div>
-                <div class="ops-card"><h3 class="h5">AI behavior</h3><p>Opening the mobile app does not call Gemini. AI runs only on report submission or explicit staff/judge action.</p></div>
+                <div class="ops-card"><h3 class="h5">AI behavior</h3><p>Opening the Citizen App does not call Gemini. Gemini runs on the backend only, never on the device, and only on report submission or explicit staff/judge action. No secrets are stored on the device.</p></div>
                 <div class="ops-card"><h3 class="h5">WhatsApp status</h3><p>WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp.</p></div>
             </div>
         </div>

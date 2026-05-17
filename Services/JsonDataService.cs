@@ -37,6 +37,8 @@ namespace CivicOps.Services
             {
                 await SeedDemoDataAsync();
             }
+
+            await EnsureRichSyntheticDataAsync();
         }
 
         private async Task LoadDataAsync()
@@ -169,6 +171,109 @@ namespace CivicOps.Services
             var reference = $"CIV-2026-{_referenceCounter:D4}";
             _referenceCounter++;
             return Task.FromResult(reference);
+        }
+
+        private async Task EnsureRichSyntheticDataAsync()
+        {
+            foreach (var incident in _incidents)
+            {
+                if (string.IsNullOrWhiteSpace(incident.RawDescription)) incident.RawDescription = incident.Description;
+                if (string.IsNullOrWhiteSpace(incident.CleanedDescription)) incident.CleanedDescription = incident.Description;
+                if (string.IsNullOrWhiteSpace(incident.OriginalArea)) incident.OriginalArea = incident.Suburb;
+                if (string.IsNullOrWhiteSpace(incident.NormalizedArea)) incident.NormalizedArea = incident.Suburb;
+                if (string.IsNullOrWhiteSpace(incident.Municipality)) incident.Municipality = "eThekwini";
+                if (string.IsNullOrWhiteSpace(incident.WardConfidence)) incident.WardConfidence = incident.Ward.Contains("Needs", StringComparison.OrdinalIgnoreCase) ? "Low" : "Synthetic estimate";
+                if (string.IsNullOrWhiteSpace(incident.EnrichmentSource)) incident.EnrichmentSource = incident.ClassificationMethod == "Deterministic" ? "Local deterministic fallback" : incident.ClassificationMethod;
+                if (string.IsNullOrWhiteSpace(incident.RoutingConfidence)) incident.RoutingConfidence = "Synthetic demo routing";
+                if (string.IsNullOrWhiteSpace(incident.RoutingReason)) incident.RoutingReason = $"Synthetic scenario routed to {incident.AssignedDepartment.GetDisplayName()} for {incident.Category}.";
+                if (string.IsNullOrWhiteSpace(incident.AlertRecommendation)) incident.AlertRecommendation = incident.Priority == IncidentPriority.Urgent ? "Review for Area Alerts and dispatcher escalation." : "Ticket-level update recommended.";
+                if (string.IsNullOrWhiteSpace(incident.CitizenResponse)) incident.CitizenResponse = $"Reference {incident.ReferenceNumber}: {incident.NormalizedArea}, {incident.Ward}. Routed to {incident.AssignedDepartment.GetDisplayName()}.";
+                if (incident.PublicUpdates.Count == 0) incident.PublicUpdates.Add(new PublicUpdate { Content = incident.CitizenResponse, UpdatedBy = "CivicOps Demo Desk", RelatedStatus = incident.Status, Timestamp = incident.CreatedAt.AddMinutes(30) });
+                if (incident.InternalNotes.Count == 0) incident.InternalNotes.Add(new IncidentNote { Content = $"Synthetic eThekwini scenario data. {incident.RoutingReason}", Author = "CivicOps Seed", Timestamp = incident.CreatedAt.AddMinutes(10) });
+            }
+
+            if (_incidents.Count < 100)
+            {
+                var areas = new[]
+                {
+                    ("Durban CBD", "Ward 26"), ("Chatsworth", "Ward 73"), ("Umlazi", "Ward 80"), ("Phoenix", "Ward 52"),
+                    ("Pinetown", "Ward 23"), ("Amanzimtoti", "Ward 97"), ("KwaMashu", "Ward 55"), ("Westville", "Ward 24"),
+                    ("Newlands", "Ward 31"), ("Inanda", "Ward 57"), ("Isipingo", "Ward 68"), ("Bluff", "Ward 66"),
+                    ("Berea", "Ward 31"), ("Glenwood", "Ward 33"), ("Hillcrest", "Ward 8"), ("Reservoir Hills", "Ward 23"),
+                    ("Tongaat", "Ward 61"), ("Verulam", "Ward 58"), ("Cato Manor", "Ward 28"), ("Mobeni", "Ward 75"),
+                    ("Merebank", "Ward 70"), ("Montclair", "Ward 64"), ("Queensburgh", "Ward 65"), ("Malvern", "Ward 18"),
+                    ("Umhlanga", "Ward 35"), ("La Lucia", "Ward 36")
+                };
+                var scenarios = new[]
+                {
+                    ("burst pipe flooding the verge", "Water Infrastructure", Department.WaterAndSanitation, IncidentPriority.High),
+                    ("water outage affecting several homes", "Water Infrastructure", Department.WaterAndSanitation, IncidentPriority.High),
+                    ("blocked drain causing pooling after rain", "Stormwater", Department.RoadsAndStormwater, IncidentPriority.Medium),
+                    ("large pothole damaging taxis", "Road Maintenance", Department.RoadsAndStormwater, IncidentPriority.Medium),
+                    ("streetlight outage near school", "Street Lighting", Department.Electricity, IncidentPriority.High),
+                    ("illegal dumping on vacant land", "Illegal Dumping", Department.WasteManagement, IncidentPriority.Medium),
+                    ("missed refuse collection and overflowing bins", "Waste Collection", Department.WasteManagement, IncidentPriority.Medium),
+                    ("fallen tree blocking pavement", "Parks", Department.ParksAndPublicSpaces, IncidentPriority.Medium),
+                    ("traffic light failure at busy intersection", "Road Maintenance", Department.RoadsAndStormwater, IncidentPriority.High),
+                    ("flooding risk at low bridge", "Disaster", Department.DisasterManagement, IncidentPriority.Urgent),
+                    ("fire risk from exposed illegal burning", "Fire Safety", Department.FireAndRescue, IncidentPriority.Urgent),
+                    ("informal settlement sanitation issue", "Informal Settlement", Department.HousingInformalSettlements, IncidentPriority.High),
+                    ("public safety referral near commuter stop", "Public Safety", Department.MetroPolicePublicSafety, IncidentPriority.High),
+                    ("environmental health complaint about smell", "Environmental Hazard", Department.EnvironmentalHealth, IncidentPriority.Medium),
+                    ("ward committee follow-up needed for unclear location", "General Inquiry", Department.WardCouncillorWardCommittee, IncidentPriority.Low)
+                };
+                var statuses = new[] { IncidentStatus.New, IncidentStatus.Triaged, IncidentStatus.InProgress, IncidentStatus.Escalated, IncidentStatus.Resolved, IncidentStatus.Closed };
+                var sources = new[] { SourceChannel.Web, SourceChannel.Android, SourceChannel.Demo, SourceChannel.VoiceNote, SourceChannel.WhatsApp };
+                var next = _incidents.Select(i => int.TryParse(i.ReferenceNumber.Split('-').LastOrDefault(), out var n) ? n : 0).DefaultIfEmpty(0).Max() + 1;
+                while (_incidents.Count < 108)
+                {
+                    var index = _incidents.Count;
+                    var area = areas[index % areas.Length];
+                    var scenario = scenarios[index % scenarios.Length];
+                    var status = statuses[index % statuses.Length];
+                    var created = DateTime.UtcNow.AddHours(-2 - index * 3);
+                    var reference = $"CIV-2026-{next:D4}";
+                    next++;
+                    var incident = new Incident
+                    {
+                        ReferenceNumber = reference,
+                        SourceChannel = sources[index % sources.Length],
+                        Description = $"{scenario.Item1} in {area.Item1}",
+                        RawDescription = $"{scenario.Item1} in {area.Item1}",
+                        CleanedDescription = $"{scenario.Item1} in {area.Item1}",
+                        AISummary = $"{scenario.Item2}: {scenario.Item1} reported in {area.Item1}.",
+                        Category = scenario.Item2,
+                        AssignedDepartment = scenario.Item3,
+                        Suburb = area.Item1,
+                        OriginalArea = area.Item1,
+                        NormalizedArea = area.Item1,
+                        Municipality = "eThekwini",
+                        Ward = area.Item2,
+                        WardConfidence = "Synthetic estimate",
+                        Status = status,
+                        Priority = scenario.Item4,
+                        CreatedAt = created,
+                        LastUpdatedAt = created.AddHours(1),
+                        ClassificationMethod = index % 4 == 0 ? "Gemini/fallback civic AI (synthetic recommendation)" : "Local deterministic fallback",
+                        EnrichmentSource = index % 4 == 0 ? "Gemini/fallback civic AI (synthetic recommendation)" : "Local deterministic fallback",
+                        EnrichmentNotes = "Synthetic eThekwini scenario with normalized area and approximate ward for demo only.",
+                        RoutingConfidence = "Synthetic demo routing",
+                        RoutingReason = $"Synthetic {scenario.Item2.ToLowerInvariant()} scenario routed to {scenario.Item3.GetDisplayName()} for queue demonstration.",
+                        AlertRecommendation = scenario.Item4 == IncidentPriority.Urgent ? "Review for Area Alert and escalation." : "Keep public ticket updates active."
+                    };
+                    incident.CitizenResponse = $"Reference {reference}: Area recorded as {area.Item1}. Ward estimate: {area.Item2}. Routed to {scenario.Item3.GetDisplayName()}.";
+                    incident.PublicUpdates.Add(new PublicUpdate { Content = "Ticket received and routed for staff review.", UpdatedBy = "CivicOps Demo Desk", RelatedStatus = IncidentStatus.Triaged, Timestamp = created.AddMinutes(20) });
+                    if (status == IncidentStatus.InProgress || status == IncidentStatus.Resolved || status == IncidentStatus.Closed)
+                    {
+                        incident.PublicUpdates.Add(new PublicUpdate { Content = "Department queue accepted the ticket and posted an update.", UpdatedBy = scenario.Item3.GetDisplayName(), RelatedStatus = status, Timestamp = created.AddHours(1) });
+                    }
+                    incident.InternalNotes.Add(new IncidentNote { Content = $"Synthetic audit: {incident.RoutingReason} No live municipal data claimed.", Author = "CivicOps Seed", Timestamp = created.AddMinutes(10) });
+                    _incidents.Add(incident);
+                }
+                _referenceCounter = next;
+            }
+
+            await SaveIncidentsAsync();
         }
 
         private async Task SeedDemoDataAsync()

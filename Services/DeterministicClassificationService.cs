@@ -31,6 +31,9 @@ namespace CivicOps.Services
                 { "blackout", (Department.Electricity, "Electricity") },
                 { "transformer", (Department.Electricity, "Electricity") },
                 { "streetlight", (Department.Electricity, "Street Lighting") },
+                { "streetlights", (Department.Electricity, "Street Lighting") },
+                { "tripping", (Department.Electricity, "Electricity") },
+                { "cable", (Department.Electricity, "Electricity") },
                 
                 // Roads & Stormwater
                 { "road", (Department.RoadsAndStormwater, "Road Maintenance") },
@@ -111,6 +114,16 @@ namespace CivicOps.Services
 
         private (Department Department, string Category) FindBestMatch(string description)
         {
+            var lower = description.ToLowerInvariant();
+            if (lower.Contains("blocked drain") || lower.Contains("stormwater") || lower.Contains("water pooling") || lower.Contains("pothole") || lower.Contains("traffic light"))
+            {
+                return (Department.RoadsAndStormwater, lower.Contains("pothole") ? "Road Maintenance" : "Stormwater");
+            }
+            if (lower.Contains("streetlights") || lower.Contains("street lights") || lower.Contains("electricity") || lower.Contains("tripping") || lower.Contains("cable fault"))
+            {
+                return (Department.Electricity, lower.Contains("street") ? "Street Lighting" : "Electricity");
+            }
+
             var words = description.ToLower().Split(new[] { ' ', ',', '.', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
             
             foreach (var word in words)

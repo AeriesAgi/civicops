@@ -38,6 +38,20 @@ namespace CivicOps.Models
         public string ReferenceNumber { get; set; } = string.Empty;
         public SourceChannel SourceChannel { get; set; }
         public string Description { get; set; } = string.Empty;
+        public string RawDescription { get; set; } = string.Empty;
+        public string CleanedDescription { get; set; } = string.Empty;
+        public string OriginalArea { get; set; } = string.Empty;
+        public string NormalizedArea { get; set; } = string.Empty;
+        public string Municipality { get; set; } = "eThekwini";
+        public string WardConfidence { get; set; } = "Needs ward confirmation";
+        public string EnrichmentSource { get; set; } = "Local deterministic fallback";
+        public string EnrichmentNotes { get; set; } = string.Empty;
+        public string RoutingConfidence { get; set; } = "Medium";
+        public bool EmergencyReferralRecommended { get; set; }
+        public string CitizenResponse { get; set; } = string.Empty;
+        public string DepartmentBrief { get; set; } = string.Empty;
+        public string AlertRecommendation { get; set; } = string.Empty;
+        public string RoutingReason { get; set; } = string.Empty;
         public string AISummary { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
         public Department AssignedDepartment { get; set; }

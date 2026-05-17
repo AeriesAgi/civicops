@@ -524,3 +524,11 @@ The submission remains honest: synthetic data is used for judging, live Gemini a
 ## Final engineering polish note
 
 IBM Bob was used to build and accelerate the main CivicOps hackathon implementation. A final engineering polish pass may have been completed after Bob to improve UI consistency, mobile/PWA positioning, Gemini quota safety, connector readiness wording, smoke scripts and documentation. This note does not claim that post-Bob polish was performed by IBM Bob, and it does not invent unavailable Bob session history. Official export placeholders remain preserved where exports were not available.
+
+## Final QA / Bob evidence continuity update
+
+- IBM Bob session ID: `446375f5-3c6b-4134-af21-641882d0ca64`.
+- Bob was used heavily as the primary build accelerator for CivicOps.
+- Bob-side build notes identify final CivicOps commit `68a8cc7` and a Bob-reported `dotnet build` pass in 15.2s with 0 errors and 0 warnings.
+- Evidence remains surfaced through `/Home/BobEvidence`, `docs/bob-report.md`, `docs/build-log.md`, `docs/ibm-bob-session-report.md`, and this continuity report.
+- CivicOps was built with IBM Bob assistance and finalized into a working hackathon submission with verification, packaging and polish. Final verification/polish may have happened after Bob and should not be represented as Bob-generated work.
