@@ -1,10 +1,15 @@
 # CivicOps downloads
 
-`CivicOpsCitizenCompanion-debug.apk` is copied here by the Android Gradle task:
+Only the submission APK filename should live here:
+
+- `CivicOpsCitizenCompanion-debug.apk`
+
+Rebuild and replace it from the Android project:
 
 ```bash
 cd mobile/CivicOpsAndroid
-./gradlew copyDebugApkToWeb
+./gradlew clean copyDebugApkToWeb
 ```
 
-The public Citizen App hub exposes the APK button only when the APK exists.
+Or run the **Android APK** GitHub Actions workflow and download/copy the artifact back to this path.
+The ASP.NET app serves `.apk` files with `application/vnd.android.package-archive` and publishes this file when present.

@@ -35,6 +35,82 @@ namespace CivicOps.Controllers
             _configuration = configuration;
         }
 
+
+        [HttpGet("mobile/citizen/home")]
+        public async Task<IActionResult> GetMobileCitizenHome([FromQuery] string area = "Chatsworth")
+        {
+            var incidents = await _dataService.GetAllIncidentsAsync();
+            var alerts = await _dataService.GetAlertsByAreaAsync(area, null);
+            var areaIncidents = incidents
+                .Where(i => i.NormalizedArea.Contains(area, StringComparison.OrdinalIgnoreCase) || i.Suburb.Contains(area, StringComparison.OrdinalIgnoreCase))
+                .Take(6)
+                .ToList();
+
+            return Ok(new
+            {
+                success = true,
+                profile = new { name = "Resident demo", selectedArea = area, followedAreas = new[] { "Chatsworth", "Phoenix", "Umlazi" } },
+                stats = new
+                {
+                    activeNearYou = areaIncidents.Count,
+                    openTickets = incidents.Count(i => i.Status != IncidentStatus.Resolved && i.Status != IncidentStatus.Closed),
+                    alerts = alerts.Count,
+                    affectedConfirmations = incidents.Sum(i => i.AffectedCount)
+                },
+                tickets = incidents.Take(4).Select(ToCitizenTicket),
+                nearby = areaIncidents.Select(ToCitizenTicket),
+                alerts = alerts.Take(4).Select(a => new { a.Id, a.Title, a.Description, a.Suburb, a.Ward, type = a.Type.ToString(), severity = a.Severity.ToString() }),
+                emergencyDisclaimer = "CivicOps does not replace police, fire, EMS, or emergency services. Immediate danger must be reported directly to emergency services."
+            });
+        }
+
+        [HttpGet("mobile/citizen/tickets")]
+        public async Task<IActionResult> GetMobileCitizenTickets()
+        {
+            var incidents = await _dataService.GetAllIncidentsAsync();
+            return Ok(new { success = true, tickets = incidents.Take(15).Select(ToCitizenTicket) });
+        }
+
+        [HttpGet("mobile/citizen/alerts")]
+        public async Task<IActionResult> GetMobileCitizenAlerts([FromQuery] string? area = null)
+        {
+            var alerts = await _dataService.GetAlertsByAreaAsync(area, null);
+            return Ok(new { success = true, alerts = alerts.Select(a => new { a.Id, a.Title, a.Description, a.Suburb, a.Ward, type = a.Type.ToString(), severity = a.Severity.ToString(), a.CreatedAt, a.ExpiresAt }) });
+        }
+
+        [HttpPost("mobile/citizen/report")]
+        public Task<IActionResult> PostMobileCitizenReport([FromBody] ReportSubmission submission)
+        {
+            submission.SourceChannel = SourceChannel.Android;
+            return SubmitReport(submission);
+        }
+
+        [HttpPost("mobile/citizen/affected")]
+        public async Task<IActionResult> MarkCitizenAffected([FromBody] AffectedRequest request)
+        {
+            var incident = string.IsNullOrWhiteSpace(request.ReferenceNumber)
+                ? await _dataService.GetIncidentByIdAsync(request.IncidentId ?? string.Empty)
+                : await _dataService.GetIncidentByReferenceAsync(request.ReferenceNumber.Trim());
+            if (incident == null) return NotFound(new { success = false, message = "Incident not found" });
+
+            incident.AffectedCount += 1;
+            incident.CommunityThreadSummary = $"{incident.AffectedCount} residents have confirmed they are affected too.";
+            incident.InternalNotes.Add(new IncidentNote { Author = "Citizen App", Content = $"Affected-too confirmation added from {request.Area ?? incident.NormalizedArea}.", IsPublic = false });
+            await _dataService.UpdateIncidentAsync(incident);
+            return Ok(new { success = true, referenceNumber = incident.ReferenceNumber, affectedCount = incident.AffectedCount, threadSummary = incident.CommunityThreadSummary });
+        }
+
+        [HttpPost("mobile/copilot/citizen")]
+        public async Task<IActionResult> RunCitizenCopilot([FromBody] CopilotRequest request)
+        {
+            Incident? incident = null;
+            if (!string.IsNullOrWhiteSpace(request.ReferenceNumber)) incident = await _dataService.GetIncidentByReferenceAsync(request.ReferenceNumber.Trim());
+            var answer = incident == null
+                ? $"CivicOps Copilot can help you submit a report, track a CIV reference, follow {request.Area ?? "your area"}, or review area alerts. If anyone is in immediate danger, contact emergency services directly."
+                : $"Reference {incident.ReferenceNumber} is {FormatStatus(incident.Status)} with {incident.AssignedDepartment.GetDisplayName()}. Priority is {FormatPriority(incident.Priority)}. Latest public update: {incident.PublicUpdates.OrderByDescending(u => u.Timestamp).FirstOrDefault()?.Content ?? incident.CitizenResponse}. Next step: monitor public updates or add more location detail if requested.";
+            return Ok(new { success = true, answer, gemini = "Server-side explicit action only; deterministic fallback response shown when Gemini is unavailable or unnecessary." });
+        }
+
         [HttpPost("reports")]
         public async Task<IActionResult> SubmitReport([FromBody] ReportSubmission submission)
         {
@@ -620,6 +696,32 @@ namespace CivicOps.Controllers
             };
         }
 
+        private static object ToCitizenTicket(Incident i) => new
+        {
+            i.Id,
+            i.ReferenceNumber,
+            status = FormatStatus(i.Status),
+            priority = FormatPriority(i.Priority),
+            department = i.AssignedDepartment.GetDisplayName(),
+            i.Category,
+            area = string.IsNullOrWhiteSpace(i.NormalizedArea) ? i.Suburb : i.NormalizedArea,
+            i.Ward,
+            i.AffectedCount,
+            latestUpdate = i.PublicUpdates.OrderByDescending(u => u.Timestamp).FirstOrDefault()?.Content ?? i.CitizenResponse,
+            i.CreatedAt,
+            i.LastUpdatedAt
+        };
+
+        private static string FormatStatus(IncidentStatus status) => status switch
+        {
+            IncidentStatus.InProgress => "In Progress",
+            IncidentStatus.WaitingForCitizen => "Waiting for Citizen",
+            IncidentStatus.AlertRecommended => "Alert Recommended",
+            _ => status.ToString()
+        };
+
+        private static string FormatPriority(IncidentPriority priority) => priority == IncidentPriority.Urgent ? "Critical" : priority.ToString();
+
         private object BuildWhatsAppConnectorSnapshot(WhatsAppStatus status) => new
         {
             enabled = status.Enabled,
@@ -672,6 +774,20 @@ namespace CivicOps.Controllers
     {
         public string Reason { get; set; } = string.Empty;
         public string? Author { get; set; }
+    }
+
+    public class AffectedRequest
+    {
+        public string? IncidentId { get; set; }
+        public string? ReferenceNumber { get; set; }
+        public string? Area { get; set; }
+    }
+
+    public class CopilotRequest
+    {
+        public string? Question { get; set; }
+        public string? ReferenceNumber { get; set; }
+        public string? Area { get; set; }
     }
 
     public class AgentRunRequest

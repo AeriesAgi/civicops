@@ -11,7 +11,9 @@
     <link rel="manifest" href="~/manifest.json" />
     <meta name="theme-color" content="#02070d" />
 </head>
-<body>
+<body class="@(ViewBag.AppShell == true ? "app-shell-body" : "")">
+    @if (ViewBag.AppShell != true)
+    {
     <nav class="navbar navbar-expand-xl navbar-dark civic-nav">
         <div class="container-fluid px-lg-4">
             <a class="navbar-brand civic-brand" href="/">
@@ -22,63 +24,72 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                @{
+                    var staffEmail = Context.Session.GetString("UserEmail");
+                    var staffRole = Context.Session.GetString("UserRole");
+                    var assignedDepartment = Context.Session.GetString("AssignedDepartment");
+                    var residentName = Context.Session.GetString("ResidentUserName");
+                    var isStaff = !string.IsNullOrWhiteSpace(staffEmail);
+                    var isResident = !string.IsNullOrWhiteSpace(residentName) && !isStaff;
+                    var departmentQueueUrl = string.IsNullOrWhiteSpace(assignedDepartment) ? "/Home/Dashboard" : $"/Home/Department?dept={assignedDepartment}";
+                }
                 <ul class="navbar-nav me-auto align-items-xl-center">
-                    <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Report"><i class="bi bi-file-earmark-plus me-1"></i>Report Issue</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Lookup"><i class="bi bi-search me-1"></i>Track Report</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Alerts"><i class="bi bi-bell me-1"></i>Area Alerts</a></li>
-                    <li class="nav-item"><a class="nav-link nav-accent" href="/citizen-app"><i class="bi bi-phone me-1"></i>Citizen App</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Agent"><i class="bi bi-stars me-1"></i>AI Assistant</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="demoDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-grid-3x3-gap me-1"></i>Demo</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/Home/DemoTour">Judge Tour</a></li>
-                            <li><a class="dropdown-item" href="/Home/Connectors">Connector Readiness</a></li>
-                            <li><a class="dropdown-item" href="/Home/BobEvidence">Bob Evidence</a></li>
-                            <li><a class="dropdown-item" href="/Home/Weather">Area Risk Weather</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <ul class="navbar-nav align-items-xl-center">
-                    @if (Context.Session.GetString("UserEmail") != null)
+                    @if (isStaff)
                     {
                         <li class="nav-item"><a class="nav-link nav-accent" href="/Home/Dashboard"><i class="bi bi-speedometer2 me-1"></i>Ops Control Room</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="/Home/Dashboard" id="userDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle me-1"></i>@Context.Session.GetString("UserEmail")</a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><span class="dropdown-item-text small">Role: @Context.Session.GetString("UserRole")</span></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><form method="post" asp-controller="Auth" asp-action="Logout" class="d-inline"><button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-1"></i>Logout</button></form></li>
-                            </ul>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="@departmentQueueUrl"><i class="bi bi-kanban me-1"></i>Department Queue</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Dashboard#incidents"><i class="bi bi-list-task me-1"></i>Incidents</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Agent"><i class="bi bi-stars me-1"></i>AI Agent</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Alerts"><i class="bi bi-bell me-1"></i>Area Alerts</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/BobEvidence"><i class="bi bi-file-earmark-check me-1"></i>Bob Evidence</a></li>
                     }
-                    else if (Context.Session.GetString("ResidentUserId") != null)
+                    else if (isResident)
                     {
-                        <li class="nav-item"><a class="nav-link" href="/Resident/MyReports"><i class="bi bi-file-text me-1"></i>My Reports</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/Resident/MyAlerts"><i class="bi bi-bell me-1"></i>My Alerts</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle nav-accent" href="/Resident/Profile" id="residentDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle me-1"></i>@Context.Session.GetString("ResidentUserName")</a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="/Resident/Profile"><i class="bi bi-person me-1"></i>Profile</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><form method="post" asp-controller="Resident" asp-action="Logout" class="d-inline"><button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-1"></i>Logout</button></form></li>
-                            </ul>
-                        </li>
+                        <li class="nav-item"><a class="nav-link nav-accent" href="/app"><i class="bi bi-phone me-1"></i>Citizen Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Report"><i class="bi bi-plus-circle me-1"></i>Report Issue</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Resident/MyReports"><i class="bi bi-ticket-perforated me-1"></i>My Tickets</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Lookup"><i class="bi bi-search me-1"></i>Track Reference</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Alerts"><i class="bi bi-bell me-1"></i>Area Alerts</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/app/area/Chatsworth/thread"><i class="bi bi-chat-dots me-1"></i>Community</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/app/copilot"><i class="bi bi-stars me-1"></i>Copilot</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Resident/Profile"><i class="bi bi-person me-1"></i>Profile</a></li>
                     }
                     else
                     {
-                        <li class="nav-item"><a class="nav-link" href="/Resident/Login"><i class="bi bi-person me-1"></i>Sign In</a></li>
-                        <li class="nav-item"><a class="nav-link staff-link" href="/Auth/Login"><i class="bi bi-shield-lock me-1"></i>Staff Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
+                        <li class="nav-item"><a class="nav-link nav-accent" href="/citizen-app"><i class="bi bi-phone me-1"></i>Citizen App</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Dashboard"><i class="bi bi-kanban me-1"></i>Municipal Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/Agent"><i class="bi bi-stars me-1"></i>AI Agent</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Home/BobEvidence"><i class="bi bi-file-earmark-check me-1"></i>Bob Evidence</a></li>
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="demoDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-grid-3x3-gap me-1"></i>Demo</a><ul class="dropdown-menu"><li><a class="dropdown-item" href="/Home/DemoTour">Judge Tour</a></li><li><a class="dropdown-item" href="/Home/Connectors">Connector Readiness</a></li><li><a class="dropdown-item" href="/Home/Weather">Area Risk Weather</a></li></ul></li>
+                    }
+                </ul>
+                <ul class="navbar-nav align-items-xl-center">
+                    @if (isStaff)
+                    {
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle nav-accent" href="/Home/Dashboard" id="staffDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-shield-check me-1"></i>@staffEmail</a><ul class="dropdown-menu dropdown-menu-end"><li><span class="dropdown-item-text small">Role: @staffRole</span></li>@if (!string.IsNullOrWhiteSpace(assignedDepartment)) { <li><span class="dropdown-item-text small">Queue: @assignedDepartment</span></li> }<li><hr class="dropdown-divider"></li><li><a class="dropdown-item" href="/Auth/Login"><i class="bi bi-arrow-repeat me-1"></i>Role switch</a></li><li><form method="post" asp-controller="Auth" asp-action="Logout" class="d-inline"><button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-1"></i>Sign out</button></form></li></ul></li>
+                    }
+                    else if (isResident)
+                    {
+                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle nav-accent" href="/Resident/Profile" id="residentDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle me-1"></i>@residentName</a><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="/app"><i class="bi bi-phone me-1"></i>Citizen App</a></li><li><a class="dropdown-item" href="/Resident/Profile"><i class="bi bi-person me-1"></i>Profile</a></li><li><hr class="dropdown-divider"></li><li><a class="dropdown-item" href="/app/login"><i class="bi bi-arrow-repeat me-1"></i>Switch demo role</a></li><li><form method="post" asp-controller="Resident" asp-action="Logout" class="d-inline"><button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-1"></i>Sign out</button></form></li></ul></li>
+                    }
+                    else
+                    {
+                        <li class="nav-item"><a class="nav-link" href="/app/login"><i class="bi bi-person me-1"></i>Resident Demo</a></li>
+                        <li class="nav-item"><a class="nav-link staff-link" href="/Auth/Login"><i class="bi bi-shield-lock me-1"></i>Staff Demo</a></li>
                     }
                 </ul>
             </div>
         </div>
     </nav>
+    }
 
     <main>
         @RenderBody()
     </main>
 
+    @if (ViewBag.AppShell != true)
+    {
     <footer class="footer civic-footer">
         <div class="container">
             <div class="row g-4 align-items-center">
@@ -93,6 +104,7 @@
             </div>
         </div>
     </footer>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
