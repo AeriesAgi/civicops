@@ -216,6 +216,7 @@ namespace CivicOps.Controllers
             return View(incidents);
         }
 
+        [HttpGet("/Home/Incident/{id?}")]
         public async Task<IActionResult> Incident(string id)
         {
             var incident = await _dataService.GetIncidentByIdAsync(id);
@@ -247,40 +248,108 @@ namespace CivicOps.Controllers
         }
 
         [HttpPost]
-        [DemoAuthorize(UserRole.Dispatcher)]
-        public async Task<IActionResult> UpdateStatus(string id, string status, string? publicNote)
+        [DemoAuthorize]
+        public async Task<IActionResult> UpdateStatus(string id, string status, string? priority, string? actionType, string? publicNote, string? internalNote)
         {
             var incident = await _dataService.GetIncidentByIdAsync(id);
-            if (incident == null)
+            if (incident == null) return NotFound();
+            if (!await CurrentStaffCanSeeAsync(incident)) return RedirectToAction("AccessDenied", "Auth");
+
+            var session = await GetCurrentStaffSessionAsync();
+            var actor = session?.Email ?? "CivicOps Staff";
+            var previousStatus = incident.Status;
+
+            var targetStatus = status;
+            if (!string.IsNullOrWhiteSpace(actionType))
             {
-                return NotFound();
+                targetStatus = actionType switch
+                {
+                    "acknowledge" => nameof(IncidentStatus.Acknowledged),
+                    "in-progress" => nameof(IncidentStatus.InProgress),
+                    "request-info" => nameof(IncidentStatus.WaitingForCitizen),
+                    "escalate" => nameof(IncidentStatus.Escalated),
+                    "recommend-alert" => nameof(IncidentStatus.AlertRecommended),
+                    "resolve" => nameof(IncidentStatus.Resolved),
+                    "close" => nameof(IncidentStatus.Closed),
+                    _ => status
+                };
             }
 
-            if (Enum.TryParse<IncidentStatus>(status, out var newStatus))
+            if (Enum.TryParse<IncidentStatus>(targetStatus, true, out var newStatus))
             {
                 incident.Status = newStatus;
-                incident.InternalNotes.Add(new IncidentNote
+                incident.StatusHistory.Add(new IncidentStatusHistory
                 {
-                    Content = $"Status changed to {newStatus}",
-                    Author = "Admin",
-                    IsPublic = false
+                    FromStatus = previousStatus,
+                    ToStatus = newStatus,
+                    ChangedBy = actor,
+                    Reason = string.IsNullOrWhiteSpace(internalNote) ? $"Action: {actionType ?? "status update"}" : internalNote
                 });
-
-                if (!string.IsNullOrEmpty(publicNote))
-                {
-                    incident.PublicUpdates.Add(new PublicUpdate 
-                    { 
-                        Content = publicNote,
-                        UpdatedBy = "Admin",
-                        RelatedStatus = newStatus
-                    });
-                }
-
-                await _dataService.UpdateIncidentAsync(incident);
             }
 
+            if (Enum.TryParse<IncidentPriority>(priority, true, out var newPriority)) incident.Priority = newPriority;
+            if (actionType == "escalate") incident.Priority = IncidentPriority.Critical;
+            if (actionType == "recommend-alert") incident.AlertRecommendation = $"Area alert recommended by {actor}: {publicNote ?? "Review duplicate reports and notify affected residents."}";
+            if (actionType == "generate-brief") incident.DepartmentBrief = $"Department brief generated for {incident.AssignedDepartment.GetDisplayName()}: {incident.Category} in {incident.NormalizedArea}. Priority {incident.Priority}; {incident.AffectedCount} affected confirmations. Next step: acknowledge, assign crew/resources, and post public update.";
+            if (actionType == "generate-citizen-response") incident.CitizenResponse = $"Reference {incident.ReferenceNumber}: your report is {FormatStatus(incident.Status)} with {incident.AssignedDepartment.GetDisplayName()}. We will post public updates as the department acts.";
+
+            var defaultPublicUpdate = BuildDefaultPublicUpdate(actionType, incident);
+            var defaultInternalNote = BuildDefaultInternalNote(actionType, incident);
+            if (string.IsNullOrWhiteSpace(publicNote)) publicNote = defaultPublicUpdate;
+            if (string.IsNullOrWhiteSpace(internalNote)) internalNote = defaultInternalNote;
+
+            if (!string.IsNullOrWhiteSpace(internalNote) || !string.IsNullOrWhiteSpace(actionType))
+            {
+                incident.InternalNotes.Add(new IncidentNote
+                {
+                    Content = string.IsNullOrWhiteSpace(internalNote) ? $"Workflow action completed: {actionType}." : internalNote,
+                    Author = actor,
+                    IsPublic = false
+                });
+            }
+
+            if (!string.IsNullOrWhiteSpace(publicNote))
+            {
+                incident.PublicUpdates.Add(new PublicUpdate
+                {
+                    Content = publicNote,
+                    UpdatedBy = actor,
+                    RelatedStatus = incident.Status
+                });
+            }
+
+            await _dataService.UpdateIncidentAsync(incident);
             return RedirectToAction("Incident", new { id });
         }
+
+        private static string BuildDefaultPublicUpdate(string? actionType, Incident incident) => actionType switch
+        {
+            "acknowledge" => $"{incident.AssignedDepartment.GetDisplayName()} has acknowledged report {incident.ReferenceNumber} and is reviewing the next operational step.",
+            "in-progress" => $"Work is now in progress for {incident.ReferenceNumber}. The assigned department will post updates as field information is confirmed.",
+            "request-info" => $"More information is required for {incident.ReferenceNumber}. Please add location details or respond through the Citizen App if requested.",
+            "escalate" => $"Report {incident.ReferenceNumber} has been escalated for urgent municipal attention.",
+            "recommend-alert" => $"An area alert has been recommended for {incident.NormalizedArea}. It will be published after human review.",
+            "resolve" => $"Report {incident.ReferenceNumber} has been marked resolved. Thank you for helping improve civic visibility.",
+            "close" => $"Report {incident.ReferenceNumber} has been closed after municipal review.",
+            "generate-citizen-response" => incident.CitizenResponse,
+            _ => null
+        };
+
+        private static string BuildDefaultInternalNote(string? actionType, Incident incident) => actionType switch
+        {
+            "generate-brief" => $"Generated department brief for {incident.AssignedDepartment.GetDisplayName()} using current incident context and affected confirmations.",
+            "generate-citizen-response" => "Drafted citizen response from current status, department and public-update context.",
+            "recommend-alert" => $"Recommended area alert review for {incident.NormalizedArea}; dispatcher approval still required before publication.",
+            _ => string.IsNullOrWhiteSpace(actionType) ? string.Empty : $"Workflow action completed: {actionType}."
+        };
+
+        private static string FormatStatus(IncidentStatus status) => status switch
+        {
+            IncidentStatus.InProgress => "In Progress",
+            IncidentStatus.WaitingForCitizen => "Waiting for Citizen",
+            IncidentStatus.AlertRecommended => "Alert Recommended",
+            _ => status.ToString()
+        };
 
         public IActionResult Connectors()
         {
@@ -292,7 +361,7 @@ namespace CivicOps.Controllers
                     Status = _geminiService.Status,
                     Mode = _geminiService.IsEnabled ? "Live Connector Ready" : "Fallback Active",
                     Description = "AI-powered incident classification and routing",
-                    EnvVars = "GEMINI_ENABLED, GEMINI_API_KEY, GEMINI_MODEL, GEMINI_ROUTINE_MODEL, GEMINI_FALLBACK_MODELS, GEMINI_AUTO_RUN_AGENT_PAGE, GEMINI_MANUAL_TEST_COOLDOWN_SECONDS, GEMINI_QUOTA_COOLDOWN_MINUTES, GEMINI_MODE",
+                    EnvVars = "Gemini__Enabled, Gemini__Mode, Gemini__Model, Gemini__PremiumModel, Gemini__RoutineModel, Gemini__FallbackModels, GEMINI_API_KEY (legacy env aliases GEMINI_ENABLED, GEMINI_MODEL, GEMINI_ROUTINE_MODEL supported)",
                     Documentation = "/Home/BobEvidence and docs/gemini-setup.md"
                 },
                 new ConnectorInfo

@@ -9,8 +9,11 @@ namespace CivicOps.Models
         New,
         Triaged,
         Assigned,
+        Acknowledged,
         InProgress,
+        WaitingForCitizen,
         Escalated,
+        AlertRecommended,
         Resolved,
         Closed
     }
@@ -20,7 +23,8 @@ namespace CivicOps.Models
         Low,
         Medium,
         High,
-        Urgent
+        Urgent,
+        Critical
     }
 
     public enum SourceChannel
@@ -75,6 +79,8 @@ namespace CivicOps.Models
         public Dictionary<string, string> ConnectorMetadata { get; set; } = new();
         public bool IsGeminiProcessed { get; set; }
         public string ClassificationMethod { get; set; } = "Deterministic";
+        public int AffectedCount { get; set; }
+        public string CommunityThreadSummary { get; set; } = string.Empty;
 
         private static string MaskPhone(string? phoneNumber)
         {

@@ -4,54 +4,50 @@
     var pwaReady = ViewBag.PwaReady == true;
     var apkExists = ViewBag.ApkExists == true;
 }
-<div class="container py-4 civic-page">
 @if (appShell)
 {
-    <section class="hero-panel mb-4">
-        <span class="eyebrow">Citizen App</span>
-        <h1 class="display-5">CivicOps Citizen Companion</h1>
-        <p class="lead">A mobile-first citizen experience for reporting, tracking, local alerts, followed areas, Copilot support and incident discussion — backed by the same CivicOps API and staff control room.</p>
-        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">Installable PWA</span><span class="badge bg-info">Android WebView shell</span><span class="badge bg-info">Backend API connected</span><span class="badge bg-secondary">Gemini server-side only</span></div>
-    </section>
-    <div class="row g-4 align-items-start">
-        <div class="col-lg-5">
-            <div class="mobile-phone"><div class="mobile-screen">
-                <div class="d-flex justify-content-between align-items-center mb-3"><strong><i class="bi bi-command me-2"></i>CivicOps</strong><span class="badge bg-success">Citizen</span></div>
-                <div class="app-profile mb-3"><div class="small text-muted-strong">Resident profile</div><strong>Resident demo / public user</strong><div class="small">Sign in for My Reports and followed areas, or submit publicly and track by reference.</div><a class="btn btn-sm btn-outline-info mt-2" href="/Resident/Login">Resident Login</a></div>
-                <a class="app-tile" href="/Home/Report"><span><i class="bi bi-plus-circle me-2"></i>Submit report / ticket</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Resident/MyReports"><span><i class="bi bi-list-check me-2"></i>My reports</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Lookup"><span><i class="bi bi-search me-2"></i>Public reference tracking</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Alerts"><span><i class="bi bi-bell me-2"></i>Area alerts</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Resident/Profile"><span><i class="bi bi-geo-alt me-2"></i>Follow suburbs / wards</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/Home/Agent"><span><i class="bi bi-stars me-2"></i>Copilot / AI assistant</span><i class="bi bi-chevron-right"></i></a>
-                <a class="app-tile" href="/app/area/Chatsworth/thread"><span><i class="bi bi-chat-dots me-2"></i>Community incident thread</span><i class="bi bi-chevron-right"></i></a>
-                <div class="alert alert-warning mt-3 small mb-0">For immediate danger, contact emergency services directly. CivicOps is civic reporting support, not emergency dispatch.</div>
-            </div></div>
-        </div>
-        <div class="col-lg-7">
-            <div class="grid-auto mb-4">
-                <div class="ops-card"><h2 class="h5">Real app capabilities</h2><p>Login, submit report, location notes, media placeholder, voice-note readiness, reference tracking, area alerts, followed areas, profile/settings and Copilot actions.</p></div>
-                <div class="ops-card"><h2 class="h5">Community confirmation</h2><p>Lightweight threads let residents confirm local impacts and see related tickets without turning CivicOps into a noisy social network.</p><a class="btn btn-outline-info" href="/app/area/Phoenix/thread">Open Phoenix thread</a></div>
-                <div class="ops-card"><h2 class="h5">API-backed shell</h2><p>The PWA and Android shell use web/backend routes and keep Gemini keys on the server. The app does not duplicate municipal logic.</p></div>
-                <div class="ops-card"><h2 class="h5">Install options</h2><p>PWA install is ready. Android APK builds from <code>mobile/CivicOpsAndroid</code> and publishes to <code>wwwroot/downloads</code> when toolchain is available.</p><a class="btn btn-primary" href="/citizen-app">Download / Install</a></div>
-            </div>
-        </div>
-    </div>
+<div class="citizen-app-shell" data-app-shell="true">
+    <header class="app-topbar">
+        <div><span class="eyebrow">CivicOps Citizen</span><h1>Good morning, Resident</h1></div>
+        <a class="app-icon-btn" href="/citizen-app" aria-label="Install App"><i class="bi bi-download"></i></a>
+    </header>
+    <main class="app-scroll">
+        <section class="app-hero-card">
+            <div><span class="badge bg-success">Live civic companion</span><h2>CivicOps AI turns scattered civic reports into structured municipal action.</h2><p>Report, track, follow areas, confirm impact and ask Copilot from a standalone app-first shell.</p></div>
+            <div class="app-radar"><span></span><span></span><span></span></div>
+        </section>
+        <section class="app-grid-metrics" id="appMetrics">
+            <div><strong>--</strong><span>Active near you</span></div><div><strong>--</strong><span>Open tickets</span></div><div><strong>--</strong><span>Alerts</span></div><div><strong>--</strong><span>Affected confirmations</span></div>
+        </section>
+        <section class="app-panel" id="home"><div class="d-flex justify-content-between align-items-center"><h2>Citizen Home</h2><button class="btn btn-sm btn-outline-info" id="demoLogin">Demo login</button></div><p class="small mb-2">Followed areas: <span id="followedAreas">Chatsworth · Phoenix · Umlazi</span></p><div id="nearbyTickets" class="app-list"></div></section>
+        <section class="app-panel" id="report"><h2>Report Issue</h2><form id="citizenReportForm" class="app-form"><textarea name="description" class="form-control" rows="4" placeholder="Example: Pheonix streetlight out near the school and cars are swerving." required></textarea><div class="row g-2 mt-2"><div class="col-6"><input name="suburb" class="form-control" value="Pheonix" placeholder="Suburb / area"></div><div class="col-6"><input name="ward" class="form-control" value="Ward 52" placeholder="Ward"></div></div><input name="locationNotes" class="form-control mt-2" placeholder="Nearest landmark / street"><button class="btn btn-primary w-100 mt-3" type="submit"><i class="bi bi-send me-1"></i>Submit civic report</button></form><div id="reportResult" class="app-result"></div></section>
+        <section class="app-panel" id="tickets"><h2>My Tickets / Track Reference</h2><div class="input-group mb-3"><input id="trackRef" class="form-control" placeholder="CIV-2026-0001"><button class="btn btn-outline-info" id="trackBtn">Track</button></div><div id="ticketList" class="app-list"></div></section>
+        <section class="app-panel" id="alerts"><h2>Area Alerts</h2><div class="d-flex gap-2 mb-3"><input id="followArea" class="form-control" value="Chatsworth"><button class="btn btn-outline-info" id="followBtn">Follow area</button></div><div id="alertList" class="app-list"></div></section>
+        <section class="app-panel" id="community"><h2>Community Thread</h2><p class="small">Confirm impact without creating noise. Counts are visible to citizens and staff.</p><div id="communityList" class="app-list"></div></section>
+        <section class="app-panel" id="copilot"><h2>CivicOps Copilot</h2><p class="small">Explicit-action assistant tied to ticket/status context. Gemini stays server-side with deterministic fallback.</p><input id="copilotRef" class="form-control mb-2" placeholder="Optional reference number"><textarea id="copilotQuestion" class="form-control" rows="3" placeholder="Ask what happens next or how to track a report."></textarea><button class="btn btn-primary w-100 mt-3" id="askCopilot">Ask Copilot</button><div id="copilotAnswer" class="app-result"></div></section>
+        <section class="app-panel" id="profile"><h2>Profile / Settings</h2><div class="app-profile"><strong>Resident demo profile</strong><p>Selected municipality: eThekwini · Notifications: area alerts + ticket updates · Channels: app/PWA/APK.</p><a class="btn btn-outline-info btn-sm" href="/Resident/Login">Resident sign in</a></div><div class="alert alert-warning mt-3 small">CivicOps does not replace police, fire, EMS, or emergency services. Immediate danger must be reported directly to emergency services.</div></section>
+    </main>
+    <nav class="app-bottom-nav"><a href="#home"><i class="bi bi-house"></i><span>Home</span></a><a href="#report"><i class="bi bi-plus-circle"></i><span>Report</span></a><a href="#tickets"><i class="bi bi-ticket"></i><span>Tickets</span></a><a href="#alerts"><i class="bi bi-bell"></i><span>Alerts</span></a><a href="#copilot"><i class="bi bi-stars"></i><span>Copilot</span></a><a href="#profile"><i class="bi bi-person"></i><span>Profile</span></a></nav>
+</div>
+<script>
+(() => {
+  const state = { tickets: [], alerts: [], area: 'Chatsworth' };
+  const ticketCard = t => `<article class="app-ticket"><div><strong>${t.referenceNumber}</strong><p>${t.area} · ${t.department}</p><small>${t.latestUpdate || 'Public update pending.'}</small></div><div class="text-end"><span class="badge bg-info">${t.status}</span><span class="badge bg-warning d-block mt-1">${t.priority}</span><button class="btn btn-sm btn-outline-info mt-2 affected" data-ref="${t.referenceNumber}">I'm affected too (${t.affectedCount || 0})</button></div></article>`;
+  const loadHome = async () => { const r = await fetch('/api/mobile/citizen/home?area=' + encodeURIComponent(state.area)); const data = await r.json(); state.tickets = data.tickets || []; state.alerts = data.alerts || []; document.querySelector('#appMetrics').innerHTML = `<div><strong>${data.stats.activeNearYou}</strong><span>Active near you</span></div><div><strong>${data.stats.openTickets}</strong><span>Open tickets</span></div><div><strong>${data.stats.alerts}</strong><span>Alerts</span></div><div><strong>${data.stats.affectedConfirmations}</strong><span>Affected confirmations</span></div>`; document.querySelector('#nearbyTickets').innerHTML = (data.nearby || data.tickets).map(ticketCard).join(''); document.querySelector('#ticketList').innerHTML = data.tickets.map(ticketCard).join(''); document.querySelector('#communityList').innerHTML = data.nearby.map(ticketCard).join(''); document.querySelector('#alertList').innerHTML = data.alerts.map(a => `<article class="app-ticket"><div><strong>${a.title}</strong><p>${a.suburb} · ${a.ward}</p><small>${a.description}</small></div><span class="badge bg-warning">${a.severity}</span></article>`).join('') || '<p>No active alerts for this followed area.</p>'; };
+  document.addEventListener('click', async e => { if (e.target.matches('.affected')) { const ref = e.target.dataset.ref; const r = await fetch('/api/mobile/citizen/affected', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ referenceNumber: ref, area: state.area }) }); const data = await r.json(); e.target.textContent = `I'm affected too (${data.affectedCount})`; await loadHome(); } });
+  document.querySelector('#citizenReportForm').addEventListener('submit', async e => { e.preventDefault(); const f = new FormData(e.target); const payload = Object.fromEntries(f.entries()); const r = await fetch('/api/mobile/citizen/report', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }); const data = await r.json(); document.querySelector('#reportResult').innerHTML = `<div class="alert alert-success mt-3"><strong>${data.referenceNumber}</strong><br>${data.citizenResponse || data.message}<br><span class="badge bg-info">${data.department}</span> <span class="badge bg-warning">${data.priority}</span></div>`; document.querySelector('#trackRef').value = data.referenceNumber; await loadHome(); });
+  document.querySelector('#trackBtn').addEventListener('click', async () => { const ref = document.querySelector('#trackRef').value.trim(); if (!ref) return; const r = await fetch('/api/reports/' + encodeURIComponent(ref)); const data = await r.json(); document.querySelector('#ticketList').innerHTML = data.success ? ticketCard({ referenceNumber:data.referenceNumber, area:data.normalizedArea, department:data.department, latestUpdate:data.latestUpdate?.content, status:data.status, priority:data.priority, affectedCount:0 }) : '<div class="alert alert-warning">Reference not found.</div>'; });
+  document.querySelector('#followBtn').addEventListener('click', async () => { state.area = document.querySelector('#followArea').value || 'Chatsworth'; document.querySelector('#followedAreas').textContent = `${state.area} · Chatsworth · Phoenix · Umlazi`; await loadHome(); });
+  document.querySelector('#askCopilot').addEventListener('click', async () => { const r = await fetch('/api/mobile/copilot/citizen', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ referenceNumber: document.querySelector('#copilotRef').value, question: document.querySelector('#copilotQuestion').value, area: state.area }) }); const data = await r.json(); document.querySelector('#copilotAnswer').innerHTML = `<div class="alert alert-info mt-3">${data.answer}<br><small>${data.gemini}</small></div>`; });
+  document.querySelector('#demoLogin').addEventListener('click', () => document.querySelector('#profile').scrollIntoView({behavior:'smooth'}));
+  loadHome();
+})();
+</script>
 }
 else
 {
-    <section class="hero-panel mb-4">
-        <span class="eyebrow">Download App / Install Hub</span>
-        <h1 class="display-5">Install the CivicOps Citizen App</h1>
-        <p class="lead">The citizen app is the primary public channel: report issues, track status, follow areas, review alerts, open Copilot and join local incident threads from a polished installable shell.</p>
-        <div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">@(pwaReady ? "PWA ready" : "PWA shell available")</span><span class="badge bg-info">Android project scaffolded</span><span class="badge bg-info">Starts at /app</span><span class="badge bg-secondary">APK @(apkExists ? "available" : "build artifact pending")</span></div>
-        <div class="command-strip mt-4"><a class="btn btn-primary btn-lg" href="/app">Open Citizen App</a><a class="btn btn-outline-info btn-lg" href="/Home/Report">Report Issue</a><a class="btn btn-outline-light btn-lg" href="/Home/Lookup">Track Reference</a>@if (apkExists) { <a class="btn btn-outline-warning btn-lg" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download Android APK</a> }</div>
-    </section>
-    <div class="row g-4">
-        <div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Option 1</span><h2 class="h4">Install as PWA</h2><ol><li>Open <code>/app</code> in Chrome, Edge or Safari.</li><li>Select <strong>Install</strong> or <strong>Add to Home Screen</strong>.</li><li>Use Report Issue, Track Reference, Area Alerts, Copilot and Threads.</li></ol></div></div>
-        <div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Option 2</span><h2 class="h4">Download APK</h2>@if (apkExists) { <p>The debug APK is available at <code>/downloads/CivicOpsCitizenCompanion-debug.apk</code>.</p><a class="btn btn-primary" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download APK</a> } else { <p>The Android project is complete under <code>mobile/CivicOpsAndroid</code>. Build with <code>./gradlew assembleDebug</code>, then copy the APK to <code>wwwroot/downloads/CivicOpsCitizenCompanion-debug.apk</code>.</p> }</div></div>
-        <div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Demo access</span><h2 class="h4">Quick credentials</h2><p>Resident: <code>resident@civicops.demo</code><br/>Staff: <code>admin@civicops.demo</code>, <code>dispatcher@civicops.demo</code>, <code>electricity@civicops.demo</code><br/>Password: <code>CivicOps2026!</code></p><a class="btn btn-outline-info" href="/Resident/Login">Resident Login</a></div></div>
-        <div class="col-lg-12"><div class="ops-card"><h2 class="h4">What the app demonstrates</h2><div class="d-flex flex-wrap"><span class="area-chip">Resident login/profile</span><span class="area-chip">Submit ticket</span><span class="area-chip">Photo placeholder</span><span class="area-chip">Voice-note placeholder</span><span class="area-chip">Track own reports</span><span class="area-chip">Reference lookup</span><span class="area-chip">Area alerts</span><span class="area-chip">Follow suburbs/wards</span><span class="area-chip">Copilot</span><span class="area-chip">Incident discussions</span><span class="area-chip">Related local activity</span></div></div></div>
-    </div>
-}
+<div class="container py-4 civic-page">
+    <section class="hero-panel mb-4"><span class="eyebrow">Download App / Install Hub</span><h1 class="display-5">Install the CivicOps Citizen App</h1><p class="lead">Open the standalone /app shell or install the Android APK. The APK target is <code>https://civicops.culltron.app/app</code> and contains no API keys.</p><div class="d-flex gap-2 flex-wrap"><span class="badge bg-success">@(pwaReady ? "PWA ready" : "PWA shell available")</span><span class="badge bg-info">Android workflow preserved</span><span class="badge bg-info">Starts at /app</span><span class="badge bg-secondary">APK @(apkExists ? "available" : "artifact pending")</span></div><div class="command-strip mt-4"><a class="btn btn-primary btn-lg" href="/app">Open Citizen App</a><a class="btn btn-outline-info btn-lg" href="/Home/Report">Report Issue</a><a class="btn btn-outline-light btn-lg" href="/Home/Lookup">Track Reference</a>@if (apkExists) { <a class="btn btn-outline-warning btn-lg" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download Android APK</a> } else { <span class="btn btn-outline-warning btn-lg disabled">APK artifact pending</span> }</div></section>
+    <div class="row g-4"><div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Option 1</span><h2 class="h4">Open Citizen App</h2><p>The /app route hides the public website shell and presents Citizen Home, Report Issue, Tickets, Alerts, Community, Copilot and Profile.</p><a class="btn btn-primary" href="/app">Open /app</a></div></div><div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Option 2</span><h2 class="h4">Download APK</h2>@if (apkExists) { <p>The APK is served from <code>/downloads/CivicOpsCitizenCompanion-debug.apk</code>.</p><a class="btn btn-primary" href="/downloads/CivicOpsCitizenCompanion-debug.apk">Download APK</a> } else { <p>APK artifact pending. GitHub Actions builds and copies it to <code>wwwroot/downloads</code>.</p> }</div></div><div class="col-lg-4"><div class="ops-card h-100"><span class="eyebrow">Demo access</span><h2 class="h4">Role paths</h2><p>Citizen app is public. Staff control room supports Admin, Dispatcher, and department responders with scoped queues.</p><a class="btn btn-outline-info" href="/Auth/Login">Staff Login</a></div></div></div>
 </div>
+}

@@ -11,7 +11,9 @@
     <link rel="manifest" href="~/manifest.json" />
     <meta name="theme-color" content="#02070d" />
 </head>
-<body>
+<body class="@(ViewBag.AppShell == true ? "app-shell-body" : "")">
+    @if (ViewBag.AppShell != true)
+    {
     <nav class="navbar navbar-expand-xl navbar-dark civic-nav">
         <div class="container-fluid px-lg-4">
             <a class="navbar-brand civic-brand" href="/">
@@ -24,11 +26,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto align-items-xl-center">
                     <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Report"><i class="bi bi-file-earmark-plus me-1"></i>Report Issue</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Lookup"><i class="bi bi-search me-1"></i>Track Report</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Alerts"><i class="bi bi-bell me-1"></i>Area Alerts</a></li>
                     <li class="nav-item"><a class="nav-link nav-accent" href="/citizen-app"><i class="bi bi-phone me-1"></i>Citizen App</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/Home/Agent"><i class="bi bi-stars me-1"></i>AI Assistant</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Dashboard"><i class="bi bi-kanban me-1"></i>Municipal Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Agent"><i class="bi bi-stars me-1"></i>AI Agent</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/BobEvidence"><i class="bi bi-file-earmark-check me-1"></i>Bob Evidence</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="demoDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-grid-3x3-gap me-1"></i>Demo</a>
                         <ul class="dropdown-menu">
@@ -74,11 +75,14 @@
             </div>
         </div>
     </nav>
+    }
 
     <main>
         @RenderBody()
     </main>
 
+    @if (ViewBag.AppShell != true)
+    {
     <footer class="footer civic-footer">
         <div class="container">
             <div class="row g-4 align-items-center">
@@ -93,6 +97,7 @@
             </div>
         </div>
     </footer>
+    }
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
