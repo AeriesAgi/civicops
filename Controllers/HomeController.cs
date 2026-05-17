@@ -483,6 +483,35 @@ namespace CivicOps.Controllers
             return View("Mobile");
         }
 
+
+        [HttpGet("/app/report")]
+        public IActionResult AppReport()
+        {
+            PrepareAppShell(startSection: "report");
+            return View("Mobile");
+        }
+
+        [HttpGet("/app/tickets")]
+        public IActionResult AppTickets()
+        {
+            PrepareAppShell(startSection: "tickets");
+            return View("Mobile");
+        }
+
+        [HttpGet("/app/alerts")]
+        public IActionResult AppAlerts()
+        {
+            PrepareAppShell(startSection: "alerts");
+            return View("Mobile");
+        }
+
+        [HttpGet("/app/profile")]
+        public IActionResult AppProfile()
+        {
+            PrepareAppShell(startSection: "profile");
+            return View("Mobile");
+        }
+
         [HttpGet("/app/copilot")]
         public IActionResult AppCopilot()
         {
@@ -547,10 +576,12 @@ namespace CivicOps.Controllers
         [HttpGet("/app/incident/{reference}")]
         public async Task<IActionResult> AppIncident(string reference)
         {
+            PrepareAppShell(startSection: "tickets");
             var incident = await _dataService.GetIncidentByReferenceAsync(reference.Trim());
             ViewBag.CanSeeAudit = false;
             ViewBag.Reference = reference;
-            return View("Status", incident);
+            ViewBag.AppTrackedIncident = incident;
+            return View("Mobile");
         }
 
         [HttpGet("/app/area/{area}/thread")]
