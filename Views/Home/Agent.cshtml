@@ -1,52 +1,51 @@
 @{
-    ViewData["Title"] = "AI Agent Command Centre";
+    ViewData["Title"] = "CivicOps AI Agent";
     var diagnostics = ViewBag.GeminiDiagnostics as CivicOps.Services.GeminiDiagnostics;
 }
-<div class="container py-4 civic-page">
-    <section class="hero-panel mb-4">
-        <span class="eyebrow">Gemini + deterministic fallback</span>
-        <h1 class="display-5">AI Agent Command Centre</h1>
-        <p class="lead">Run action-triggered agent tasks. No Gemini call runs on page load; each button calls the backend once and shows the model/fallback source.</p>
-        <div class="d-flex gap-2 flex-wrap">
-            <span class="badge bg-info">Gemini enabled: @(diagnostics?.Enabled == true ? "yes" : "no")</span>
-            <span class="badge bg-info">Key present: @(diagnostics?.KeyPresent == true ? "yes" : "no")</span>
-            <span class="badge bg-warning">Fallback active: @(diagnostics?.FallbackActive == true ? "yes" : "ready")</span>
-            <span class="badge bg-secondary">Auto-run: false</span>
-        </div>
-    </section>
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="ops-card mb-3">
-                <h2 class="h5">Actions</h2>
-                <div class="d-grid gap-2" id="agentButtons">
-                    <button class="btn btn-primary agent-action" data-scenario="latest-report">Analyze latest resident report</button>
-                    <button class="btn btn-outline-info agent-action" data-scenario="whatsapp-report">Analyze optional WhatsApp sandbox report</button>
-                    <button class="btn btn-outline-info agent-action" data-scenario="voice-note">Analyze voice-note transcript</button>
-                    <button class="btn btn-outline-warning agent-action" data-scenario="gemini-health">Run live Gemini health test</button>
-                    <button class="btn btn-outline-info agent-action" data-scenario="citizen-response" data-endpoint="/api/agent/generate-response">Generate citizen response</button>
-                    <button class="btn btn-outline-info agent-action" data-scenario="department-brief">Generate department brief</button>
-                    <button class="btn btn-outline-info agent-action" data-scenario="area-alert" data-endpoint="/api/agent/recommend-alert">Recommend area alert</button>
-                    <button class="btn btn-outline-light agent-action" data-scenario="judge-summary">Generate judge summary</button>
+<div class="container-fluid px-lg-4 py-4 civic-page agent-command-page">
+    <section class="hero-panel mb-4 agent-hero">
+        <div class="row g-4 align-items-center">
+            <div class="col-xl-7">
+                <span class="eyebrow">CivicOps AI Agent</span>
+                <h1 class="display-5 mb-3">Operational assistant for civic intake, triage, routing and municipal response.</h1>
+                <p class="lead mb-3">Select a workflow, run a single explicit action, then review structured output, model/fallback source and audit trail before any human-facing decision.</p>
+                <div class="d-flex flex-wrap gap-2"><span class="badge bg-info">Model: @(diagnostics?.PrimaryModel ?? "gemini-2.5-flash")</span><span class="badge bg-secondary">Fallback ready</span><span class="badge bg-success">Human-in-the-loop</span></div>
+            </div>
+            <div class="col-xl-5">
+                <div class="selected-report-card">
+                    <span class="eyebrow">Selected report context</span>
+                    <div class="d-flex justify-content-between align-items-start gap-3"><h2 class="h4 mb-1">CIV-2026-LIVE</h2><span class="badge bg-warning">High</span></div>
+                    <p class="mb-2">Messy resident report: “Pheonix streetlight out near school, cars swerving, area feels unsafe.”</p>
+                    <div class="d-flex flex-wrap gap-2"><span class="area-chip">Pheonix → Phoenix</span><span class="area-chip">Electricity & Power</span><span class="area-chip">Ward 52</span></div>
                 </div>
             </div>
-            <div class="ops-card">
-                <h2 class="h5">Diagnostics</h2>
-                <dl class="mb-0 small">
-                    <dt>Primary model</dt><dd>@(diagnostics?.PrimaryModel ?? "gemini-2.5-flash")</dd>
-                    <dt>Routine model</dt><dd>@(diagnostics?.RoutineModel ?? "gemini-3.1-flash-lite")</dd>
-                    <dt>Fallback models</dt><dd>@string.Join(", ", diagnostics?.FallbackModels ?? Array.Empty<string>())</dd>
-                    <dt>Calls since start</dt><dd id="diagCalls">@(diagnostics?.CallsSinceAppStart ?? 0)</dd>
-                    <dt>Last action/model/result</dt><dd id="diagLast">@(diagnostics?.LastCallAction ?? "None") / @(diagnostics?.LastModelUsed ?? "None") / @(diagnostics?.LastResult ?? "No calls yet")</dd>
-                    <dt>Quota limited</dt><dd id="diagQuota">@(diagnostics?.QuotaLimited == true ? "yes" : "no")</dd>
-                </dl>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-xl-4">
+            <div class="ops-card workflow-library">
+                <div class="d-flex justify-content-between align-items-center mb-3"><div><span class="eyebrow">Workflow actions</span><h2 class="h4 mb-0">Agent tasks</h2></div><span id="agentState" class="badge bg-secondary">Ready</span></div>
+                <div class="workflow-section"><h3>Intake</h3><button class="workflow-card agent-action" data-scenario="latest-report"><i class="bi bi-search-heart"></i><span><strong>Analyze selected report</strong><small>Extract issue, area, urgency and next step</small></span></button><button class="workflow-card agent-action" data-scenario="voice-note"><i class="bi bi-geo-alt"></i><span><strong>Correct messy location</strong><small>Normalize Chatworth, Pheonix, Durbn CBD and similar reports</small></span></button></div>
+                <div class="workflow-section"><h3>Routing</h3><button class="workflow-card agent-action" data-scenario="whatsapp-report"><i class="bi bi-diagram-3"></i><span><strong>Classify issue + suggest department</strong><small>Category, priority and routing reason</small></span></button><button class="workflow-card agent-action" data-scenario="department-brief"><i class="bi bi-file-earmark-medical"></i><span><strong>Generate department brief</strong><small>Operational summary for queue responders</small></span></button></div>
+                <div class="workflow-section"><h3>Response</h3><button class="workflow-card agent-action" data-scenario="citizen-response" data-endpoint="/api/agent/generate-response"><i class="bi bi-reply"></i><span><strong>Draft citizen response</strong><small>Status-aware, plain-language update</small></span></button></div>
+                <div class="workflow-section"><h3>Alerting</h3><button class="workflow-card agent-action" data-scenario="area-alert" data-endpoint="/api/agent/recommend-alert"><i class="bi bi-broadcast-pin"></i><span><strong>Recommend area alert</strong><small>Cluster-aware alert recommendation for human approval</small></span></button></div>
+                <div class="workflow-section"><h3>Judge Summary</h3><button class="workflow-card agent-action" data-scenario="judge-summary"><i class="bi bi-braces"></i><span><strong>Produce structured incident JSON</strong><small>Submission-ready operational evidence</small></span></button><button class="workflow-card agent-action muted" data-scenario="gemini-health"><i class="bi bi-activity"></i><span><strong>Run live Gemini health test</strong><small>Explicit connector check only</small></span></button></div>
             </div>
         </div>
-        <div class="col-lg-8">
-            <div class="agent-console ops-card">
-                <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h4 mb-0">Agent output</h2><span id="agentState" class="badge bg-secondary">Waiting for action</span></div>
-                <div id="agentOutput" class="alert alert-info">Choose an action to run a single backend call. Results will include validation, category, department, priority, routing reason, citizen response, alert recommendation, source model/fallback and audit notes.</div>
-                <h3 class="h5 mt-4">Audit trail</h3>
-                <ul id="auditTrail" class="timeline-list"><li>Agent page opened; no Gemini call was triggered.</li></ul>
+        <div class="col-xl-8">
+            <div class="ops-card agent-output-panel mb-4">
+                <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-3"><div><span class="eyebrow">Structured output</span><h2 class="h4 mb-0">Decision support result</h2></div><span id="modelBadge" class="badge bg-info">No call yet</span></div>
+                <div id="agentOutput" class="agent-empty-state"><i class="bi bi-command"></i><h3>Select an operational action</h3><p>The AI Agent will create structured triage output here: category, corrected location, department, priority, public response, alert recommendation and audit notes.</p></div>
+                <div class="agent-json-preview mt-4"><span class="eyebrow">Structured incident JSON preview</span><pre id="jsonPreview">{
+  "referenceNumber": null,
+  "status": "waiting-for-action",
+  "humanReviewRequired": true
+}</pre></div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-7"><div class="ops-card"><span class="eyebrow">Audit trail</span><h2 class="h5">Agent action log</h2><ul id="auditTrail" class="timeline-list command-timeline"><li>AI Agent page opened. No Gemini call was made.</li></ul></div></div>
+                <div class="col-lg-5"><div class="ops-card diagnostic-card"><span class="eyebrow">Diagnostics</span><h2 class="h5">Connector mode</h2><dl class="small mb-0"><dt>Gemini enabled</dt><dd>@(diagnostics?.Enabled == true ? "yes" : "no")</dd><dt>API key present</dt><dd>@(diagnostics?.KeyPresent == true ? "yes" : "no")</dd><dt>Routine model</dt><dd>@(diagnostics?.RoutineModel ?? "gemini-2.5-flash-lite")</dd><dt>Calls since app start</dt><dd id="diagCalls">@(diagnostics?.CallsSinceAppStart ?? 0)</dd><dt>Safety note</dt><dd>No Gemini call runs on page load; every call is a button-triggered server action.</dd></dl></div></div>
             </div>
         </div>
     </div>
@@ -56,37 +55,34 @@
   const output = document.getElementById('agentOutput');
   const audit = document.getElementById('auditTrail');
   const state = document.getElementById('agentState');
+  const modelBadge = document.getElementById('modelBadge');
+  const jsonPreview = document.getElementById('jsonPreview');
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const render = (data) => {
+    const source = data.aiSource || data.status || 'Local deterministic fallback';
+    modelBadge.textContent = source;
+    modelBadge.className = data.geminiAssisted ? 'badge bg-success' : 'badge bg-info';
+    output.className = 'agent-result-grid';
+    output.innerHTML = `
+      <div class="agent-result-card primary"><span>Action</span><strong>${escapeHtml(data.action || 'Agent action')}</strong><small>${escapeHtml(source)}</small></div>
+      <div class="agent-result-card"><span>Category</span><strong>${escapeHtml(data.category || 'Connector')}</strong><small>${escapeHtml(data.validation || data.message)}</small></div>
+      <div class="agent-result-card"><span>Corrected location</span><strong>${escapeHtml(data.normalizedArea || 'n/a')}</strong><small>${escapeHtml(data.ward || '')} ${escapeHtml(data.wardConfidence || '')}</small></div>
+      <div class="agent-result-card"><span>Department</span><strong>${escapeHtml(data.department || 'CivicOps platform')}</strong><small>${escapeHtml(data.routingReason || '')}</small></div>
+      <div class="agent-result-card"><span>Priority</span><strong>${escapeHtml(data.priority || 'Review')}</strong><small>Human approval required</small></div>
+      <div class="agent-result-card wide"><span>Citizen response</span><p>${escapeHtml(data.citizenResponse || 'No response generated.')}</p></div>
+      <div class="agent-result-card wide"><span>Alert recommendation</span><p>${escapeHtml(data.alertRecommendation || 'No alert recommendation generated.')}</p></div>`;
+    const structured = { referenceNumber: data.referenceNumber || null, category: data.category || null, normalizedArea: data.normalizedArea || null, department: data.department || null, priority: data.priority || null, aiSource: source, humanReviewRequired: true };
+    jsonPreview.textContent = JSON.stringify(structured, null, 2);
     const notes = (data.auditNotes || []).map(n => `<li>${escapeHtml(n)}</li>`).join('');
-    output.className = 'alert alert-info';
-    output.innerHTML = `<div class="row g-3">
-      <div class="col-md-6"><strong>Action</strong><br>${escapeHtml(data.action || 'Agent action')}</div>
-      <div class="col-md-6"><strong>Source</strong><br>${escapeHtml(data.aiSource || data.status || 'Local deterministic fallback')}</div>
-      <div class="col-md-4"><strong>Validation</strong><br>${escapeHtml(data.validation || data.message)}</div>
-      <div class="col-md-4"><strong>Category</strong><br>${escapeHtml(data.category || 'Connector health')}</div>
-      <div class="col-md-4"><strong>Normalized area</strong><br>${escapeHtml(data.normalizedArea || 'n/a')}</div>
-      <div class="col-md-4"><strong>Ward / confidence</strong><br>${escapeHtml(data.ward || 'n/a')} ${escapeHtml(data.wardConfidence || '')}</div>
-      <div class="col-md-4"><strong>Department</strong><br>${escapeHtml(data.department)}</div>
-      <div class="col-md-4"><strong>Priority</strong><br>${escapeHtml(data.priority)}</div>
-      <div class="col-md-8"><strong>Routing reason</strong><br>${escapeHtml(data.routingReason)}</div>
-      <div class="col-12"><strong>Citizen response</strong><br>${escapeHtml(data.citizenResponse)}</div>
-      <div class="col-12"><strong>Alert recommendation</strong><br>${escapeHtml(data.alertRecommendation)}</div>
-      ${data.referenceNumber ? `<div class="col-12"><a class="btn btn-outline-info" href="/Home/Lookup">Track reference ${escapeHtml(data.referenceNumber)}</a></div>` : ''}
-    </div>`;
-    audit.insertAdjacentHTML('afterbegin', `<li><strong>${new Date().toLocaleTimeString()}</strong> ${escapeHtml(data.action || 'Action')} completed. ${notes ? `<ul>${notes}</ul>` : ''}</li>`);
-    if (data.diagnostics) {
-      document.getElementById('diagCalls').textContent = data.diagnostics.callsSinceAppStart;
-      document.getElementById('diagLast').textContent = `${data.diagnostics.lastCallAction} / ${data.diagnostics.lastModelUsed} / ${data.diagnostics.lastResult}`;
-      document.getElementById('diagQuota').textContent = data.diagnostics.quotaLimited ? 'yes' : 'no';
-    }
+    audit.insertAdjacentHTML('afterbegin', `<li><strong>${new Date().toLocaleTimeString()}</strong> ${escapeHtml(data.action || 'Action')} completed.${notes ? `<ul>${notes}</ul>` : ''}</li>`);
+    if (data.diagnostics) document.getElementById('diagCalls').textContent = data.diagnostics.callsSinceAppStart;
   };
   document.querySelectorAll('.agent-action').forEach(button => {
     button.addEventListener('click', async () => {
       const endpoint = button.dataset.endpoint || '/api/agent/run';
       const scenario = button.dataset.scenario;
-      const original = button.textContent;
-      button.disabled = true; button.textContent = 'Running...'; state.textContent = 'Loading'; state.className = 'badge bg-warning';
+      const label = button.innerText;
+      button.disabled = true; state.textContent = 'Running'; state.className = 'badge bg-warning';
       try {
         const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario }) });
         const data = await response.json();
@@ -94,8 +90,8 @@
         render(data); state.textContent = 'Complete'; state.className = 'badge bg-success';
       } catch (error) {
         output.className = 'alert alert-danger'; output.textContent = error.message; state.textContent = 'Failed'; state.className = 'badge bg-danger';
-        audit.insertAdjacentHTML('afterbegin', `<li>${new Date().toLocaleTimeString()} action failed: ${escapeHtml(error.message)}</li>`);
-      } finally { button.disabled = false; button.textContent = original; }
+        audit.insertAdjacentHTML('afterbegin', `<li>${new Date().toLocaleTimeString()} failed: ${escapeHtml(error.message)}</li>`);
+      } finally { button.disabled = false; }
     });
   });
 })();

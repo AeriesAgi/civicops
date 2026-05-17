@@ -1,8 +1,161 @@
 @model CivicOps.Models.Incident
 @{
-    ViewData["Title"] = "Incident Detail";
+    ViewData["Title"] = "Incident Command";
+    string StatusLabel(CivicOps.Models.IncidentStatus s) => s switch { CivicOps.Models.IncidentStatus.InProgress => "In Progress", CivicOps.Models.IncidentStatus.WaitingForCitizen => "Waiting for Citizen", CivicOps.Models.IncidentStatus.AlertRecommended => "Alert Recommended", _ => s.ToString() };
+    string PriorityLabel(CivicOps.Models.IncidentPriority p) => p == CivicOps.Models.IncidentPriority.Urgent ? "Critical" : p.ToString();
+    var actionButtons = new[]
+    {
+        ("acknowledge", "Acknowledge", "bi-check2-circle", "Primary intake acknowledgement"),
+        ("in-progress", "Mark In Progress", "bi-play-circle", "Crew or desk action started"),
+        ("request-info", "Request More Info", "bi-chat-square-text", "Need resident/location detail"),
+        ("escalate", "Escalate", "bi-exclamation-octagon", "Raise priority and command focus"),
+        ("recommend-alert", "Recommend Alert", "bi-broadcast", "Prepare area-wide notice"),
+        ("resolve", "Resolve", "bi-patch-check", "Issue addressed"),
+        ("close", "Close", "bi-lock", "End operational workflow"),
+        ("generate-brief", "Generate Department Brief", "bi-file-earmark-text", "Operational summary"),
+        ("generate-citizen-response", "Draft Citizen Response", "bi-reply", "Public-facing update")
+    };
 }
-<div class="container py-4 civic-page">
-  <section class="hero-panel mb-4"><span class="eyebrow">Staff incident detail</span><h1 class="display-5">@Model.ReferenceNumber</h1><p class="lead"><span class="badge bg-info">@Model.Status</span> <span class="badge bg-warning">@Model.Priority</span> <span class="badge bg-info">@Model.AssignedDepartment.GetDisplayName()</span></p></section>
-  <div class="row g-4"><div class="col-lg-6"><div class="ops-card"><h2 class="h4">Incident information</h2><dl><dt>Category</dt><dd>@Model.Category</dd><dt>Source</dt><dd>@Model.SourceChannel</dd><dt>AI source</dt><dd>@Model.ClassificationMethod</dd><dt>Original area</dt><dd>@Model.OriginalArea</dd><dt>Normalized area</dt><dd>@Model.NormalizedArea · @Model.Ward (@Model.WardConfidence)</dd><dt>Enrichment source</dt><dd>@Model.EnrichmentSource</dd><dt>Routing reason</dt><dd>@Model.RoutingReason</dd><dt>Department brief</dt><dd>@Model.DepartmentBrief</dd><dt>Location notes</dt><dd>@Model.LocationNotes</dd></dl><h3 class="h5">Description</h3><p style="white-space:pre-wrap">@Model.Description</p></div></div><div class="col-lg-6"><div class="ops-card"><h2 class="h4">Public updates</h2><ol class="timeline-list">@foreach (var u in Model.PublicUpdates.OrderByDescending(u => u.Timestamp)) { <li><strong>@u.Timestamp.ToString("MMM dd HH:mm")</strong> — @u.Content</li> }</ol></div><div class="ops-card mt-4"><h2 class="h4">Audit notes</h2><ol class="timeline-list">@foreach (var n in Model.InternalNotes.OrderByDescending(n => n.Timestamp)) { <li><strong>@n.Timestamp.ToString("MMM dd HH:mm")</strong> — @n.Content</li> }</ol></div></div></div>
+<div class="container-fluid px-lg-4 py-4 civic-page incident-command-page">
+    <section class="hero-panel mb-4 incident-hero">
+        @if (TempData["IncidentActionMessage"] != null)
+        {
+            <div class="alert alert-success mb-4"><i class="bi bi-check2-circle me-2"></i>@TempData["IncidentActionMessage"]</div>
+        }
+        <div class="row g-4 align-items-end">
+            <div class="col-lg-8">
+                <span class="eyebrow">Municipal incident command</span>
+                <h1 class="display-5 mb-2">@Model.ReferenceNumber</h1>
+                <p class="lead mb-3">@Model.Category in @Model.NormalizedArea · routed to @Model.AssignedDepartment.GetDisplayName()</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-info">@StatusLabel(Model.Status)</span>
+                    <span class="badge bg-warning">@PriorityLabel(Model.Priority)</span>
+                    <span class="badge bg-success">@Model.AffectedCount affected confirmations</span>
+                    <span class="badge bg-secondary">@Model.ClassificationMethod</span>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="ops-mini-map">
+                    <span class="map-node" style="left:22%; top:42%"></span>
+                    <span class="map-node" style="left:62%; top:30%"></span>
+                    <span class="map-node" style="left:48%; top:72%"></span>
+                    <strong>@Model.NormalizedArea</strong>
+                    <small>@Model.Ward · @Model.WardConfidence</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="ops-card mb-4">
+                <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                    <div>
+                        <span class="eyebrow">Incident intelligence</span>
+                        <h2 class="h4">Resident signal and routing context</h2>
+                    </div>
+                    <a class="btn btn-outline-info btn-sm" href="/Home/Department?dept=@Model.AssignedDepartment">Back to queue</a>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6"><div class="intel-tile"><span>Source</span><strong>@Model.SourceChannel</strong></div></div>
+                    <div class="col-md-6"><div class="intel-tile"><span>Department</span><strong>@Model.AssignedDepartment.GetDisplayName()</strong></div></div>
+                    <div class="col-md-6"><div class="intel-tile"><span>Original area</span><strong>@Model.OriginalArea</strong></div></div>
+                    <div class="col-md-6"><div class="intel-tile"><span>Corrected area</span><strong>@Model.NormalizedArea</strong></div></div>
+                </div>
+                <div class="signal-line my-4"></div>
+                <h3 class="h5">Resident description</h3>
+                <p class="incident-description">@Model.Description</p>
+                <div class="row g-3">
+                    <div class="col-md-6"><h3 class="h6">Routing reason</h3><p>@Model.RoutingReason</p></div>
+                    <div class="col-md-6"><h3 class="h6">Alert recommendation</h3><p>@Model.AlertRecommendation</p></div>
+                    <div class="col-12"><h3 class="h6">Department brief</h3><p>@Model.DepartmentBrief</p></div>
+                </div>
+            </div>
+
+            <div class="ops-card">
+                <span class="eyebrow">Timeline and transparency</span>
+                <h2 class="h4">Public, status and audit history</h2>
+                <div class="row g-4 mt-1">
+                    <div class="col-lg-4">
+                        <h3 class="h6">Public updates</h3>
+                        <ol class="timeline-list command-timeline">
+                            @foreach (var u in Model.PublicUpdates.OrderByDescending(u => u.Timestamp))
+                            {
+                                <li><strong>@u.Timestamp.ToString("MMM dd HH:mm")</strong><br />@u.Content</li>
+                            }
+                        </ol>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3 class="h6">Status history</h3>
+                        <ol class="timeline-list command-timeline">
+                            @foreach (var h in Model.StatusHistory.OrderByDescending(h => h.Timestamp))
+                            {
+                                <li><strong>@h.Timestamp.ToString("MMM dd HH:mm")</strong><br />@StatusLabel(h.FromStatus) → @StatusLabel(h.ToStatus)<br /><small>@h.ChangedBy · @h.Reason</small></li>
+                            }
+                        </ol>
+                        @if (!Model.StatusHistory.Any()) { <p class="small text-muted-strong">No manual workflow actions yet.</p> }
+                    </div>
+                    <div class="col-lg-4">
+                        <h3 class="h6">Internal audit log</h3>
+                        <ol class="timeline-list command-timeline">
+                            @foreach (var n in Model.InternalNotes.OrderByDescending(n => n.Timestamp))
+                            {
+                                <li><strong>@n.Timestamp.ToString("MMM dd HH:mm")</strong><br />@n.Author: @n.Content</li>
+                            }
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <aside class="col-xl-4">
+            <div class="ops-card action-command-panel sticky-xl-top">
+                <span class="eyebrow">Department action panel</span>
+                <h2 class="h4">Act on this report</h2>
+                <p class="small text-muted-strong">Each action writes status history, internal audit notes and a citizen-visible update where appropriate.</p>
+                <div class="action-grid">
+                    @foreach (var action in actionButtons)
+                    {
+                        <form method="post" asp-action="UpdateStatus" class="quick-action-form">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="@Model.Status" />
+                            <input type="hidden" name="priority" value="@Model.Priority" />
+                            <input type="hidden" name="actionType" value="@action.Item1" />
+                            <button type="submit" class="quick-action-btn">
+                                <i class="bi @action.Item3"></i>
+                                <span><strong>@action.Item2</strong><small>@action.Item4</small></span>
+                            </button>
+                        </form>
+                    }
+                </div>
+                <div class="manual-action-box mt-4">
+                    <h3 class="h6">Custom update</h3>
+                    <form method="post" asp-action="UpdateStatus" class="row g-2">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <div class="col-6">
+                            <select name="status" class="form-select form-select-sm">
+                                <option value="@Model.Status">Keep status</option>
+                                <option value="Acknowledged">Acknowledged</option>
+                                <option value="InProgress">In Progress</option>
+                                <option value="WaitingForCitizen">Waiting for Citizen</option>
+                                <option value="Escalated">Escalated</option>
+                                <option value="AlertRecommended">Alert Recommended</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <select name="priority" class="form-select form-select-sm">
+                                <option value="@Model.Priority">@PriorityLabel(Model.Priority)</option>
+                                <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+                            </select>
+                        </div>
+                        <div class="col-12"><textarea name="internalNote" class="form-control" rows="2" placeholder="Internal note / crew assignment"></textarea></div>
+                        <div class="col-12"><textarea name="publicNote" class="form-control" rows="2" placeholder="Public update for residents"></textarea></div>
+                        <div class="col-12 d-grid"><button class="btn btn-primary" type="submit">Post operational update</button></div>
+                    </form>
+                </div>
+            </div>
+        </aside>
+    </div>
 </div>
