@@ -65,6 +65,12 @@ namespace CivicOps.Controllers
                     department = incident.AssignedDepartment.GetDisplayName(),
                     status = incident.Status.ToString(),
                     priority = incident.Priority.ToString(),
+                    originalArea = incident.OriginalArea,
+                    normalizedArea = incident.NormalizedArea,
+                    ward = incident.Ward,
+                    wardConfidence = incident.WardConfidence,
+                    aiSource = incident.EnrichmentSource,
+                    routingReason = result.RoutingReason,
                     citizenResponse = result.CitizenResponse,
                     alertRecommendation = result.AlertRecommendation,
                     message = "Report submitted successfully"
@@ -93,7 +99,10 @@ namespace CivicOps.Controllers
                 department = incident.AssignedDepartment.GetDisplayName(),
                 category = incident.Category,
                 suburb = incident.Suburb,
+                originalArea = incident.OriginalArea,
+                normalizedArea = incident.NormalizedArea,
                 ward = incident.Ward,
+                wardConfidence = incident.WardConfidence,
                 priority = incident.Priority.ToString(),
                 createdAt = incident.CreatedAt,
                 lastUpdatedAt = incident.LastUpdatedAt,
@@ -382,6 +391,10 @@ namespace CivicOps.Controllers
                 department = incident.AssignedDepartment.GetDisplayName(),
                 priority = incident.Priority.ToString(),
                 category = incident.Category,
+                normalizedArea = incident.NormalizedArea,
+                originalArea = incident.OriginalArea,
+                ward = incident.Ward,
+                wardConfidence = incident.WardConfidence,
                 summary = incident.AISummary,
                 routingReason = result.RoutingReason,
                 citizenResponse = result.CitizenResponse,
@@ -392,6 +405,7 @@ namespace CivicOps.Controllers
                 {
                     $"Created via shared IncidentIntakeService from {incident.SourceChannel}.",
                     $"Classification method: {incident.ClassificationMethod}.",
+                    $"Area normalized from '{incident.OriginalArea}' to '{incident.NormalizedArea}', ward {incident.Ward} ({incident.WardConfidence}).",
                     incident.IsGeminiProcessed ? $"Gemini classification source: {incident.ClassificationMethod}." : "Fallback active — live Gemini activates only for event/action-triggered calls when GEMINI_API_KEY and GEMINI_ENABLED=true are configured.",
                     whatsAppStatus.CanSend ? "WhatsApp Cloud API send ready." : "Sandbox WhatsApp flow active — Cloud API activates through env vars.",
                     "Human-in-the-loop review remains required before field dispatch or public alerting."
@@ -555,7 +569,7 @@ namespace CivicOps.Controllers
             "voice-note" => "Umlazi",
             "department-brief" => "Phoenix",
             "area-alert" => "Chatsworth",
-            _ => "Durban"
+            _ => "Durban CBD"
         };
 
         private static string ScenarioWard(string scenario) => scenario switch
@@ -564,7 +578,7 @@ namespace CivicOps.Controllers
             "voice-note" => "Ward 80",
             "department-brief" => "Ward 52",
             "area-alert" => "Ward 73",
-            _ => "Ward 00"
+            _ => "Ward 26"
         };
 
         private static string ScenarioLabel(string scenario) => scenario switch

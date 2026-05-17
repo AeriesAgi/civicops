@@ -1,23 +1,22 @@
 @{
     ViewData["Title"] = "Judge Tour";
     var steps = new[] {
-        new { Title="1. Home / product story", Link="/", Click="Read the hero and primary channel explanation.", See="Mobile/PWA and web reporting are the main public channels.", Why="Frames CivicOps as a pilot-ready civic AI product.", Next="Report an issue" },
-        new { Title="2. Report an issue", Link="/Home/Report", Click="Submit the mobile-first report form or review its fields.", See="A reference number, citizen response, routing and status link.", Why="Proves web/PWA reporting works without WhatsApp.", Next="Open mobile app" },
-        new { Title="3. Mobile/PWA app hub", Link="/Home/Mobile", Click="Open the phone-like app tiles.", See="Report, track, alerts, weather and resident profile paths.", Why="Shows the main citizen channel.", Next="Run AI agent" },
+        new { Title="1. Home / product story", Link="/", Click="Read the hero and primary channel explanation.", See="Citizen App / PWA and web reporting are the main public channels.", Why="Frames CivicOps as a pilot-ready civic AI product.", Next="Report an issue" },
+        new { Title="2. Report an issue", Link="/Home/Report", Click="Submit the app-first report form or review its fields.", See="A reference number, citizen response, routing and status link.", Why="Proves web/PWA reporting works without WhatsApp.", Next="Open Citizen App" },
+        new { Title="3. Citizen App / PWA", Link="/Home/Mobile", Click="Open the phone-like app tiles.", See="Report, track, alerts, weather and resident profile paths.", Why="Shows the main citizen channel.", Next="Run AI agent" },
         new { Title="4. AI Agent Command Centre", Link="/Home/Agent", Click="Run each action button once.", See="Validation, department, priority, citizen response, alert recommendation and audit trail.", Why="Shows Gemini/fallback intelligence is event-triggered and quota-safe.", Next="Open dashboard" },
         new { Title="5. Dashboard/control room", Link="/Home/Dashboard", Click="Review stats, queues and high-priority reports.", See="A civic operations view for staff review.", Why="Shows routing has operational value.", Next="Track a reference" },
         new { Title="6. Incident/status lookup", Link="/Home/Lookup", Click="Enter a reference from a submitted ticket.", See="Status, department, timeline and latest update.", Why="Residents can self-serve status without calling staff.", Next="View alerts/weather" },
-        new { Title="7. Alerts/weather", Link="/Home/Alerts", Click="Review alert cards, then open weather context.", See="Area, ward, severity and sandbox weather signals.", Why="Connects individual reports to public resilience messaging.", Next="Optional WhatsApp" },
-        new { Title="8. Optional WhatsApp sandbox", Link="/Demo/WhatsAppSimulator", Click="Submit the sandbox message.", See="Masked intake and connector-ready copy.", Why="Shows WhatsApp readiness without making it the core dependency.", Next="Connector readiness" },
-        new { Title="9. Connector readiness", Link="/Home/Connectors", Click="Review Gemini diagnostics and WhatsApp environment gates.", See="Enabled/key-present/model/cooldown/fallback status without secrets.", Why="Demonstrates honest integration posture.", Next="Bob evidence" },
-        new { Title="10. Bob evidence/report docs", Link="/Home/BobEvidence", Click="Open the visible evidence route and source docs list.", See="Bob-assisted build and final polish caveats.", Why="Preserves hackathon build evidence honestly.", Next="Finish" }
+        new { Title="7. Alerts/weather", Link="/Home/Alerts", Click="Review alert cards, then open weather context.", See="Area, ward, severity and sandbox weather signals.", Why="Connects individual reports to public resilience messaging.", Next="Connector readiness" },
+        new { Title="8. Connector readiness", Link="/Home/Connectors", Click="Review Gemini diagnostics and connector order.", See="Enabled/key-present/model/cooldown/fallback status without secrets.", Why="Demonstrates honest integration posture.", Next="Bob evidence" },
+        new { Title="9. Bob evidence/report docs", Link="/Home/BobEvidence", Click="Open the visible evidence route and source docs list.", See="Bob-assisted build and final polish caveats.", Why="Preserves hackathon build evidence honestly.", Next="Finish" }
     };
 }
 <div class="container py-4 civic-page">
     <section class="hero-panel mb-4">
         <span class="eyebrow">3–5 minute guided evaluation path</span>
         <h1 class="display-5">CivicOps judge tour</h1>
-        <p class="lead">Follow this route from public product story to intake, AI action, ticket tracking, control room, alerts, mobile app and connector readiness.</p>
+        <p class="lead">Follow this route from public product story to intake, AI action, ticket tracking, control room, alerts, Citizen App and connector readiness.</p>
         <a class="btn btn-primary btn-lg" href="/Home/Report">Begin with a report</a>
     </section>
     <div class="row g-3">

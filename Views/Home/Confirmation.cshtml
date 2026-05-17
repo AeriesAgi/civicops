@@ -1,8 +1,45 @@
 @model CivicOps.Models.Incident
 @{
     ViewData["Title"] = "Report Confirmation";
+    var latestResponse = Model.PublicUpdates.LastOrDefault()?.Content ?? Model.CitizenResponse ?? "Your report has been received.";
 }
 <div class="container py-4 civic-page">
-  <section class="hero-panel mb-4"><span class="eyebrow">Reference created</span><h1 class="display-5">Thank you — @Model.ReferenceNumber</h1><p class="lead">Your report has been validated, classified and routed for human review.</p><div class="d-flex gap-2 flex-wrap"><a class="btn btn-primary" href="/Home/Lookup">Track status</a><a class="btn btn-outline-info" href="/Home/Report">Submit another report</a><a class="btn btn-outline-light" href="/Home/Mobile">Open mobile hub</a></div></section>
-  <div class="row g-4"><div class="col-lg-6"><div class="ops-card"><h2 class="h4">Routing</h2><dl><dt>Department</dt><dd>@Model.AssignedDepartment.GetDisplayName()</dd><dt>Category</dt><dd>@Model.Category</dd><dt>Priority</dt><dd>@Model.Priority</dd><dt>AI source</dt><dd>@Model.ClassificationMethod</dd></dl></div></div><div class="col-lg-6"><div class="ops-card"><h2 class="h4">Citizen response</h2><p>@(Model.PublicUpdates.LastOrDefault()?.Content ?? "Your report has been received.")</p><p class="small text-muted-strong">CivicOps does not replace emergency services.</p></div></div></div>
+  <section class="hero-panel mb-4">
+    <span class="eyebrow">Reference created</span>
+    <h1 class="display-5">Thank you — @Model.ReferenceNumber</h1>
+    <p class="lead">Gemini/fallback civic AI cleaned, enriched and routed your report for human review.</p>
+    <div class="d-flex gap-2 flex-wrap">
+      <a class="btn btn-primary" href="/Home/Status?reference=@Model.ReferenceNumber">Track this in Citizen App</a>
+      <a class="btn btn-outline-info" href="/Home/Alerts?suburb=@Uri.EscapeDataString(Model.NormalizedArea)">View Area Alerts</a>
+      <a class="btn btn-outline-light" href="/app">Open Citizen App</a>
+    </div>
+  </section>
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="ops-card">
+        <h2 class="h4">AI enrichment result</h2>
+        <dl>
+          <dt>Original report summary</dt><dd>@Model.RawDescription</dd>
+          <dt>Cleaned description</dt><dd>@Model.CleanedDescription</dd>
+          <dt>Area normalization</dt><dd>From <strong>@Model.OriginalArea</strong> to <strong>@Model.NormalizedArea</strong></dd>
+          <dt>Ward</dt><dd>@Model.Ward <span class="badge bg-info">@Model.WardConfidence</span></dd>
+          <dt>Municipality</dt><dd>@Model.Municipality synthetic scenario</dd>
+          <dt>AI/fallback source</dt><dd>@Model.EnrichmentSource</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="ops-card">
+        <h2 class="h4">Routing</h2>
+        <dl>
+          <dt>Department</dt><dd>@Model.AssignedDepartment.GetDisplayName()</dd>
+          <dt>Category</dt><dd>@Model.Category</dd>
+          <dt>Priority</dt><dd>@Model.Priority</dd>
+          <dt>Routing reason</dt><dd>@Model.RoutingReason</dd>
+          <dt>Alert recommendation</dt><dd>@Model.AlertRecommendation</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="col-12"><div class="ops-card"><h2 class="h4">Citizen response</h2><p>@latestResponse</p><p class="small text-muted-strong">CivicOps does not replace emergency services.</p></div></div>
+  </div>
 </div>

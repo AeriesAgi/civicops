@@ -3,7 +3,7 @@
     ViewData["Title"] = "Operations Dashboard";
 }
 <div class="container py-4 civic-page">
-  <section class="hero-panel mb-4"><span class="eyebrow">Civic control room</span><h1 class="display-5">Operations Dashboard</h1><p class="lead">Synthetic civic workload, department queues, high-priority issues and AI recommendations for human review.</p><span class="badge bg-success">System online</span> <span class="badge bg-info">@Model.GeminiStatus</span></section>
+  <section class="hero-panel mb-4"><span class="eyebrow">Civic control room</span><h1 class="display-5">Operations Dashboard</h1><p class="lead">Synthetic civic workload, department queues, high-priority issues and AI recommendations for human review.</p>@if (ViewBag.QueueScope != null) { <div class="alert alert-info">@ViewBag.QueueScope</div> }<span class="badge bg-success">System online</span> <span class="badge bg-info">@Model.GeminiStatus</span></section>
   <div class="grid-auto mb-4">
     <div class="ops-card"><div class="metric">@Model.TotalIncidents</div><p>Total incidents</p></div><div class="ops-card"><div class="metric text-info">@Model.NewIncidents</div><p>New</p></div><div class="ops-card"><div class="metric text-warning">@Model.InProgressIncidents</div><p>In progress</p></div><div class="ops-card"><div class="metric text-danger">@Model.EscalatedIncidents</div><p>Escalated</p></div><div class="ops-card"><div class="metric text-success">@Model.ActiveAlerts</div><p>Active alerts</p></div>
   </div>

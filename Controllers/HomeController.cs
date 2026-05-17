@@ -18,6 +18,7 @@ namespace CivicOps.Controllers
         private readonly IIncidentIntakeService _intakeService;
         private readonly IWhatsAppService _whatsAppService;
         private readonly IConfiguration _configuration;
+        private readonly IDemoAuthService _demoAuthService;
 
         public HomeController(
             IDataService dataService,
@@ -26,7 +27,8 @@ namespace CivicOps.Controllers
             IWeatherService weatherService,
             IIncidentIntakeService intakeService,
             IWhatsAppService whatsAppService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IDemoAuthService demoAuthService)
         {
             _dataService = dataService;
             _geminiService = geminiService;
@@ -35,6 +37,7 @@ namespace CivicOps.Controllers
             _intakeService = intakeService;
             _whatsAppService = whatsAppService;
             _configuration = configuration;
+            _demoAuthService = demoAuthService;
         }
 
         public IActionResult Index()
@@ -91,9 +94,30 @@ namespace CivicOps.Controllers
             var incident = await _dataService.GetIncidentByReferenceAsync(reference);
             if (incident == null)
             {
-                return NotFound();
+                ViewBag.Reference = reference;
+                return View("Status", null);
             }
 
+            return View(incident);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Status(string? reference)
+        {
+            if (string.IsNullOrWhiteSpace(reference))
+            {
+                ViewBag.Reference = reference;
+                return View(null);
+            }
+
+            var incident = await _dataService.GetIncidentByReferenceAsync(reference.Trim());
+            if (incident == null)
+            {
+                ViewBag.Reference = reference.Trim();
+                return View(null);
+            }
+
+            ViewBag.CanSeeAudit = await CurrentStaffCanSeeAsync(incident);
             return View(incident);
         }
 
@@ -134,6 +158,20 @@ namespace CivicOps.Controllers
         {
             var incidents = await _dataService.GetAllIncidentsAsync();
             var alerts = await _dataService.GetAllAlertsAsync();
+            var session = await GetCurrentStaffSessionAsync();
+            if (session?.Role == UserRole.DepartmentResponder && session.AssignedDepartment.HasValue)
+            {
+                incidents = incidents.Where(i => i.AssignedDepartment == session.AssignedDepartment.Value).ToList();
+                ViewBag.QueueScope = $"Signed in as {session.AssignedDepartment.Value.GetDisplayName()} Department — Showing {session.AssignedDepartment.Value.GetDisplayName()} queue only";
+            }
+            else if (session?.Role == UserRole.Admin)
+            {
+                ViewBag.QueueScope = "Signed in as Admin — showing all incidents";
+            }
+            else if (session?.Role == UserRole.Dispatcher)
+            {
+                ViewBag.QueueScope = "Signed in as Dispatcher — showing all routing queues";
+            }
 
             var model = new DashboardViewModel
             {
@@ -165,7 +203,14 @@ namespace CivicOps.Controllers
                 return NotFound();
             }
 
+            var session = await GetCurrentStaffSessionAsync();
+            if (session?.Role == UserRole.DepartmentResponder && session.AssignedDepartment.HasValue && session.AssignedDepartment.Value != department)
+            {
+                return RedirectToAction("AccessDenied", "Auth");
+            }
+
             var incidents = await _dataService.GetIncidentsByDepartmentAsync(department);
+            ViewBag.QueueScope = session?.Role == UserRole.DepartmentResponder ? $"Signed in as {department.GetDisplayName()} Department — Showing {department.GetDisplayName()} queue only" : null;
             ViewBag.DepartmentName = department.GetDisplayName();
             ViewBag.Department = department;
             return View(incidents);
@@ -179,7 +224,26 @@ namespace CivicOps.Controllers
                 return NotFound();
             }
 
+            if (!await CurrentStaffCanSeeAsync(incident))
+            {
+                return RedirectToAction("AccessDenied", "Auth");
+            }
+
             return View(incident);
+        }
+
+        private async Task<DemoAuthSession?> GetCurrentStaffSessionAsync()
+        {
+            var sessionId = HttpContext.Session.GetString("SessionId");
+            return string.IsNullOrWhiteSpace(sessionId) ? null : await _demoAuthService.GetSessionAsync(sessionId);
+        }
+
+        private async Task<bool> CurrentStaffCanSeeAsync(Incident incident)
+        {
+            var session = await GetCurrentStaffSessionAsync();
+            if (session == null) return false;
+            if (session.Role == UserRole.Admin || session.Role == UserRole.Dispatcher) return true;
+            return session.Role == UserRole.DepartmentResponder && session.AssignedDepartment == incident.AssignedDepartment;
         }
 
         [HttpPost]
@@ -224,7 +288,7 @@ namespace CivicOps.Controllers
             {
                 new ConnectorInfo
                 {
-                    Name = "Gemini AI",
+                    Name = "Gemini AI Agent",
                     Status = _geminiService.Status,
                     Mode = _geminiService.IsEnabled ? "Live Connector Ready" : "Fallback Active",
                     Description = "AI-powered incident classification and routing",
@@ -233,57 +297,66 @@ namespace CivicOps.Controllers
                 },
                 new ConnectorInfo
                 {
-                    Name = "WhatsApp Cloud API",
+                    Name = "Citizen App / PWA / App Channel",
+                    Status = "Installable PWA Ready",
+                    Mode = "Backend Gemini/fallback enrichment",
+                    Description = "Main public channel for reports, tracking, alerts and profile without WhatsApp dependency",
+                    EnvVars = "None on device; Gemini runs on backend only",
+                    Documentation = "docs/mobile-pwa.md"
+                },
+                new ConnectorInfo
+                {
+                    Name = "Department/ERP Connector Readiness",
+                    Status = "Future Connector",
+                    Mode = "Pilot-ready architecture",
+                    Description = "Department queues can be mapped to municipal ticketing/ERP systems after approvals",
+                    EnvVars = "ERP_API_URL, ERP_API_KEY",
+                    Documentation = "docs/integration-readiness.md"
+                },
+                new ConnectorInfo
+                {
+                    Name = "GIS/Geocoding Connector Readiness",
+                    Status = "Future Connector",
+                    Mode = "Synthetic ward estimates now",
+                    Description = "Real GIS/ward data required for production-grade geocoding",
+                    EnvVars = "GIS_API_KEY",
+                    Documentation = "docs/integration-readiness.md"
+                },
+                new ConnectorInfo
+                {
+                    Name = "Weather/Area Context Connector Readiness",
+                    Status = "Sandbox Context",
+                    Mode = "Area risk cards",
+                    Description = "Weather and area context support alert recommendations",
+                    EnvVars = "WEATHER_API_KEY",
+                    Documentation = "docs/integration-readiness.md"
+                },
+                new ConnectorInfo
+                {
+                    Name = "Email/SMS Connector Readiness",
+                    Status = "Future Connector",
+                    Mode = "Placeholder",
+                    Description = "Approved citizen messaging channels can be added without changing the intake story",
+                    EnvVars = "SMS_API_KEY, SMTP_HOST",
+                    Documentation = "docs/integration-readiness.md"
+                },
+                new ConnectorInfo
+                {
+                    Name = "WhatsApp Optional Connector Readiness",
                     Status = _whatsAppService.GetStatus().Status,
                     Mode = _whatsAppService.GetStatus().Mode,
-                    Description = "WhatsApp message intake (requires Meta app setup)",
+                    Description = "Optional connector-ready WhatsApp Cloud API integration for future pilots/live-test messaging.",
                     EnvVars = "WHATSAPP_ENABLED, WHATSAPP_DEMO_MODE, WHATSAPP_VERIFY_TOKEN, WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_GRAPH_VERSION, WHATSAPP_PUBLIC_BASE_URL",
                     Documentation = "/Home/BobEvidence and docs/whatsapp-setup.md"
                 },
                 new ConnectorInfo
                 {
-                    Name = "Voice Transcription",
+                    Name = "Voice-note Transcript Readiness",
                     Status = "Future Connector",
-                    Mode = "Placeholder",
-                    Description = "Audio-to-text transcription service",
+                    Mode = "Transcript sandbox",
+                    Description = "Voice-note transcripts can enter the same Gemini/fallback intake pipeline",
                     EnvVars = "VOICE_API_KEY, VOICE_SERVICE_URL",
-                    Documentation = "Future integration"
-                },
-                new ConnectorInfo
-                {
-                    Name = "SMS Notifications",
-                    Status = "Future Connector",
-                    Mode = "Placeholder",
-                    Description = "SMS notification service",
-                    EnvVars = "SMS_API_KEY, SMS_FROM_NUMBER",
-                    Documentation = "Future integration"
-                },
-                new ConnectorInfo
-                {
-                    Name = "Email Notifications",
-                    Status = "Future Connector",
-                    Mode = "Placeholder",
-                    Description = "Email notification service",
-                    EnvVars = "SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD",
-                    Documentation = "Future integration"
-                },
-                new ConnectorInfo
-                {
-                    Name = "GIS/Geocoding",
-                    Status = "Future Connector",
-                    Mode = "Placeholder",
-                    Description = "Location mapping and geocoding",
-                    EnvVars = "GIS_API_KEY",
-                    Documentation = "Future integration"
-                },
-                new ConnectorInfo
-                {
-                    Name = "Municipal ERP",
-                    Status = "Future Connector",
-                    Mode = "Placeholder",
-                    Description = "Integration with municipal ticketing systems",
-                    EnvVars = "ERP_API_URL, ERP_API_KEY",
-                    Documentation = "Future integration"
+                    Documentation = "docs/integration-readiness.md"
                 }
             };
 
@@ -304,6 +377,7 @@ namespace CivicOps.Controllers
         public IActionResult Mobile()
         {
             ViewBag.PwaReady = true;
+            ViewBag.ApkExists = System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "downloads", "CivicOpsCitizenCompanion-debug.apk"));
             return View();
         }
 
@@ -311,6 +385,7 @@ namespace CivicOps.Controllers
         public IActionResult App()
         {
             ViewBag.PwaReady = true;
+            ViewBag.ApkExists = System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "downloads", "CivicOpsCitizenCompanion-debug.apk"));
             ViewBag.AppShell = true;
             return View("Mobile");
         }

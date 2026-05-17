@@ -8,12 +8,12 @@
             <div class="col-lg-7 position-relative">
                 <span class="eyebrow">Pilot-ready civic AI platform</span>
                 <h1 class="display-4 mt-2">AI-powered civic reporting, routing and public alerts.</h1>
-                <p class="lead">CivicOps helps residents report local issues through the mobile/PWA app and web portal, then structures messy reports into trackable civic tickets with Gemini or a deterministic fallback.</p>
+                <p class="lead">CivicOps helps residents report local issues through the Citizen App / PWA and web portal, then structures messy reports into trackable civic tickets with Gemini or a deterministic fallback.</p>
                 <p class="text-muted-strong">Departments get queues, residents get reference numbers, area alerts and weather context improve civic resilience, and humans remain in control. CivicOps does not replace emergency services.</p>
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <a class="btn btn-primary btn-lg" href="/Home/DemoTour">Start Judge Tour</a>
                     <a class="btn btn-outline-info btn-lg" href="/Home/Report">Report Issue</a>
-                    <a class="btn btn-outline-light btn-lg" href="/app">Open Mobile App</a>
+                    <a class="btn btn-outline-light btn-lg" href="/app">Open Citizen App</a>
                     <a class="btn btn-outline-info btn-lg" href="/Home/Agent">Open AI Agent</a>
                     <a class="btn btn-outline-light btn-lg" href="/Home/Lookup">Track Reference</a>
                     <a class="btn btn-outline-warning btn-lg" href="/Home/Alerts">View Area Alerts</a>
@@ -25,7 +25,7 @@
                     <span class="badge bg-info mb-3">Event-triggered AI</span>
                     <h2 class="h4">Resident report → AI route → public status</h2>
                     <ol class="timeline-list">
-                        <li>Residents submit via mobile/PWA or web.</li>
+                        <li>Residents submit via Citizen App / PWA or web.</li>
                         <li>Gemini/fallback validates, classifies and routes only on user action.</li>
                         <li>Departments review queues and audit notes.</li>
                         <li>Citizens track status with a public reference.</li>
@@ -37,10 +37,10 @@
     </section>
 
     <div class="grid-auto mb-4">
-        <div class="ops-card"><i class="bi bi-phone fs-1 text-info"></i><h3 class="h5 mt-3">Mobile/PWA first</h3><p>Installable citizen app shell for reporting, tracking, alerts, weather context and followed areas.</p><a href="/Home/Mobile" class="btn btn-outline-info">Open mobile hub</a></div>
+        <div class="ops-card"><i class="bi bi-phone fs-1 text-info"></i><h3 class="h5 mt-3">Citizen App / PWA first</h3><p>Installable citizen app shell for reporting, tracking, alerts, weather context and followed areas.</p><a href="/Home/Mobile" class="btn btn-outline-info">Open Citizen App</a></div>
         <div class="ops-card"><i class="bi bi-cpu fs-1 text-info"></i><h3 class="h5 mt-3">Gemini agent layer</h3><p>Gemini is openly embedded for report classification, responses, briefs, alerts and judge summaries with cooldowns and fallback.</p><a href="/Home/Agent" class="btn btn-outline-info">Run agent actions</a></div>
         <div class="ops-card"><i class="bi bi-kanban fs-1 text-info"></i><h3 class="h5 mt-3">Control room</h3><p>Staff-facing dashboard shows open incidents, high priority queues, departments and recommendations.</p><a href="/Home/Dashboard" class="btn btn-outline-info">View dashboard</a></div>
-        <div class="ops-card"><i class="bi bi-whatsapp fs-1 text-success"></i><h3 class="h5 mt-3">Connector-ready WhatsApp</h3><p>WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp.</p><a href="/Demo/WhatsAppSimulator" class="btn btn-outline-info">Open sandbox</a></div>
+        <div class="ops-card opacity-75"><span class="badge bg-secondary">Optional Connector</span><i class="bi bi-whatsapp fs-2 text-success d-block mt-2"></i><h3 class="h6 mt-3">Optional WhatsApp connector</h3><p>Optional connector-ready WhatsApp Cloud API integration for future pilots/live-test messaging.</p><a href="/Demo/WhatsAppSimulator" class="btn btn-outline-info btn-sm">Open optional sandbox</a></div>
     </div>
 
     <div class="alert alert-info">CivicOps uses synthetic civic data for this sandbox scenario. It makes no official municipal partnership claim and is not an emergency services replacement; emergencies should be directed to the appropriate emergency number.</div>

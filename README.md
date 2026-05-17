@@ -1,24 +1,24 @@
 # CivicOps
 
-CivicOps is a polished, mobile-first civic AI platform for AI-powered civic reporting, routing and public alerts. It is designed as a pilot-ready architecture for municipalities, ward offices, civic response teams, NGOs, public utilities or disaster-management-adjacent teams.
+CivicOps is a polished, app-first civic AI platform for AI-powered civic reporting, routing and public alerts. It is designed as a pilot-ready architecture for municipalities, ward offices, civic response teams, NGOs, public utilities or disaster-management-adjacent teams.
 
 ## Core flow
 
-Landing page → report issue → Gemini/fallback AI agent → ticket/reference → dashboard/control room → status lookup → alerts/weather → mobile/PWA app → connector readiness.
+Landing page → report issue → Gemini/fallback AI agent → ticket/reference → dashboard/control room → status lookup → alerts/weather → Citizen App / PWA → connector readiness.
 
 ## Primary citizen channels
 
-1. Mobile/PWA citizen app (`/Home/Mobile` and `/app`)
+1. Citizen App / Installable PWA (`/Home/Mobile` and `/app`)
 2. Web reporting portal (`/Home/Report`)
 3. Public reference/status lookup (`/Home/Lookup`)
 4. Area alerts/weather notices (`/Home/Alerts`, `/Home/Weather`)
 5. Optional WhatsApp connector-ready integration (`/Demo/WhatsAppSimulator`)
 
-WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp. Residents can report, track, and receive alerts through the mobile/PWA app and web portal.
+WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp. Residents can report, track, and receive alerts through the Citizen App / PWA and web portal.
 
 ## Gemini AI agent layer
 
-Gemini is openly embedded but event/action-triggered and quota-safe. Gemini does **not** run on startup, public page load, dashboard load, connector page load, weather/alerts page load, mobile app opening, refreshes, background timers or smoke tests.
+Gemini is openly embedded but event/action-triggered and quota-safe. Gemini does **not** run on startup, public page load, dashboard load, connector page load, weather/alerts page load, Citizen App opening, refreshes, background timers or smoke tests.
 
 Gemini may run only when a resident report is submitted, a voice-note transcript is analyzed, an optional WhatsApp inbound report is processed, or staff/judges click an AI Agent action.
 
@@ -39,7 +39,7 @@ Do not commit `GEMINI_API_KEY`, WhatsApp tokens, phone numbers or credentials.
 
 ## Judge route
 
-Open `/Home/DemoTour` and follow the 3–5 minute route: home, report, mobile app, AI Agent, dashboard, lookup, alerts/weather, optional WhatsApp sandbox, connector readiness and Bob evidence.
+Open `/Home/DemoTour` and follow the 3–5 minute route: home, report, Citizen App, AI Agent, dashboard, lookup, alerts/weather, optional WhatsApp sandbox, connector readiness and Bob evidence.
 
 ## Local verification
 
@@ -68,3 +68,14 @@ IBM Bob was used to build and accelerate the main CivicOps hackathon implementat
 - `docs/evidence/`
 
 Final engineering polish may have been completed after Bob and is not falsely claimed as Bob work.
+
+## Final submission positioning
+
+- Citizen App / Installable PWA is the main public channel. Reports, tracking, My Reports, Area Alerts, Weather/Area Risk, Follow My Area and Profile work without WhatsApp.
+- Gemini is the civic AI agent layer for event-triggered enrichment only: report submission, voice-note transcript analysis, optional WhatsApp inbound processing, explicit AI Agent/staff/judge action, alert recommendation and department brief generation.
+- Gemini/fallback cleans messy descriptions, corrects common area spelling such as Chatworth→Chatsworth and Pheonix→Phoenix, normalizes eThekwini demo suburbs, estimates synthetic wards where available, and flags “Needs ward confirmation” when uncertain.
+- Department users see only incidents assigned to their department; admins and dispatchers can see all queues.
+- The platform uses synthetic eThekwini scenario data and does not claim live municipal data, official municipal partnership, emergency-service replacement or production WhatsApp approval.
+- WhatsApp is optional connector-ready only for future pilots/live-test messaging.
+- Local deterministic fallback keeps classification, routing, citizen response, department brief and alert recommendations working if Gemini is disabled, quota-limited or missing a key.
+- Production would require real identity, municipal integrations, privacy/security hardening, approved communication channels and authoritative GIS/ward data.

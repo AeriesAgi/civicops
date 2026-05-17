@@ -1,93 +1,46 @@
 @{
-    ViewData["Title"] = "Login - CivicOps Demo";
+    ViewData["Title"] = "Staff Login - CivicOps";
     var returnUrl = ViewBag.ReturnUrl as string;
+    var credentials = new[]
+    {
+        new { Group="Control room", Items = new[] { ("Admin", "admin@civicops.demo"), ("Dispatcher", "dispatcher@civicops.demo") } },
+        new { Group="Department queues", Items = new[] { ("Water", "water@civicops.demo"), ("Electricity", "electricity@civicops.demo"), ("Roads", "roads@civicops.demo"), ("Waste", "waste@civicops.demo"), ("Parks", "parks@civicops.demo"), ("Health", "health@civicops.demo"), ("Disaster", "disaster@civicops.demo"), ("Fire", "fire@civicops.demo"), ("Safety", "safety@civicops.demo") } },
+        new { Group="Resident", Items = new[] { ("Resident", "resident@civicops.demo") } }
+    };
 }
-
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <h2 class="fw-bold text-primary">CivicOps</h2>
-                        <p class="text-muted">Demo Authentication</p>
-                    </div>
-
-                    <div class="alert alert-info" role="alert">
-                        <strong>Demo Mode:</strong> This is demonstration authentication only. Production deployment requires proper identity management.
-                    </div>
-
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <div class="alert alert-danger" role="alert">
-                            @Html.ValidationSummary(false, "", new { @class = "mb-0" })
-                        </div>
-                    }
-
-                    <form method="post" asp-action="Login" asp-controller="Auth">
-                        <input type="hidden" name="returnUrl" value="@returnUrl" />
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required 
-                                   placeholder="user@civicops.demo" autocomplete="email">
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required 
-                                   placeholder="Enter password" autocomplete="current-password">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 mb-3">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
-                        </button>
-                    </form>
-
-                    <hr class="my-4">
-
-                    <div class="demo-credentials">
-                        <h6 class="text-muted mb-3">Demo Credentials:</h6>
-                        <div class="small">
-                            <div class="mb-2">
-                                <strong>Admin:</strong><br>
-                                <code>admin@civicops.demo</code> / <code>CivicOps2026!</code>
-                            </div>
-                            <div class="mb-2">
-                                <strong>Dispatcher:</strong><br>
-                                <code>dispatcher@civicops.demo</code> / <code>CivicOps2026!</code>
-                            </div>
-                            <div class="mb-2">
-                                <strong>Department Users:</strong><br>
-                                <code>water@civicops.demo</code><br>
-                                <code>electricity@civicops.demo</code><br>
-                                <code>roads@civicops.demo</code><br>
-                                Password: <code>CivicOps2026!</code>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center mt-3">
-                <a asp-controller="Home" asp-action="Index" class="text-muted">
-                    <i class="bi bi-arrow-left me-1"></i>Back to Home
-                </a>
-            </div>
+<div class="container py-5 civic-page">
+  <section class="hero-panel mb-4"><span class="eyebrow">Secure demo access</span><h1 class="display-5">CivicOps staff login</h1><p class="lead">Use the quick-fill buttons to review admin, dispatcher and department-only queues.</p></section>
+  <div class="row g-4">
+    <div class="col-lg-5"><div class="ops-card">
+      @if (!ViewData.ModelState.IsValid) { <div class="alert alert-danger">@Html.ValidationSummary(false, "", new { @class = "mb-0" })</div> }
+      <form method="post" asp-action="Login" asp-controller="Auth">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <div class="mb-3"><label for="email" class="form-label">Email</label><input type="email" class="form-control" id="email" name="email" required placeholder="user@civicops.demo" autocomplete="email"></div>
+        <div class="mb-4"><label for="password" class="form-label">Password</label><input type="password" class="form-control" id="password" name="password" required placeholder="CivicOps2026!" autocomplete="current-password"></div>
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-box-arrow-in-right me-2"></i>Sign in</button>
+      </form>
+      <p class="small text-muted-strong mt-3 mb-0">Demo authentication only. Production requires real identity, authorization and audit controls.</p>
+    </div></div>
+    <div class="col-lg-7"><div class="ops-card"><h2 class="h4">Quick-fill demo credentials</h2><p>All demo accounts use password <code>CivicOps2026!</code>.</p>
+      @foreach (var group in credentials)
+      {
+        <h3 class="h6 text-info mt-3">@group.Group</h3>
+        <div class="d-flex gap-2 flex-wrap mb-2">
+          @foreach (var item in group.Items)
+          {
+            <button type="button" class="btn btn-outline-info btn-sm quick-fill" data-email="@item.Item2">@item.Item1</button>
+          }
         </div>
-    </div>
+      }
+      <div class="alert alert-info mt-3 mb-0">Department users see only incidents assigned to their department, for example “Signed in as Electricity Department” and “Showing Electricity queue only”.</div>
+    </div></div>
+  </div>
 </div>
-
-<style>
-    .demo-credentials {
-        background-color: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.5rem;
-    }
-    .demo-credentials code {
-        background-color: #e9ecef;
-        padding: 0.2rem 0.4rem;
-        border-radius: 0.25rem;
-        font-size: 0.875rem;
-    }
-</style>
+@section Scripts {
+<script>
+document.querySelectorAll('.quick-fill').forEach(button => button.addEventListener('click', () => {
+  document.getElementById('email').value = button.dataset.email;
+  document.getElementById('password').value = 'CivicOps2026!';
+}));
+</script>
+}

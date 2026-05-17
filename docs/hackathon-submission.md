@@ -6,7 +6,7 @@ CivicOps is a public-facing civic AI platform for mobile/PWA and web reporting, 
 Residents submit messy reports through the mobile/PWA app or web portal. CivicOps validates and structures them, then Gemini or deterministic fallback classifies, prioritizes and routes them to department queues. Residents receive reference numbers and status tracking. Area alerts and weather/context improve civic resilience.
 
 ## Gemini
-Gemini is the AI agent layer. It is event/action-triggered only: report submission, voice-note transcript analysis, WhatsApp inbound processing, or explicit staff/judge agent buttons. It does not run on startup, page load, dashboards, connector pages, mobile app opening, background timers or smoke tests.
+Gemini is the AI agent layer. It is event/action-triggered only: report submission, voice-note transcript analysis, WhatsApp inbound processing, or explicit staff/judge agent buttons. It does not run on startup, page load, dashboards, connector pages, Citizen App opening, background timers or smoke tests.
 
 Model plan: premium judge summary starts with `gemini-2.5-flash`; routine classification uses `gemini-3.1-flash-lite`; fallback chain is `gemini-3.1-flash-lite`, `gemini-2.5-flash-lite`, `gemini-2.0-flash-lite`, `gemini-2.0-flash`; deterministic fallback remains active.
 
@@ -15,3 +15,14 @@ WhatsApp Cloud API is connector-ready for sandbox/live-test and future productio
 
 ## Safety and honesty
 CivicOps uses synthetic scenario data, makes no official municipal partnership claim, is human-in-the-loop, and is not an emergency services replacement.
+
+## Final submission positioning
+
+- Citizen App / Installable PWA is the main public channel. Reports, tracking, My Reports, Area Alerts, Weather/Area Risk, Follow My Area and Profile work without WhatsApp.
+- Gemini is the civic AI agent layer for event-triggered enrichment only: report submission, voice-note transcript analysis, optional WhatsApp inbound processing, explicit AI Agent/staff/judge action, alert recommendation and department brief generation.
+- Gemini/fallback cleans messy descriptions, corrects common area spelling such as Chatworth→Chatsworth and Pheonix→Phoenix, normalizes eThekwini demo suburbs, estimates synthetic wards where available, and flags “Needs ward confirmation” when uncertain.
+- Department users see only incidents assigned to their department; admins and dispatchers can see all queues.
+- The platform uses synthetic eThekwini scenario data and does not claim live municipal data, official municipal partnership, emergency-service replacement or production WhatsApp approval.
+- WhatsApp is optional connector-ready only for future pilots/live-test messaging.
+- Local deterministic fallback keeps classification, routing, citizen response, department brief and alert recommendations working if Gemini is disabled, quota-limited or missing a key.
+- Production would require real identity, municipal integrations, privacy/security hardening, approved communication channels and authoritative GIS/ward data.
