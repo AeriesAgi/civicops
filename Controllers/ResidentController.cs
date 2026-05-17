@@ -101,6 +101,7 @@ namespace CivicOps.Controllers
             HttpContext.Session.Remove("ResidentUserId");
             HttpContext.Session.Remove("ResidentUserEmail");
             HttpContext.Session.Remove("ResidentUserName");
+            HttpContext.Session.Remove("AppDemoAccess");
             return RedirectToAction("Index", "Home");
         }
 

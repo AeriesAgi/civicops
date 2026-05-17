@@ -43,6 +43,14 @@ namespace CivicOps.Controllers
             HttpContext.Session.SetString("SessionId", session.SessionId);
             HttpContext.Session.SetString("UserEmail", session.Email);
             HttpContext.Session.SetString("UserRole", session.Role.ToString());
+            if (session.AssignedDepartment.HasValue)
+            {
+                HttpContext.Session.SetString("AssignedDepartment", session.AssignedDepartment.Value.ToString());
+            }
+            else
+            {
+                HttpContext.Session.Remove("AssignedDepartment");
+            }
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {

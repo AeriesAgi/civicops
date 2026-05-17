@@ -3,12 +3,47 @@
     ViewData["Title"] = appShell ? "CivicOps Citizen App" : "Citizen App Download / Install Hub";
     var pwaReady = ViewBag.PwaReady == true;
     var apkExists = ViewBag.ApkExists == true;
+    var appAuthenticated = ViewBag.AppAuthenticated == true;
+    var appSignupMode = ViewBag.AppSignupMode == true;
+    var appResidentName = ViewBag.AppResidentName as string ?? "Demo Resident";
+    var appMessage = ViewBag.AppMessage as string;
+    var appStartSection = ViewBag.AppStartSection as string;
 }
-@if (appShell)
+@if (appShell && !appAuthenticated)
 {
-<div class="citizen-app-shell" data-app-shell="true">
+<div class="citizen-app-shell app-login-shell" data-app-shell="true">
+    <main class="app-login-screen">
+        <div class="app-login-brand"><span class="brand-mark"><i class="bi bi-command"></i></span><span class="eyebrow">CivicOps Citizen</span></div>
+        <section class="app-login-card">
+            <span class="badge bg-info">Demo-safe app access</span>
+            <h1>@(appSignupMode ? "Create a demo citizen profile" : "Open the Citizen App")</h1>
+            <p>CivicOps Citizen is app-first: report issues, track tickets, follow areas, confirm impact and use Copilot without entering the public website shell.</p>
+            @if (!string.IsNullOrWhiteSpace(appMessage)) { <div class="alert alert-success">@appMessage</div> }
+            @if (appSignupMode)
+            {
+                <form method="post" action="/app/create-demo-profile" class="app-form mt-3">
+                    <input class="form-control mb-2" name="displayName" placeholder="Display name" value="Demo Resident" />
+                    <input class="form-control mb-3" name="area" placeholder="Area to follow" value="Chatsworth" />
+                    <button class="btn btn-primary w-100" type="submit">Create demo profile</button>
+                </form>
+            }
+            else
+            {
+                <form method="post" action="/app/demo-resident" class="d-grid gap-2 mt-3"><button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-phone me-2"></i>Continue as demo resident</button></form>
+                <a class="btn btn-outline-info w-100 mt-2" href="/app/signup">Create demo profile</a>
+                <a class="btn btn-outline-light w-100 mt-2" href="/Home/Lookup">Track existing reference</a>
+            }
+            <div class="app-login-demo-grid mt-4"><a href="/Auth/Login"><strong>Staff demo login</strong><small>Admin / department roles</small></a><a href="/citizen-app"><strong>Install hub</strong><small>APK + PWA options</small></a></div>
+            <p class="small text-muted-strong mt-3 mb-0">Hackathon demo access only. CivicOps does not replace emergency services.</p>
+        </section>
+    </main>
+</div>
+}
+else if (appShell)
+{
+<div class="citizen-app-shell" data-app-shell="true" data-start-section="@appStartSection">
     <header class="app-topbar">
-        <div><span class="eyebrow">CivicOps Citizen</span><h1>Good morning, Resident</h1></div>
+        <div><span class="eyebrow">CivicOps Citizen</span><h1>Good morning, @appResidentName</h1></div>
         <a class="app-icon-btn" href="/citizen-app" aria-label="Install App"><i class="bi bi-download"></i></a>
     </header>
     <main class="app-scroll">
@@ -19,12 +54,12 @@
         <section class="app-grid-metrics" id="appMetrics">
             <div><strong>--</strong><span>Active near you</span></div><div><strong>--</strong><span>Open tickets</span></div><div><strong>--</strong><span>Alerts</span></div><div><strong>--</strong><span>Affected confirmations</span></div>
         </section>
-        <section class="app-panel" id="home"><div class="d-flex justify-content-between align-items-center"><h2>Citizen Home</h2><button class="btn btn-sm btn-outline-info" id="demoLogin">Demo login</button></div><p class="small mb-2">Followed areas: <span id="followedAreas">Chatsworth · Phoenix · Umlazi</span></p><div id="nearbyTickets" class="app-list"></div></section>
+        <section class="app-panel" id="home"><div class="d-flex justify-content-between align-items-center"><h2>Citizen Home</h2><form method="post" action="/app/logout"><button class="btn btn-sm btn-outline-info" type="submit">Switch demo role</button></form></div><p class="small mb-2">Followed areas: <span id="followedAreas">Chatsworth · Phoenix · Umlazi</span></p><div id="nearbyTickets" class="app-list"></div></section>
         <section class="app-panel" id="report"><h2>Report Issue</h2><form id="citizenReportForm" class="app-form"><textarea name="description" class="form-control" rows="4" placeholder="Example: Pheonix streetlight out near the school and cars are swerving." required></textarea><div class="row g-2 mt-2"><div class="col-6"><input name="suburb" class="form-control" value="Pheonix" placeholder="Suburb / area"></div><div class="col-6"><input name="ward" class="form-control" value="Ward 52" placeholder="Ward"></div></div><input name="locationNotes" class="form-control mt-2" placeholder="Nearest landmark / street"><button class="btn btn-primary w-100 mt-3" type="submit"><i class="bi bi-send me-1"></i>Submit civic report</button></form><div id="reportResult" class="app-result"></div></section>
         <section class="app-panel" id="tickets"><h2>My Tickets / Track Reference</h2><div class="input-group mb-3"><input id="trackRef" class="form-control" placeholder="CIV-2026-0001"><button class="btn btn-outline-info" id="trackBtn">Track</button></div><div id="ticketList" class="app-list"></div></section>
         <section class="app-panel" id="alerts"><h2>Area Alerts</h2><div class="d-flex gap-2 mb-3"><input id="followArea" class="form-control" value="Chatsworth"><button class="btn btn-outline-info" id="followBtn">Follow area</button></div><div id="alertList" class="app-list"></div></section>
         <section class="app-panel" id="community"><h2>Community Thread</h2><p class="small">Confirm impact without creating noise. Counts are visible to citizens and staff.</p><div id="communityList" class="app-list"></div></section>
-        <section class="app-panel" id="copilot"><h2>CivicOps Copilot</h2><p class="small">Explicit-action assistant tied to ticket/status context. Gemini stays server-side with deterministic fallback.</p><input id="copilotRef" class="form-control mb-2" placeholder="Optional reference number"><textarea id="copilotQuestion" class="form-control" rows="3" placeholder="Ask what happens next or how to track a report."></textarea><button class="btn btn-primary w-100 mt-3" id="askCopilot">Ask Copilot</button><div id="copilotAnswer" class="app-result"></div></section>
+        <section class="app-panel" id="copilot"><h2>CivicOps Copilot Report Intake</h2><p class="small">CivicOps Copilot helps you turn a messy civic issue into a structured municipal report. Gemini is only used server-side when explicitly submitted/configured; this guided flow has a deterministic fallback.</p><div id="copilotChat" class="copilot-chat"><div class="copilot-bubble bot">What happened? Describe the civic issue in your own words.</div></div><textarea id="copilotStepInput" class="form-control mt-2" rows="3" placeholder="Type your answer..."></textarea><div class="d-grid gap-2 mt-2"><button class="btn btn-primary" id="copilotNext" type="button">Next step</button><button class="btn btn-outline-info d-none" id="copilotSubmitReport" type="button">Submit structured report</button></div><div id="copilotPreview" class="app-result"></div><hr/><h3 class="h6">Ask about an existing ticket</h3><input id="copilotRef" class="form-control mb-2" placeholder="Optional reference number"><textarea id="copilotQuestion" class="form-control" rows="2" placeholder="Ask what happens next or how to track a report."></textarea><button class="btn btn-outline-info w-100 mt-2" id="askCopilot" type="button">Ask ticket Copilot</button><div id="copilotAnswer" class="app-result"></div></section>
         <section class="app-panel" id="profile"><h2>Profile / Settings</h2><div class="app-profile"><strong>Resident demo profile</strong><p>Selected municipality: eThekwini · Notifications: area alerts + ticket updates · Channels: app/PWA/APK.</p><a class="btn btn-outline-info btn-sm" href="/Resident/Login">Resident sign in</a></div><div class="alert alert-warning mt-3 small">CivicOps does not replace police, fire, EMS, or emergency services. Immediate danger must be reported directly to emergency services.</div></section>
     </main>
     <nav class="app-bottom-nav"><a href="#home"><i class="bi bi-house"></i><span>Home</span></a><a href="#report"><i class="bi bi-plus-circle"></i><span>Report</span></a><a href="#tickets"><i class="bi bi-ticket"></i><span>Tickets</span></a><a href="#alerts"><i class="bi bi-bell"></i><span>Alerts</span></a><a href="#copilot"><i class="bi bi-stars"></i><span>Copilot</span></a><a href="#profile"><i class="bi bi-person"></i><span>Profile</span></a></nav>
@@ -39,7 +74,58 @@
   document.querySelector('#trackBtn').addEventListener('click', async () => { const ref = document.querySelector('#trackRef').value.trim(); if (!ref) return; const r = await fetch('/api/reports/' + encodeURIComponent(ref)); const data = await r.json(); document.querySelector('#ticketList').innerHTML = data.success ? ticketCard({ referenceNumber:data.referenceNumber, area:data.normalizedArea, department:data.department, latestUpdate:data.latestUpdate?.content, status:data.status, priority:data.priority, affectedCount:0 }) : '<div class="alert alert-warning">Reference not found.</div>'; });
   document.querySelector('#followBtn').addEventListener('click', async () => { state.area = document.querySelector('#followArea').value || 'Chatsworth'; document.querySelector('#followedAreas').textContent = `${state.area} · Chatsworth · Phoenix · Umlazi`; await loadHome(); });
   document.querySelector('#askCopilot').addEventListener('click', async () => { const r = await fetch('/api/mobile/copilot/citizen', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ referenceNumber: document.querySelector('#copilotRef').value, question: document.querySelector('#copilotQuestion').value, area: state.area }) }); const data = await r.json(); document.querySelector('#copilotAnswer').innerHTML = `<div class="alert alert-info mt-3">${data.answer}<br><small>${data.gemini}</small></div>`; });
-  document.querySelector('#demoLogin').addEventListener('click', () => document.querySelector('#profile').scrollIntoView({behavior:'smooth'}));
+  const intake = { step: 0, description: '', area: '', contact: '', danger: '' };
+  const prompts = ['Where is this happening? Include suburb, ward, street or landmark.', 'What name or contact/display name should staff see?', 'Is anyone in immediate danger? Type yes or no.'];
+  const normalizeArea = value => {
+    const text = (value || '').trim();
+    const key = text.toLowerCase();
+    if (key.includes('chatworth')) return 'Chatsworth';
+    if (key.includes('pheonix') || key.includes('phoenix')) return 'Phoenix';
+    if (key.includes('durbn') || key.includes('dbn town') || key.includes('durban cbd')) return 'Durban CBD';
+    if (key.includes('umlaz')) return 'Umlazi';
+    if (key.includes('kwa mashu') || key.includes('kwamashu')) return 'KwaMashu';
+    if (key.includes('pinetowm') || key.includes('pinetown')) return 'Pinetown';
+    if (key.includes('amanzi mtoti') || key.includes('amanzimtoti')) return 'Amanzimtoti';
+    if (key.includes('ethekweni') || key.includes('ethekwini')) return 'eThekwini';
+    return text || 'Area to confirm';
+  };
+  const classify = text => {
+    const value = (text || '').toLowerCase();
+    if (value.includes('water') || value.includes('pipe') || value.includes('leak')) return ['Water disruption', 'Water & Sanitation', 'High'];
+    if (value.includes('electric') || value.includes('streetlight') || value.includes('cable') || value.includes('power')) return ['Electricity fault', 'Electricity & Power', value.includes('danger') || value.includes('sparking') ? 'Critical' : 'High'];
+    if (value.includes('road') || value.includes('pothole') || value.includes('drain')) return ['Roads / stormwater', 'Roads & Infrastructure', 'Medium'];
+    if (value.includes('waste') || value.includes('refuse')) return ['Waste disruption', 'Waste Management', 'Medium'];
+    return ['Civic service issue', 'Community Liaison', 'Medium'];
+  };
+  const addBubble = (who, text) => document.querySelector('#copilotChat').insertAdjacentHTML('beforeend', `<div class="copilot-bubble ${who}">${text}</div>`);
+  document.querySelector('#copilotNext').addEventListener('click', () => {
+    const input = document.querySelector('#copilotStepInput');
+    const answer = input.value.trim(); if (!answer) return;
+    addBubble('user', answer);
+    if (intake.step === 0) intake.description = answer;
+    if (intake.step === 1) intake.area = answer;
+    if (intake.step === 2) intake.contact = answer;
+    if (intake.step === 3) intake.danger = answer;
+    input.value = '';
+    if (intake.step < prompts.length) { addBubble('bot', prompts[intake.step]); intake.step += 1; return; }
+    const normalized = normalizeArea(intake.area);
+    const [category, department, priority] = classify(`${intake.description} ${intake.danger}`);
+    intake.normalizedArea = normalized; intake.category = category; intake.department = department; intake.priority = priority;
+    const emergency = /yes|danger|fire|sparking|injur/i.test(intake.danger);
+    document.querySelector('#copilotPreview').innerHTML = `<div class="alert alert-info mt-3"><strong>Structured report preview</strong><br>Issue: ${category}<br>Area: ${normalized}<br>Department: ${department}<br>Priority: ${priority}<br>Contact: ${intake.contact}<br>${emergency ? '<strong>Emergency reminder:</strong> contact emergency services directly if anyone is in immediate danger.<br>' : ''}<span class="badge bg-secondary">Deterministic fallback ready</span></div>`;
+    addBubble('bot', 'Preview ready. Submit this report?');
+    document.querySelector('#copilotSubmitReport').classList.remove('d-none');
+  });
+  document.querySelector('#copilotSubmitReport').addEventListener('click', async () => {
+    const payload = { description: intake.description, suburb: intake.normalizedArea, contactName: intake.contact, locationNotes: `Copilot guided intake. Immediate danger answer: ${intake.danger}`, category: intake.category };
+    const r = await fetch('/api/mobile/citizen/report', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const data = await r.json();
+    addBubble('bot', `Submitted. Your reference is <strong>${data.referenceNumber}</strong>.`);
+    document.querySelector('#copilotPreview').innerHTML += `<div class="alert alert-success mt-2"><strong>${data.referenceNumber}</strong> created. <a href="/app/incident/${data.referenceNumber}">Track status</a></div>`;
+    await loadHome();
+  });
+  const startSection = document.querySelector('.citizen-app-shell').dataset.startSection;
+  if (startSection) setTimeout(() => document.querySelector('#' + startSection)?.scrollIntoView({behavior:'smooth'}), 300);
   loadHome();
 })();
 </script>

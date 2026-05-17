@@ -19,6 +19,7 @@ namespace CivicOps.Controllers
         private readonly IWhatsAppService _whatsAppService;
         private readonly IConfiguration _configuration;
         private readonly IDemoAuthService _demoAuthService;
+        private readonly IResidentAuthService _residentAuthService;
 
         public HomeController(
             IDataService dataService,
@@ -28,7 +29,8 @@ namespace CivicOps.Controllers
             IIncidentIntakeService intakeService,
             IWhatsAppService whatsAppService,
             IConfiguration configuration,
-            IDemoAuthService demoAuthService)
+            IDemoAuthService demoAuthService,
+            IResidentAuthService residentAuthService)
         {
             _dataService = dataService;
             _geminiService = geminiService;
@@ -38,6 +40,7 @@ namespace CivicOps.Controllers
             _whatsAppService = whatsAppService;
             _configuration = configuration;
             _demoAuthService = demoAuthService;
+            _residentAuthService = residentAuthService;
         }
 
         public IActionResult Index()
@@ -319,6 +322,7 @@ namespace CivicOps.Controllers
             }
 
             await _dataService.UpdateIncidentAsync(incident);
+            TempData["IncidentActionMessage"] = $"{FormatStatus(incident.Status)} action saved for {incident.ReferenceNumber}. Timeline, public updates and audit notes are current.";
             return RedirectToAction("Incident", new { id });
         }
 
@@ -461,10 +465,83 @@ namespace CivicOps.Controllers
         [HttpGet("/app")]
         public IActionResult App()
         {
+            PrepareAppShell();
+            return View("Mobile");
+        }
+
+        [HttpGet("/app/login")]
+        public IActionResult AppLogin()
+        {
+            PrepareAppShell(forceLogin: true);
+            return View("Mobile");
+        }
+
+        [HttpGet("/app/signup")]
+        public IActionResult AppSignup()
+        {
+            PrepareAppShell(forceLogin: true, signupMode: true);
+            return View("Mobile");
+        }
+
+        [HttpGet("/app/copilot")]
+        public IActionResult AppCopilot()
+        {
+            PrepareAppShell(startSection: "copilot");
+            return View("Mobile");
+        }
+
+        [HttpPost("/app/demo-resident")]
+        public async Task<IActionResult> AppDemoResident()
+        {
+            var user = await _residentAuthService.AuthenticateAsync("resident@civicops.demo", "CivicOps2026!");
+            if (user != null)
+            {
+                HttpContext.Session.SetString("ResidentUserId", user.Id);
+                HttpContext.Session.SetString("ResidentUserEmail", user.Email);
+                HttpContext.Session.SetString("ResidentUserName", user.FullName);
+            }
+            HttpContext.Session.SetString("AppDemoAccess", "true");
+            TempData["AppMessage"] = "Demo resident access enabled for the Citizen App.";
+            return Redirect("/app");
+        }
+
+        [HttpPost("/app/create-demo-profile")]
+        public async Task<IActionResult> AppCreateDemoProfile(string? displayName, string? area)
+        {
+            var safeName = string.IsNullOrWhiteSpace(displayName) ? "Demo Resident" : displayName.Trim();
+            var email = $"appdemo-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}-{Guid.NewGuid():N}@civicops.demo";
+            var user = await _residentAuthService.CreateUserAsync(email, "CivicOps2026!", safeName);
+            user.AreaSuburb = string.IsNullOrWhiteSpace(area) ? "Chatsworth" : area.Trim();
+            user.FollowedSuburbs.Add(user.AreaSuburb);
+            await _residentAuthService.UpdateUserAsync(user);
+            HttpContext.Session.SetString("ResidentUserId", user.Id);
+            HttpContext.Session.SetString("ResidentUserEmail", user.Email);
+            HttpContext.Session.SetString("ResidentUserName", user.FullName);
+            HttpContext.Session.SetString("AppDemoAccess", "true");
+            TempData["AppMessage"] = "Demo profile created. You can now use the Citizen App dashboard.";
+            return Redirect("/app");
+        }
+
+        [HttpPost("/app/logout")]
+        public IActionResult AppLogout()
+        {
+            HttpContext.Session.Remove("ResidentUserId");
+            HttpContext.Session.Remove("ResidentUserEmail");
+            HttpContext.Session.Remove("ResidentUserName");
+            HttpContext.Session.Remove("AppDemoAccess");
+            return Redirect("/app/login");
+        }
+
+        private void PrepareAppShell(bool forceLogin = false, bool signupMode = false, string? startSection = null)
+        {
             ViewBag.PwaReady = true;
             ViewBag.ApkExists = System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "downloads", "CivicOpsCitizenCompanion-debug.apk"));
             ViewBag.AppShell = true;
-            return View("Mobile");
+            ViewBag.AppAuthenticated = !forceLogin && (HttpContext.Session.GetString("ResidentUserId") != null || HttpContext.Session.GetString("AppDemoAccess") == "true");
+            ViewBag.AppSignupMode = signupMode;
+            ViewBag.AppStartSection = startSection;
+            ViewBag.AppResidentName = HttpContext.Session.GetString("ResidentUserName") ?? "Demo Resident";
+            ViewBag.AppMessage = TempData["AppMessage"] as string;
         }
 
         [HttpGet("/app/incident/{reference}")]

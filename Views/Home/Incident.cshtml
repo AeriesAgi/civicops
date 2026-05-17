@@ -18,6 +18,10 @@
 }
 <div class="container-fluid px-lg-4 py-4 civic-page incident-command-page">
     <section class="hero-panel mb-4 incident-hero">
+        @if (TempData["IncidentActionMessage"] != null)
+        {
+            <div class="alert alert-success mb-4"><i class="bi bi-check2-circle me-2"></i>@TempData["IncidentActionMessage"]</div>
+        }
         <div class="row g-4 align-items-end">
             <div class="col-lg-8">
                 <span class="eyebrow">Municipal incident command</span>
