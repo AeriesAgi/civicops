@@ -10,7 +10,7 @@ android {
         targetSdk 35
         versionCode 1
         versionName '1.0.0-hackathon'
-        buildConfigField 'String', 'CIVICOPS_BASE_URL', "\"${project.findProperty('civicopsBaseUrl') ?: 'https://civicops.example.com'}\""
+        buildConfigField 'String', 'CIVICOPS_BASE_URL', "\"${project.findProperty('civicopsBaseUrl') ?: 'https://civicops.culltron.app/app'}\""
     }
 
     buildFeatures { buildConfig true }

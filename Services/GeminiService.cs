@@ -53,13 +53,13 @@ namespace CivicOps.Services
         private void InitializeGemini()
         {
             var apiKey = _configuration["GEMINI_API_KEY"];
-            var enabled = _configuration.GetValue<bool>("GEMINI_ENABLED", false);
-            Model = _configuration.GetValue<string>("GEMINI_MODEL", "gemini-2.5-flash") ?? "gemini-2.5-flash";
-            RoutineModel = _configuration.GetValue<string>("GEMINI_ROUTINE_MODEL", "gemini-3.1-flash-lite") ?? "gemini-3.1-flash-lite";
-            Mode = _configuration.GetValue<string>("GEMINI_MODE", "Hybrid") ?? "Hybrid";
+            var enabled = _configuration.GetValue<bool?>("Gemini:Enabled") ?? _configuration.GetValue<bool>("GEMINI_ENABLED", false);
+            Model = _configuration.GetValue<string>("Gemini:PremiumModel") ?? _configuration.GetValue<string>("Gemini:Model") ?? _configuration.GetValue<string>("GEMINI_MODEL", "gemini-2.5-flash") ?? "gemini-2.5-flash";
+            RoutineModel = _configuration.GetValue<string>("Gemini:RoutineModel") ?? _configuration.GetValue<string>("GEMINI_ROUTINE_MODEL", "gemini-2.5-flash-lite") ?? "gemini-2.5-flash-lite";
+            Mode = _configuration.GetValue<string>("Gemini:Mode") ?? _configuration.GetValue<string>("GEMINI_MODE", "Hybrid") ?? "Hybrid";
             ManualTestCooldownSeconds = _configuration.GetValue<int>("GEMINI_MANUAL_TEST_COOLDOWN_SECONDS", 60);
             QuotaCooldownMinutes = _configuration.GetValue<int>("GEMINI_QUOTA_COOLDOWN_MINUTES", 30);
-            FallbackModels = (_configuration.GetValue<string>("GEMINI_FALLBACK_MODELS", "gemini-3.1-flash-lite,gemini-2.5-flash-lite,gemini-2.0-flash-lite,gemini-2.0-flash") ?? string.Empty)
+            FallbackModels = (_configuration.GetValue<string>("Gemini:FallbackModels") ?? _configuration.GetValue<string>("GEMINI_FALLBACK_MODELS", "gemini-2.5-flash-lite,gemini-2.0-flash-lite,gemini-2.0-flash") ?? string.Empty)
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Where(IsSupportedTextModel)
                 .Distinct(StringComparer.OrdinalIgnoreCase)

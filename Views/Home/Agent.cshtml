@@ -1,12 +1,12 @@
 @{
-    ViewData["Title"] = "AI Agent Command Centre";
+    ViewData["Title"] = "CivicOps AI Agent";
     var diagnostics = ViewBag.GeminiDiagnostics as CivicOps.Services.GeminiDiagnostics;
 }
 <div class="container py-4 civic-page">
     <section class="hero-panel mb-4">
-        <span class="eyebrow">Gemini + deterministic fallback</span>
-        <h1 class="display-5">AI Agent Command Centre</h1>
-        <p class="lead">Run action-triggered agent tasks. No Gemini call runs on page load; each button calls the backend once and shows the model/fallback source.</p>
+        <span class="eyebrow">Operational assistant</span>
+        <h1 class="display-5">CivicOps AI Agent</h1>
+        <p class="lead">Operational assistant for civic intake, triage, routing, municipal response, department briefs, citizen replies, area alerts and structured incident JSON. No Gemini call runs on page load; each button is an explicit backend action.</p>
         <div class="d-flex gap-2 flex-wrap">
             <span class="badge bg-info">Gemini enabled: @(diagnostics?.Enabled == true ? "yes" : "no")</span>
             <span class="badge bg-info">Key present: @(diagnostics?.KeyPresent == true ? "yes" : "no")</span>
@@ -19,14 +19,14 @@
             <div class="ops-card mb-3">
                 <h2 class="h5">Actions</h2>
                 <div class="d-grid gap-2" id="agentButtons">
-                    <button class="btn btn-primary agent-action" data-scenario="latest-report">Analyze latest resident report</button>
-                    <button class="btn btn-outline-info agent-action" data-scenario="whatsapp-report">Analyze optional WhatsApp sandbox report</button>
-                    <button class="btn btn-outline-info agent-action" data-scenario="voice-note">Analyze voice-note transcript</button>
+                    <button class="btn btn-primary agent-action" data-scenario="latest-report">Analyze selected report</button>
+                    <button class="btn btn-outline-info agent-action" data-scenario="whatsapp-report">Classify issue / route department</button>
+                    <button class="btn btn-outline-info agent-action" data-scenario="voice-note">Correct messy location</button>
                     <button class="btn btn-outline-warning agent-action" data-scenario="gemini-health">Run live Gemini health test</button>
                     <button class="btn btn-outline-info agent-action" data-scenario="citizen-response" data-endpoint="/api/agent/generate-response">Generate citizen response</button>
                     <button class="btn btn-outline-info agent-action" data-scenario="department-brief">Generate department brief</button>
                     <button class="btn btn-outline-info agent-action" data-scenario="area-alert" data-endpoint="/api/agent/recommend-alert">Recommend area alert</button>
-                    <button class="btn btn-outline-light agent-action" data-scenario="judge-summary">Generate judge summary</button>
+                    <button class="btn btn-outline-light agent-action" data-scenario="judge-summary">Produce structured incident JSON</button>
                 </div>
             </div>
             <div class="ops-card">

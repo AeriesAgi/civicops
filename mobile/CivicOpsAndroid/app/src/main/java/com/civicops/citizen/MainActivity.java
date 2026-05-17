@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
     private String resolveStartUrl() {
         String baseUrl = BuildConfig.CIVICOPS_BASE_URL;
         if (baseUrl.endsWith("/")) baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-        return baseUrl + "/app";
+        return baseUrl.endsWith("/app") ? baseUrl : baseUrl + "/app";
     }
 
     private boolean isOnline() {
