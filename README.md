@@ -8,7 +8,7 @@ Landing page → report issue → Gemini/fallback AI agent → ticket/reference 
 
 ## Primary citizen channels
 
-1. Citizen App / Installable PWA (`/Home/Mobile` and `/app`)
+1. Citizen App / Installable PWA (`/citizen-app` and `/app`)
 2. Web reporting portal (`/Home/Report`)
 3. Public reference/status lookup (`/Home/Lookup`)
 4. Area alerts/weather notices (`/Home/Alerts`, `/Home/Weather`)
@@ -93,3 +93,34 @@ Final engineering polish may have been completed after Bob and is not falsely cl
 - WhatsApp is optional connector-ready only for future pilots/live-test messaging; the Citizen App/PWA is the primary demo path.
 - Production requires real identity, municipal integrations, privacy/security hardening, approved communications channels, and authoritative GIS/ward data.
 - CivicOps was built with IBM Bob assistance and finalized into a working hackathon submission with verification, packaging and polish.
+
+## Citizen App, Android APK and PWA delivery
+
+Primary install routes:
+
+- `/citizen-app` — public Download / Install App hub.
+- `/app` — app shell experience for PWA and Android WebView wrapper.
+- `/downloads/CivicOpsCitizenCompanion-debug.apk` — exposed only after a real debug APK is copied into `wwwroot/downloads`.
+
+Build Android locally with a machine that has Android SDK + Gradle access:
+
+```bash
+cd mobile/CivicOpsAndroid
+./gradlew assembleDebug -PcivicopsBaseUrl=https://your-civicops-host.example
+./gradlew copyDebugApkToWeb -PcivicopsBaseUrl=https://your-civicops-host.example
+```
+
+Expected output:
+
+- Android build output: `mobile/CivicOpsAndroid/app/build/outputs/apk/debug/app-debug.apk`
+- Web download artifact: `wwwroot/downloads/CivicOpsCitizenCompanion-debug.apk`
+
+The project includes a GitHub Actions workflow at `.github/workflows/android-apk.yml` that installs Java/Android tooling, builds the debug APK and uploads it as an artifact. The Android shell is intentionally API-backed: it loads `/app`, keeps Gemini keys on the server, and relies on CivicOps backend routes rather than duplicating civic routing logic on-device.
+
+## Premium overhaul highlights
+
+- Public IA now prioritizes Home, Report Issue, Track Report, Area Alerts, Citizen App, AI Assistant, Sign In and subtle Staff Login.
+- The homepage uses a darker control-room visual identity with a citizen product face and a staff operations face.
+- The Citizen App hub explains PWA install, APK output, demo login, API-backed architecture, followed areas, Copilot and community threads.
+- Seed logic maintains 100+ synthetic eThekwini incident reports and expands alerts across water, electricity, roads, waste, disaster, safety and environmental scenarios.
+- Gemini model allocation is explicit: Gemini 3.1 Flash Lite for routine classification/extraction, Gemini 2.5 Flash for richer summaries/briefs/health actions, deterministic fallback for reliability.

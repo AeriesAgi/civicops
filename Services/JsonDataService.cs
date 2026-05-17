@@ -200,7 +200,7 @@ namespace CivicOps.Services
                     ("Pinetown", "Ward 23"), ("Amanzimtoti", "Ward 97"), ("KwaMashu", "Ward 55"), ("Westville", "Ward 24"),
                     ("Newlands", "Ward 31"), ("Inanda", "Ward 57"), ("Isipingo", "Ward 68"), ("Bluff", "Ward 66"),
                     ("Berea", "Ward 31"), ("Glenwood", "Ward 33"), ("Hillcrest", "Ward 8"), ("Reservoir Hills", "Ward 23"),
-                    ("Tongaat", "Ward 61"), ("Verulam", "Ward 58"), ("Cato Manor", "Ward 28"), ("Mobeni", "Ward 75"),
+                    ("Tongaat", "Ward 61"), ("Verulam", "Ward 58"), ("Clermont", "Ward 92"), ("Cato Manor", "Ward 28"), ("Mobeni", "Ward 75"),
                     ("Merebank", "Ward 70"), ("Montclair", "Ward 64"), ("Queensburgh", "Ward 65"), ("Malvern", "Ward 18"),
                     ("Umhlanga", "Ward 35"), ("La Lucia", "Ward 36")
                 };
@@ -271,6 +271,44 @@ namespace CivicOps.Services
                     _incidents.Add(incident);
                 }
                 _referenceCounter = next;
+            }
+
+
+            if (_alerts.Count < 18)
+            {
+                var alertScenarios = new[]
+                {
+                    (AlertType.WaterOutage, AlertSeverity.Warning, "Water pressure monitoring", "Low pressure reported across parts of the area; crews are validating valve status.", "Chatsworth", "Ward 73", Department.WaterAndSanitation),
+                    (AlertType.ElectricityDisruption, AlertSeverity.Urgent, "Unplanned feeder outage", "Electricity disruption affecting pockets of Phoenix; restoration estimate pending field confirmation.", "Phoenix", "Ward 52", Department.Electricity),
+                    (AlertType.RoadClosure, AlertSeverity.Warning, "Stormwater road caution", "Standing water and blocked drains reported near low-lying crossings. Drive with caution.", "Isipingo", "Ward 68", Department.RoadsAndStormwater),
+                    (AlertType.WasteCollectionDisruption, AlertSeverity.Info, "Refuse route delay", "Collection teams are running behind schedule; keep bins accessible until the route is cleared.", "Umlazi", "Ward 80", Department.WasteManagement),
+                    (AlertType.PublicSafetyNotice, AlertSeverity.Warning, "Commuter corridor safety notice", "Metro safety teams are monitoring repeated reports near evening commuter points.", "Durban CBD", "Ward 26", Department.MetroPolicePublicSafety),
+                    (AlertType.Flood, AlertSeverity.Urgent, "Heavy rain runoff watch", "Rainfall may affect roads, informal drainage channels and low bridges; avoid crossing flooded roads.", "Amanzimtoti", "Ward 97", Department.DisasterManagement),
+                    (AlertType.EnvironmentalHazard, AlertSeverity.Warning, "Illegal dumping hotspot", "Repeat dumping reports are being reviewed for cleanup and enforcement response.", "Clermont", "Ward 92", Department.WasteManagement),
+                    (AlertType.Fire, AlertSeverity.Critical, "Informal burning risk", "Open burning reports near dense housing require urgent safety review and public caution.", "KwaMashu", "Ward 55", Department.FireAndRescue),
+                    (AlertType.DisasterWarning, AlertSeverity.Warning, "Weather disruption advisory", "High winds and localized storms may affect trees, power lines and road visibility.", "Pinetown", "Ward 23", Department.DisasterManagement),
+                    (AlertType.RoadClosure, AlertSeverity.Info, "Planned resurfacing", "Night works scheduled on selected lanes; expect delays and follow temporary signage.", "Bluff", "Ward 66", Department.RoadsAndStormwater)
+                };
+
+                var existingKeys = _alerts.Select(a => $"{a.Title}|{a.Suburb}").ToHashSet(StringComparer.OrdinalIgnoreCase);
+                foreach (var scenario in alertScenarios)
+                {
+                    if (existingKeys.Contains($"{scenario.Item3}|{scenario.Item5}")) continue;
+                    _alerts.Add(new Alert
+                    {
+                        Type = scenario.Item1,
+                        Severity = scenario.Item2,
+                        Title = scenario.Item3,
+                        Description = scenario.Item4,
+                        Suburb = scenario.Item5,
+                        Ward = scenario.Item6,
+                        AffectedDepartment = scenario.Item7,
+                        CreatedAt = DateTime.UtcNow.AddHours(-2 - _alerts.Count),
+                        ExpiresAt = DateTime.UtcNow.AddDays(2)
+                    });
+                }
+
+                await SaveAlertsAsync();
             }
 
             await SaveIncidentsAsync();

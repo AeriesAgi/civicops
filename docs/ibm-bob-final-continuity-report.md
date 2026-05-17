@@ -189,7 +189,7 @@ The AI Agent Console (`/Home/Agent`) is a comprehensive visualization of the Civ
 - ✅ `/Home/Report` - Report issue
 - ✅ `/Home/Lookup` - Track report
 - ✅ `/Home/Alerts` - View alerts
-- ✅ `/Home/Mobile` - Download / Install Citizen App
+- ✅ `/citizen-app` - Download / Install Citizen App
 - ✅ `/Home/Weather` - Weather/area conditions
 
 ### Protected Routes (Login Required)

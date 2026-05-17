@@ -374,11 +374,19 @@ namespace CivicOps.Controllers
             return View(connectors);
         }
 
-        public IActionResult Mobile()
+        [HttpGet("/citizen-app")]
+        [HttpGet("/download-app")]
+        [HttpGet("/install-app")]
+        public IActionResult CitizenApp()
         {
             ViewBag.PwaReady = true;
             ViewBag.ApkExists = System.IO.File.Exists(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "downloads", "CivicOpsCitizenCompanion-debug.apk"));
-            return View();
+            return View("Mobile");
+        }
+
+        public IActionResult Mobile()
+        {
+            return RedirectToAction(nameof(CitizenApp));
         }
 
         [HttpGet("/app")]

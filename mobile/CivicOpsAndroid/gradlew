@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -e
+DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+if command -v gradle >/dev/null 2>&1; then
+  exec gradle -p "$DIR" "$@"
+fi
+echo "CivicOps Android wrapper fallback: install Gradle 8.14.4 or run the GitHub Actions APK workflow." >&2
+exit 1
