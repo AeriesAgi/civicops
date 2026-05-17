@@ -1,6 +1,6 @@
 # WhatsApp Connector Readiness
 
-WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp; residents can report, track and receive alerts through the mobile/PWA app and web portal immediately.
+WhatsApp Cloud API is connector-ready for sandbox/live-test and future production pilots. CivicOps does not depend on WhatsApp; residents can report, track and receive alerts through the Citizen App / PWA and web portal immediately.
 
 Production WhatsApp use requires:
 - WhatsApp Business setup
@@ -32,3 +32,17 @@ Do not commit WhatsApp tokens, phone numbers or credentials.
 ## Final connector wording
 
 Use this wording in judging: “Optional connector-ready WhatsApp Cloud API integration for future pilots/live-test messaging.” Do not describe WhatsApp as the main demo path, a production-approved channel, or a dependency for reporting.
+
+
+## Final CivicOps submission QA notes
+
+- Citizen App / Installable PWA (`/app`) is the main public channel for reporting, tracking references, My Reports, Area Alerts, Weather/Area Risk, followed suburbs/wards, Gemini Copilot actions and lightweight Community Threads.
+- Gemini is the civic AI agent layer and runs server-side only from explicit app/staff/judge actions: report submission, Copilot/AI Agent button click, voice-note transcript analysis, optional WhatsApp sandbox processing, generated citizen response, department brief or alert recommendation.
+- Gemini/fallback enrichment cleans messy report text, corrects common area spellings such as Chatworth to Chatsworth and Pheonix to Phoenix, assigns category/department/priority, creates citizen responses and department briefs, and records audit notes.
+- Ward values are synthetic estimates for the eThekwini scenario. If a ward cannot be inferred, CivicOps must show a ward estimate or Needs ward confirmation rather than pretending certainty.
+- Department responders see only their own queues; Admin and Dispatcher can see broader operational views.
+- Community Threads are lightweight local confirmation/update areas, not a full social network.
+- The data set is synthetic eThekwini scenario data for hackathon judging. CivicOps does not claim live municipal data, an official municipal partnership, emergency-service replacement, or production WhatsApp approval.
+- WhatsApp is optional connector-ready only for future pilots/live-test messaging; the Citizen App/PWA is the primary demo path.
+- Production requires real identity, municipal integrations, privacy/security hardening, approved communications channels, and authoritative GIS/ward data.
+- CivicOps was built with IBM Bob assistance and finalized into a working hackathon submission with verification, packaging and polish.

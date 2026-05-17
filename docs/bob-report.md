@@ -387,7 +387,7 @@ All code is maintainable, understandable, and follows ASP.NET Core MVC best prac
 - ✅ /Home/Report - Report issue
 - ✅ /Home/Lookup - Track report
 - ✅ /Home/Alerts - View alerts
-- ✅ /Home/Mobile - Mobile info
+- ✅ /Home/Mobile - Download / Install Citizen App
 
 **Protected Routes**:
 - ✅ /Home/Dashboard - Operations dashboard

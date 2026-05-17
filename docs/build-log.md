@@ -53,7 +53,7 @@ CivicOps/
 │   │   ├── Connectors.cshtml     - Connector status
 │   │   ├── Department.cshtml     - Department queue
 │   │   ├── Incident.cshtml       - Incident detail
-│   │   ├── Mobile.cshtml         - Mobile info
+│   │   ├── Mobile.cshtml         - Citizen App install page
 │   │   └── Confirmation.cshtml   - Submission confirmation
 │   └── Shared/
 │       ├── _Layout.cshtml        - Main layout with auth nav
@@ -84,7 +84,7 @@ CivicOps/
   - electricity@civicops.demo / CivicOps2026!
   - roads@civicops.demo / CivicOps2026!
 - **Protected Routes**: Dashboard, Department queues, Incident management, Connectors
-- **Public Routes**: Landing, Report, Lookup, Alerts, Mobile
+- **Public Routes**: Landing, Report, Lookup, Alerts, Citizen App
 
 #### 3. Professional UI/UX
 - **Theme**: Dark navy/teal/cyan CivicOps branding
@@ -136,7 +136,7 @@ CivicOps/
 - `/Home/Report` - Report issue
 - `/Home/Lookup` - Track report
 - `/Home/Alerts` - View alerts
-- `/Home/Mobile` - Mobile info
+- `/Home/Mobile` - Citizen App install page
 - `/Home/Status?reference={ref}` - Report status
 - `/Home/Confirmation?reference={ref}` - Submission confirmation
 

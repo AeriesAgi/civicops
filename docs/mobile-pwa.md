@@ -32,3 +32,17 @@ Opening the Citizen App does **not** call Gemini. AI runs only on report submiss
 ## APK status
 
 Installable PWA is ready as the main public channel. An optional APK/WebView wrapper may be added or built by CI only when the wrapper exists and produces an actual artifact; UI should show a Download APK button only when an APK file is present.
+
+
+## Final CivicOps submission QA notes
+
+- Citizen App / Installable PWA (`/app`) is the main public channel for reporting, tracking references, My Reports, Area Alerts, Weather/Area Risk, followed suburbs/wards, Gemini Copilot actions and lightweight Community Threads.
+- Gemini is the civic AI agent layer and runs server-side only from explicit app/staff/judge actions: report submission, Copilot/AI Agent button click, voice-note transcript analysis, optional WhatsApp sandbox processing, generated citizen response, department brief or alert recommendation.
+- Gemini/fallback enrichment cleans messy report text, corrects common area spellings such as Chatworth to Chatsworth and Pheonix to Phoenix, assigns category/department/priority, creates citizen responses and department briefs, and records audit notes.
+- Ward values are synthetic estimates for the eThekwini scenario. If a ward cannot be inferred, CivicOps must show a ward estimate or Needs ward confirmation rather than pretending certainty.
+- Department responders see only their own queues; Admin and Dispatcher can see broader operational views.
+- Community Threads are lightweight local confirmation/update areas, not a full social network.
+- The data set is synthetic eThekwini scenario data for hackathon judging. CivicOps does not claim live municipal data, an official municipal partnership, emergency-service replacement, or production WhatsApp approval.
+- WhatsApp is optional connector-ready only for future pilots/live-test messaging; the Citizen App/PWA is the primary demo path.
+- Production requires real identity, municipal integrations, privacy/security hardening, approved communications channels, and authoritative GIS/ward data.
+- CivicOps was built with IBM Bob assistance and finalized into a working hackathon submission with verification, packaging and polish.

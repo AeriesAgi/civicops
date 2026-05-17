@@ -1,0 +1,31 @@
+@model List<CivicOps.Models.Incident>
+@{
+    var area = (ViewBag.Area as string) ?? "Selected area";
+    ViewData["Title"] = $"{area} Community Thread";
+    var affectedCount = Math.Max(Model.Count, 3);
+    var samples = new[]
+    {
+        "Also affected on Road 701 — water pooling near the school gate.",
+        "Water pressure low since 6 AM; following for official updates.",
+        "Drain overflowing after rain. Please keep children away from the crossing.",
+        "Electricity restored in part of Phoenix, but streetlights remain out.",
+        "Staff update: team dispatched; keep this thread for local confirmations only."
+    };
+}
+<div class="container py-4 civic-page">
+  <section class="hero-panel mb-4">
+    <span class="eyebrow">Community Thread</span>
+    <h1 class="display-5">@area local updates</h1>
+    <p class="lead">A lightweight civic thread for resident confirmations, official updates and status context. Moderation note: no personal data, no abuse, and emergency services must be contacted directly for immediate danger.</p>
+    <div class="d-flex gap-2 flex-wrap"><span class="badge bg-info">@affectedCount affected too</span><span class="badge bg-secondary">Synthetic scenario data</span><a class="btn btn-primary btn-sm" href="/app">Open Citizen App</a><a class="btn btn-outline-info btn-sm" href="/Home/Alerts?suburb=@Uri.EscapeDataString(area)">View Area Alerts</a></div>
+  </section>
+  <div class="row g-4">
+    <div class="col-lg-7"><div class="ops-card"><h2 class="h4">Thread updates</h2><ol class="timeline-list">
+      @for (var i = 0; i < samples.Length; i++)
+      {
+          <li><strong>@DateTime.UtcNow.AddMinutes(-20 * (i + 1)).ToString("MMM dd HH:mm")</strong> — @samples[i] <span class="text-muted-strong">(@area)</span></li>
+      }
+    </ol></div></div>
+    <div class="col-lg-5"><div class="ops-card"><h2 class="h4">Linked references</h2>@if (Model.Any()) { <div class="list-group list-group-flush">@foreach (var incident in Model) { <a class="list-group-item bg-transparent text-light border-secondary" href="/Home/Status?reference=@incident.ReferenceNumber"><strong>@incident.ReferenceNumber</strong><br/><span class="small">@incident.Category · @incident.Status · @incident.AssignedDepartment.GetDisplayName()</span></a> }</div> } else { <p>No linked incidents yet. Submit a report to create a reference and seed this area thread.</p><a class="btn btn-outline-info" href="/Home/Report">Report Issue</a> }</div></div>
+  </div>
+</div>

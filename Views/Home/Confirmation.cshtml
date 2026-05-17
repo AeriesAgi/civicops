@@ -12,6 +12,7 @@
       <a class="btn btn-primary" href="/Home/Status?reference=@Model.ReferenceNumber">Track this in Citizen App</a>
       <a class="btn btn-outline-info" href="/Home/Alerts?suburb=@Uri.EscapeDataString(Model.NormalizedArea)">View Area Alerts</a>
       <a class="btn btn-outline-light" href="/app">Open Citizen App</a>
+      <a class="btn btn-outline-warning" href="/app/incident/@Model.ReferenceNumber">Open community thread</a>
     </div>
   </section>
   <div class="row g-4">
@@ -41,5 +42,6 @@
       </div>
     </div>
     <div class="col-12"><div class="ops-card"><h2 class="h4">Citizen response</h2><p>@latestResponse</p><p class="small text-muted-strong">CivicOps does not replace emergency services.</p></div></div>
+    <div class="col-12"><div class="ops-card"><h2 class="h4">Community Thread</h2><p><strong>@Model.NormalizedArea</strong> residents can confirm local impact, follow official updates and discuss this reference without sharing personal details.</p><div class="d-flex gap-2 flex-wrap"><a class="btn btn-outline-warning" href="/app/incident/@Model.ReferenceNumber">Open incident thread</a><a class="btn btn-outline-info" href="/app/area/@Uri.EscapeDataString(Model.NormalizedArea)/thread">Open @Model.NormalizedArea area thread</a></div><ul class="timeline-list mt-3"><li>Resident confirmation: “Drain overflowing after rain near the school.”</li><li>Staff update placeholder: team assignment appears here after review.</li></ul></div></div>
   </div>
 </div>
