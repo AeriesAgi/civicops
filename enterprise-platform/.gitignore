@@ -1,0 +1,32 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+artifacts/
+publish/
+
+# Logs
+logs/
+*.log
+
+# Environment
+.env
+*.pfx
+*.key
+*.pem
+secrets/
+appsettings.*.local.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml

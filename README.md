@@ -1,6 +1,71 @@
-# CivicOps
+# CivicOps Command
 
 CivicOps is a polished, app-first civic AI platform for AI-powered civic reporting, routing and public alerts. It is designed as a pilot-ready architecture for municipalities, ward offices, civic response teams, NGOs, public utilities or disaster-management-adjacent teams.
+
+---
+
+## 🛰️ NEW: Band Multi-Agent Emergency Dispatch (Band of Agents Hackathon — Track 3)
+
+CivicOps Command now coordinates emergency dispatch with **three specialised AI
+agents that communicate _through_ [Band](https://band.ai), the shared agent
+interaction layer** — not before or after it. Open **`/Band`** in the running app.
+
+- **IncidentIntakeAgent** — receives a raw report (citizen app, WhatsApp, call
+  centre, walk-in), classifies type/severity/area/required resource, and posts
+  the structured incident to a per-incident Band room.
+- **DispatchCoordinatorAgent** — reads the classified incident from Band, scores
+  available units by ETA + skill + workload, proposes the best unit, and **waits
+  for a human dispatcher to confirm in the same Band room.**
+- **ResponseMonitorAgent** — reads the active assignment from Band, monitors GPS +
+  the SLA timer, escalates to a supervisor through Band, pushes citizen updates,
+  and closes the incident with an audit summary.
+
+**The room IS the incident** (`incident id = room id`). Every signal — raw report,
+classification, unit scoring, the human confirmation, GPS heartbeats, SLA
+escalation, resolution — flows through one shared Band room that judges can replay
+end to end in the live **Band Room Viewer**.
+
+```
+RawReport → Classified → UnitsProposed → 🧑‍✈️ Human confirm → Dispatched → Monitored → Resolved → Summary
+   (Intake)     (Intake)     (Dispatch)      (Human)          (Dispatch)   (Monitor)   (Monitor)  (Monitor)
+```
+
+### Try it in 30 seconds
+1. Run the app, open **`/Band`**.
+2. Pick a scenario (e.g. *Structural fire with people trapped*) → **Launch in Band**.
+3. Watch all three agents coordinate live; confirm the dispatch yourself
+   (uncheck auto-confirm) to see the human-in-the-loop step, or let it auto-drive.
+4. Or from a shell: `./scripts/band-demo.sh structure-fire`
+
+Architecture deep-dive: [`docs/band-architecture.md`](docs/band-architecture.md).
+Submission text: [`SUBMISSION.md`](SUBMISSION.md).
+
+### Band configuration (`appsettings.json` → `Band`)
+```jsonc
+"Band": {
+  "Mode": "Simulation",        // "Simulation" (in-process, always works) or "Live"
+  "ApiBaseUrl": "https://api.band.ai",
+  "ApiKey": "",                // set + Mode=Live to also mirror to a hosted Band room
+  "Workspace": "civicops-command",
+  "TickSeconds": 2.5           // monitor heartbeat cadence
+}
+```
+In **Simulation** mode the agents coordinate through an in-process model of Band,
+so the demo runs with zero external dependencies. In **Live** mode the *same*
+agents additionally relay every message to a hosted band.ai workspace — no agent
+code changes, because each agent is written against the `IBandTransport` seam.
+
+---
+
+## Enterprise Command platform (production blueprint)
+
+The full enterprise Clean Architecture build (ASP.NET Core 8, Domain/Application/
+Infrastructure/Api, EF Core + PostgreSQL/TimescaleDB, Redis, SignalR, Docker,
+CI/CD) lives in [`enterprise-platform/`](enterprise-platform/). It is the
+scale-out target for this same system; the Band coordination layer ports directly
+onto it via the identical `IBandTransport` contract.
+
+---
 
 ## Core flow
 

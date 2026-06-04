@@ -7,6 +7,18 @@
   </PropertyGroup>
 
 
+  <!--
+    The enterprise-platform/ folder is a *separate* ASP.NET Core 8 Clean
+    Architecture solution (the production scale-out blueprint). It must NOT be
+    compiled into this running app, so exclude it from every default item glob.
+  -->
+  <ItemGroup>
+    <Compile Remove="enterprise-platform/**/*.cs" />
+    <Content Remove="enterprise-platform/**/*" />
+    <None Remove="enterprise-platform/**/*" />
+    <EmbeddedResource Remove="enterprise-platform/**/*" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Update="wwwroot/downloads/CivicOpsCitizenCompanion-debug.apk" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Condition="Exists('wwwroot/downloads/CivicOpsCitizenCompanion-debug.apk')" />
   </ItemGroup>
