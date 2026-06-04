@@ -88,10 +88,12 @@ Band runs in two modes, chosen in `appsettings.json` → `Band:Mode`:
 - **Simulation (default):** the `LocalBandBroker` is a faithful in-process model
   of Band. Zero external dependencies — the multi-agent demo always runs, even
   offline, which is exactly what you want for a reliable video and a hosted demo.
-- **Live:** set `Band:Mode=Live` and `Band:ApiKey`. The same agents run, and
-  `BandHttpGateway` additionally relays every message to a hosted band.ai
-  workspace room. The local broker stays the source of truth, so going live is
-  purely additive and never breaks the flow.
+- **Live:** set `Band:Mode=Live`. The same agents run, and `BandHttpGateway`
+  additionally relays every message to the **`band-bridge/`** Node sidecar, which
+  republishes them to a hosted Band workspace using the official
+  `@band-sdk/core` SDK (`cd band-bridge && npm install && BAND_API_KEY=... npm start`).
+  The local broker stays the source of truth, so going live is purely additive and
+  never breaks the flow.
 
 Because every agent is written against `IBandTransport`, swapping Simulation for
 Live changes **no agent code**.

@@ -7,12 +7,12 @@ using Microsoft.Extensions.Logging;
 namespace CivicOps.Band
 {
     /// <summary>
-    /// Optional live mirror to a hosted band.ai workspace. When Band:Mode=Live and
-    /// an API key is configured, every message the agents publish locally is also
-    /// best-effort relayed to the real Band REST API, so the same multi-agent
-    /// transcript lands in a hosted Band room. The local broker stays the source
-    /// of truth, which guarantees the demo runs even with no network — this layer
-    /// is purely additive. Mirrors the shape of the @band-sdk/core REST surface.
+    /// Optional live mirror to the Band platform. When Band:Mode=Live, every
+    /// message the agents publish locally is also best-effort relayed to the
+    /// Node <c>band-bridge</c> sidecar, which republishes it to a hosted Band
+    /// workspace using the official <c>@band-sdk/core</c> SDK. The local broker
+    /// stays the source of truth, so the demo runs even with no network and no
+    /// sidecar — this layer is purely additive.
     /// </summary>
     public class BandHttpGateway
     {
@@ -33,8 +33,8 @@ namespace CivicOps.Band
             if (_options.IsLive)
             {
                 transport.MessagePosted += OnMessagePosted;
-                _logger.LogInformation("Band live mirror enabled → {Url} (workspace {Ws})",
-                    _options.ApiBaseUrl, _options.Workspace);
+                _logger.LogInformation("Band live mirror enabled → band-bridge {Url} (workspace {Ws})",
+                    _options.BridgeUrl, _options.Workspace);
             }
         }
 
@@ -49,15 +49,12 @@ namespace CivicOps.Band
             try
             {
                 var client = _httpFactory.CreateClient("band");
-                client.BaseAddress = new Uri(_options.ApiBaseUrl);
-                client.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _options.ApiKey);
+                client.BaseAddress = new Uri(_options.BridgeUrl);
+                client.Timeout = TimeSpan.FromSeconds(4);
 
                 var payload = new
                 {
-                    workspace = _options.Workspace,
-                    room = msg.RoomId,
-                    agent = msg.SenderId,
+                    agentId = msg.SenderId,
                     agentName = msg.SenderName,
                     role = msg.SenderKind.ToString(),
                     type = msg.Kind.ToString(),
@@ -68,7 +65,7 @@ namespace CivicOps.Band
                 };
 
                 using var resp = await client.PostAsJsonAsync(
-                    $"/v1/workspaces/{_options.Workspace}/rooms/{msg.RoomId}/messages", payload);
+                    $"/rooms/{msg.RoomId}/messages", payload);
 
                 if (!resp.IsSuccessStatusCode)
                 {

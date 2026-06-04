@@ -88,3 +88,8 @@ local.properties
 
 # Bob Shell temporary files
 .bob/
+
+# Band bridge (Node sidecar)
+band-bridge/node_modules/
+band-bridge/.env
+band-bridge/package-lock.json

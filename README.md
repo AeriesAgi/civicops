@@ -44,16 +44,17 @@ Submission text: [`SUBMISSION.md`](SUBMISSION.md).
 ```jsonc
 "Band": {
   "Mode": "Simulation",        // "Simulation" (in-process, always works) or "Live"
-  "ApiBaseUrl": "https://api.band.ai",
-  "ApiKey": "",                // set + Mode=Live to also mirror to a hosted Band room
+  "BridgeUrl": "http://localhost:8787",  // Node band-bridge sidecar (real SDK)
   "Workspace": "civicops-command",
   "TickSeconds": 2.5           // monitor heartbeat cadence
 }
 ```
 In **Simulation** mode the agents coordinate through an in-process model of Band,
 so the demo runs with zero external dependencies. In **Live** mode the *same*
-agents additionally relay every message to a hosted band.ai workspace — no agent
-code changes, because each agent is written against the `IBandTransport` seam.
+agents additionally relay every message to the **`band-bridge/`** Node sidecar,
+which publishes them to a hosted Band workspace using the official
+[`@band-sdk/core`](https://band.ai/docs) SDK — no agent code changes, because each
+agent is written against the `IBandTransport` seam. See [`band-bridge/`](band-bridge/).
 
 ---
 

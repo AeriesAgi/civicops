@@ -7,11 +7,9 @@ namespace CivicOps.Band
         /// (also mirror messages to a hosted band.ai room).</summary>
         public string Mode { get; set; } = "Simulation";
 
-        /// <summary>Base URL of the live Band API (used only in Live mode).</summary>
-        public string ApiBaseUrl { get; set; } = "https://api.band.ai";
-
-        /// <summary>API key for the live Band workspace (used only in Live mode).</summary>
-        public string ApiKey { get; set; } = string.Empty;
+        /// <summary>URL of the Node band-bridge sidecar that speaks @band-sdk/core
+        /// to the real Band platform (used only in Live mode).</summary>
+        public string BridgeUrl { get; set; } = "http://localhost:8787";
 
         /// <summary>Band workspace / project the rooms live under.</summary>
         public string Workspace { get; set; } = "civicops-command";
@@ -20,6 +18,6 @@ namespace CivicOps.Band
         public double TickSeconds { get; set; } = 2.5;
 
         public bool IsLive => string.Equals(Mode, "Live", System.StringComparison.OrdinalIgnoreCase)
-                              && !string.IsNullOrWhiteSpace(ApiKey);
+                              && !string.IsNullOrWhiteSpace(BridgeUrl);
     }
 }
