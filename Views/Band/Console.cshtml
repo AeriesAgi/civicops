@@ -1,0 +1,132 @@
+@using CivicOps.Band
+@{
+    ViewData["Title"] = "Band Dispatch Console";
+    var scenarios = ViewBag.Scenarios as System.Collections.Generic.IReadOnlyList<BandScenario>;
+    var rooms = ViewBag.Rooms as System.Collections.Generic.IReadOnlyList<BandRoom>;
+    var units = ViewBag.Units as System.Collections.Generic.IReadOnlyList<ResponseUnit>;
+}
+
+<div class="container py-4" style="max-width:1150px;">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-1"><i class="bi bi-broadcast-pin text-info"></i> Band Multi-Agent Dispatch</h2>
+            <p class="text-secondary mb-0">Three specialised AI agents coordinate every emergency through <strong>Band</strong>, the shared interaction layer. Humans confirm dispatch inside the same room.</p>
+        </div>
+        <div>
+            <span class="badge bg-info text-dark">Band: @ViewBag.Mode</span>
+            @if (ViewBag.IsLive == true) { <span class="badge bg-success">Live mirror on</span> } else { <span class="badge bg-secondary">In-process broker</span> }
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-md-4"><div class="card h-100"><div class="card-body text-center"><i class="bi bi-clipboard2-pulse fs-3" style="color:#38bdf8;"></i><h6 class="mt-2 mb-0">IncidentIntakeAgent</h6><small class="text-secondary">Classifies &amp; posts to Band</small></div></div></div>
+        <div class="col-md-4"><div class="card h-100"><div class="card-body text-center"><i class="bi bi-diagram-3 fs-3" style="color:#a855f7;"></i><h6 class="mt-2 mb-0">DispatchCoordinatorAgent</h6><small class="text-secondary">Matches unit, awaits human</small></div></div></div>
+        <div class="col-md-4"><div class="card h-100"><div class="card-body text-center"><i class="bi bi-activity fs-3" style="color:#f97316;"></i><h6 class="mt-2 mb-0">ResponseMonitorAgent</h6><small class="text-secondary">Monitors, escalates, resolves</small></div></div></div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white"><i class="bi bi-play-circle"></i> Run the full demo</div>
+                <div class="card-body">
+                    <p class="small text-secondary">Drops a serious report into Band and runs all three agents end to end. Auto-confirm performs the human step automatically (for the video); turn it off to confirm dispatch yourself in the room.</p>
+                    <label class="form-label small mb-1">Scenario</label>
+                    <select id="scenario" class="form-select mb-2">
+                        @if (scenarios != null)
+                        {
+                            foreach (var s in scenarios)
+                            {
+                                <option value="@s.Key">@s.Title — @s.Area (@s.Channel)</option>
+                            }
+                        }
+                    </select>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="autoConfirm" checked>
+                        <label class="form-check-label small" for="autoConfirm">Auto-confirm human step (unattended demo)</label>
+                    </div>
+                    <button class="btn btn-info w-100" onclick="simulate()"><i class="bi bi-broadcast"></i> Launch in Band</button>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header"><i class="bi bi-megaphone"></i> Or submit a raw report</div>
+                <div class="card-body">
+                    <textarea id="rawText" class="form-control mb-2" rows="3" placeholder="e.g. Big fire at a block of flats in Chatsworth, people trapped on the top floor..."></textarea>
+                    <div class="row g-2">
+                        <div class="col-7"><input id="area" class="form-control" placeholder="Area (e.g. Chatsworth)"></div>
+                        <div class="col-5">
+                            <select id="channel" class="form-select">
+                                <option>Web</option><option>WhatsApp</option><option>Android</option><option>VoiceNote</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-info w-100 mt-2" onclick="report()"><i class="bi bi-send"></i> Send into Band</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between"><span><i class="bi bi-collection"></i> Active Band rooms</span><a href="/Band" class="small">refresh</a></div>
+                <div class="card-body p-2" style="max-height:240px;overflow-y:auto;">
+                    @if (rooms == null || rooms.Count == 0)
+                    {
+                        <div class="text-secondary small p-2">No rooms yet — launch a scenario to open one.</div>
+                    }
+                    else
+                    {
+                        foreach (var r in rooms)
+                        {
+                            <a href="/Band/Room/@r.Id" class="d-block text-decoration-none border-bottom py-2 px-1">
+                                <div class="d-flex justify-content-between">
+                                    <strong class="text-info">@r.Id</strong>
+                                    <span class="badge @(r.IsClosed ? "bg-success" : (r.AwaitingHumanConfirmation ? "bg-warning text-dark" : "bg-secondary"))">@r.Phase</span>
+                                </div>
+                                <div class="small text-body">@r.Title</div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header"><i class="bi bi-truck"></i> Command fleet</div>
+                <div class="card-body p-2" style="max-height:260px;overflow-y:auto;">
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>Call sign</th><th>Type</th><th>Area</th><th>Status</th></tr></thead>
+                        <tbody>
+                        @if (units != null)
+                        {
+                            foreach (var u in units)
+                            {
+                                <tr>
+                                    <td><strong>@u.CallSign</strong></td>
+                                    <td class="small">@u.TypeName</td>
+                                    <td class="small">@u.HomeArea</td>
+                                    <td><span class="badge @(u.Status == UnitStatus.Available ? "bg-success" : "bg-secondary")">@u.Status</span></td>
+                                </tr>
+                            }
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function simulate(){
+        const body = { scenario: document.getElementById('scenario').value, autoConfirm: document.getElementById('autoConfirm').checked };
+        const r = await fetch('/api/band/simulate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        const j = await r.json();
+        window.location.href = j.url;
+    }
+    async function report(){
+        const body = { rawText: document.getElementById('rawText').value, area: document.getElementById('area').value, channel: document.getElementById('channel').value };
+        if(!body.rawText.trim()){ alert('Please describe the incident.'); return; }
+        const r = await fetch('/api/band/report', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+        const j = await r.json();
+        window.location.href = j.url;
+    }
+</script>

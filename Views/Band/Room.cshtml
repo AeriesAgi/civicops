@@ -1,0 +1,211 @@
+@using CivicOps.Band
+@model CivicOps.Band.BandRoomView
+@{
+    ViewData["Title"] = $"Band Room {Model.Room.Id}";
+    var initialMessages = System.Text.Json.JsonSerializer.Serialize(Model.Messages.Select(BandDto.Message));
+    var initialRoom = System.Text.Json.JsonSerializer.Serialize(BandDto.Room(Model.Room));
+    var units = (ViewBag.Units as System.Collections.Generic.IEnumerable<ResponseUnit>);
+}
+
+<div class="container-fluid py-4 band-room" style="max-width:1200px;">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div>
+            <a href="/Band" class="text-decoration-none small text-secondary"><i class="bi bi-arrow-left"></i> Band Console</a>
+            <h3 class="mb-0 mt-1"><i class="bi bi-broadcast-pin text-info"></i> Band Room <code id="roomId">@Model.Room.Id</code></h3>
+            <div class="text-secondary small">Reference <strong id="roomRef">@Model.Room.IncidentReference</strong> · per-incident shared room · live audit trail</div>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-secondary" id="modeBadge">Band: @ViewBag.Mode</span>
+            <span class="badge bg-dark" id="phaseBadge">@Model.Room.Phase</span>
+            <span class="badge bg-danger" id="sevBadge">@Model.Room.Severity</span>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-chat-square-dots"></i> Agent coordination stream</span>
+                    <span class="small text-secondary"><i class="bi bi-circle-fill text-success" id="liveDot" style="font-size:.5rem;"></i> <span id="liveState">live</span></span>
+                </div>
+                <div id="stream" class="card-body band-stream" style="height:62vh;overflow-y:auto;background:#0b1220;"></div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-3" id="humanPanel" style="display:none;">
+                <div class="card-header bg-success text-white"><i class="bi bi-person-badge"></i> Human dispatcher — confirm in Band</div>
+                <div class="card-body">
+                    <p class="small text-secondary mb-2">An agent has proposed a dispatch and is waiting for you, in this Band room. This is the human-in-the-loop checkpoint.</p>
+                    <div class="mb-2">
+                        <div class="fw-bold" id="proposalUnit">—</div>
+                        <div class="small text-secondary" id="proposalReason"></div>
+                    </div>
+                    <label class="form-label small mb-1">Override unit (optional)</label>
+                    <select id="overrideUnit" class="form-select form-select-sm mb-2">
+                        <option value="">Use recommended unit</option>
+                        @if (units != null)
+                        {
+                            foreach (var u in units)
+                            {
+                                <option value="@u.Id">@u.CallSign — @u.TypeName (@u.HomeArea)</option>
+                            }
+                        }
+                    </select>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success btn-sm" onclick="decide('confirm')"><i class="bi bi-check-circle"></i> Confirm dispatch</button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="decide('override')"><i class="bi bi-arrow-repeat"></i> Override &amp; dispatch</button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="decide('reject')"><i class="bi bi-x-circle"></i> Reject</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header"><i class="bi bi-people"></i> Room members</div>
+                <div class="card-body" id="members">
+                    <div class="small text-secondary">Agents and humans appear here as they join Band.</div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mt-3">
+                <div class="card-header"><i class="bi bi-list-ol"></i> Lifecycle</div>
+                <div class="card-body small">
+                    <div id="lc-RawReport" class="lc">① Raw report</div>
+                    <div id="lc-Classified" class="lc">② Classified <span class="text-secondary">(IntakeAgent)</span></div>
+                    <div id="lc-AssignmentProposed" class="lc">③ Unit proposed <span class="text-secondary">(DispatchAgent)</span></div>
+                    <div id="lc-HumanDecision" class="lc">④ Human confirm</div>
+                    <div id="lc-Dispatched" class="lc">⑤ Dispatched</div>
+                    <div id="lc-StatusUpdate" class="lc">⑥ Monitoring <span class="text-secondary">(MonitorAgent)</span></div>
+                    <div id="lc-Resolved" class="lc">⑦ Resolved</div>
+                    <div id="lc-Summary" class="lc">⑧ Summary</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .band-stream .bmsg{border-radius:10px;padding:.6rem .8rem;margin-bottom:.6rem;border-left:4px solid #334155;background:#111c2e;color:#e2e8f0;}
+    .band-stream .bmsg .who{font-weight:600;font-size:.85rem;}
+    .band-stream .bmsg .meta{font-size:.7rem;color:#94a3b8;}
+    .band-stream .bmsg .body{white-space:pre-wrap;font-size:.86rem;margin-top:.25rem;}
+    .band-stream .bmsg.kind-Handoff{background:#1e1b2e;border-left-color:#a855f7;font-style:italic;}
+    .band-stream .bmsg.kind-AssignmentProposed{background:#15233b;border-left-color:#a855f7;}
+    .band-stream .bmsg.kind-Dispatched{background:#0f2a1f;border-left-color:#22c55e;}
+    .band-stream .bmsg.kind-Escalation,.band-stream .bmsg.kind-SlaWarning{background:#2a1414;border-left-color:#ef4444;}
+    .band-stream .bmsg.kind-Resolved{background:#0f2a1f;border-left-color:#22c55e;}
+    .band-stream .bmsg.kind-Summary{background:#1a2233;border-left-color:#38bdf8;}
+    .band-stream .bmsg.kind-HumanDecision{background:#13241a;border-left-color:#22c55e;}
+    .band-stream .bmsg.kind-CitizenUpdate{background:#1d2433;border-left-color:#eab308;}
+    .lc{padding:.15rem 0;color:#64748b;}
+    .lc.done{color:#16a34a;font-weight:600;}
+    .kindtag{font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;padding:.05rem .35rem;border-radius:6px;background:#1f2937;color:#cbd5e1;margin-left:.4rem;}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@@8/dist/browser/signalr.min.js"></script>
+<script>
+    const ROOM_ID = document.getElementById('roomId').textContent.trim();
+    let lastSeq = 0;
+    const seen = new Set();
+    const members = new Map();
+
+    function esc(s){ const d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }
+
+    function markLifecycle(kind){
+        const el = document.getElementById('lc-'+kind);
+        if(el) el.classList.add('done');
+    }
+
+    function addMember(m){
+        if(members.has(m.senderId)) return;
+        members.set(m.senderId, m);
+        const wrap = document.getElementById('members');
+        if(wrap.querySelector('.text-secondary')) wrap.innerHTML='';
+        const row = document.createElement('div');
+        row.className='d-flex align-items-center mb-2';
+        row.innerHTML = '<span class="me-2" style="width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:'+esc(m.senderColor)+'22;color:'+esc(m.senderColor)+';"><i class="bi '+esc(m.senderAvatar)+'"></i></span>'+
+                        '<div><div style="font-size:.82rem;font-weight:600;">'+esc(m.senderName)+'</div><div class="small text-secondary">'+esc(m.senderKind)+'</div></div>';
+        wrap.appendChild(row);
+    }
+
+    function render(m){
+        if(seen.has(m.id)) return;
+        seen.add(m.id);
+        if(m.sequence > lastSeq) lastSeq = m.sequence;
+        addMember(m);
+        markLifecycle(m.kind);
+
+        const stream = document.getElementById('stream');
+        const div = document.createElement('div');
+        div.className = 'bmsg kind-'+m.kind;
+        div.style.borderLeftColor = m.senderColor;
+        const t = new Date(m.createdAt).toLocaleTimeString();
+        let handoff = '';
+        if(m.handoffTo){ handoff = ' <i class="bi bi-arrow-right-circle text-info"></i> <span class="meta">handoff → '+esc(m.handoffTo)+'</span>'; }
+        div.innerHTML =
+            '<div class="d-flex justify-content-between align-items-center">'+
+              '<span class="who" style="color:'+esc(m.senderColor)+';"><i class="bi '+esc(m.senderAvatar)+'"></i> '+esc(m.senderName)+
+              '<span class="kindtag">'+esc(m.kind)+'</span></span>'+
+              '<span class="meta">'+esc(t)+'</span>'+
+            '</div>'+
+            '<div class="body">'+esc(m.text)+handoff+'</div>';
+        stream.appendChild(div);
+        stream.scrollTop = stream.scrollHeight;
+
+        // Human-in-the-loop panel toggling.
+        if(m.kind === 'AssignmentProposed'){
+            const d = m.data || {};
+            document.getElementById('proposalUnit').textContent = (d.recommendedCallSign||'Recommended unit')+' · ETA '+(d.etaMinutes||'?')+' min';
+            document.getElementById('proposalReason').textContent = m.text;
+            if(d.recommendedUnitId) document.getElementById('humanPanel').dataset.unit = d.recommendedUnitId;
+            document.getElementById('humanPanel').style.display = 'block';
+        }
+        if(m.kind === 'HumanDecision' || m.kind === 'Dispatched'){
+            document.getElementById('humanPanel').style.display = 'none';
+        }
+        if(['Dispatched','StatusUpdate','Resolved','Summary','Classified','Escalation'].includes(m.kind)){
+            const sev = (m.data && m.data.severity) ? m.data.severity : null;
+            if(sev) document.getElementById('sevBadge').textContent = sev;
+        }
+        document.getElementById('phaseBadge').textContent = phaseFor(m.kind);
+    }
+
+    function phaseFor(kind){
+        switch(kind){
+            case 'RawReport': return 'Intake';
+            case 'Classified': case 'Handoff': return 'Classified';
+            case 'AssignmentProposed': case 'UnitsQueried': return 'Awaiting Confirmation';
+            case 'HumanDecision': case 'Dispatched': return 'Dispatched';
+            case 'StatusUpdate': case 'SlaWarning': case 'Escalation': case 'CitizenUpdate': return 'Monitoring';
+            case 'Resolved': case 'Summary': return 'Resolved';
+            default: return document.getElementById('phaseBadge').textContent;
+        }
+    }
+
+    async function decide(decision){
+        const panel = document.getElementById('humanPanel');
+        let unitId = document.getElementById('overrideUnit').value || panel.dataset.unit || '';
+        if(decision === 'confirm') unitId = panel.dataset.unit || unitId;
+        panel.style.display='none';
+        await fetch('/api/band/rooms/'+ROOM_ID+'/decision', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ decision: decision, unitId: unitId, note: 'Decided from Band room context.', dispatcherName: 'Human Dispatcher' })
+        });
+    }
+
+    // Seed from server, then go live.
+    const initialMessages = @Html.Raw(initialMessages);
+    initialMessages.forEach(render);
+
+    const conn = new signalR.HubConnectionBuilder().withUrl('/hubs/band').withAutomaticReconnect().build();
+    conn.on('ReceiveBandMessage', function(m){ if(m.roomId === ROOM_ID) render(m); });
+    conn.start().then(function(){ return conn.invoke('JoinRoom', ROOM_ID); })
+        .catch(function(){ document.getElementById('liveState').textContent='polling'; });
+
+    // Polling fallback (also covers any missed messages).
+    setInterval(async function(){
+        try{
+            const r = await fetch('/api/band/rooms/'+ROOM_ID+'/since/'+lastSeq);
+            if(r.ok){ const arr = await r.json(); arr.forEach(render); }
+        }catch(e){}
+    }, 2500);
+</script>
