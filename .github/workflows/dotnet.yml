@@ -1,0 +1,69 @@
+name: build-and-smoke
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore CivicOps.csproj
+
+      - name: Build (Release)
+        run: dotnet build CivicOps.csproj -c Release --no-restore
+
+      - name: Publish
+        run: dotnet publish CivicOps.csproj -c Release --no-build -o ./publish
+
+      - name: Start app
+        env:
+          ASPNETCORE_ENVIRONMENT: Production
+          PORT: "5000"
+        run: |
+          dotnet ./publish/CivicOps.dll &
+          echo $! > app.pid
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:5000/healthz >/dev/null; then echo "app up"; break; fi
+            sleep 1
+          done
+          curl -sf http://localhost:5000/healthz
+
+      - name: Smoke test (routes + API)
+        run: |
+          ./scripts/smoke-test.sh http://localhost:5000
+          ./scripts/api-check.sh http://localhost:5000
+
+      - name: Band five-agent end-to-end
+        run: |
+          ROOM=$(curl -s -X POST http://localhost:5000/api/band/simulate \
+            -H 'Content-Type: application/json' \
+            -d '{"scenario":"structure-fire","autoConfirm":true}' \
+            | python3 -c "import sys,json;print(json.load(sys.stdin)['roomId'])")
+          echo "Band room: $ROOM"
+          sleep 35
+          curl -s "http://localhost:5000/api/band/rooms/$ROOM" | python3 -c "
+          import sys, json
+          v = json.load(sys.stdin)
+          agents = sorted({m['senderName'] for m in v['messages'] if m['senderKind'] == 'Agent'})
+          closed = v['room']['isClosed']
+          print('agents:', agents)
+          print('closed:', closed)
+          assert len(agents) == 5, f'expected 5 collaborating agents, got {len(agents)}'
+          assert closed, 'incident did not resolve/close'
+          print('OK: five agents collaborated through Band and the incident resolved.')
+          "
+
+      - name: Stop app
+        if: always()
+        run: kill "$(cat app.pid)" 2>/dev/null || true

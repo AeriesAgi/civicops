@@ -93,9 +93,15 @@ Command demonstrates.
 | 1 | Working Band integration (5 agents) | `Band/` + `Band/Agents/` |
 | 2 | End-to-end demo flow | `/Band` console + `scripts/band-demo.sh` |
 | 3 | Clean public GitHub repo | this repository |
-| 4 | Hosted demo URL | _add your deployment URL here_ |
+| 4 | Hosted demo URL | **`<your-deploy>.onrender.com`** — one-click deploy via [`render.yaml`](render.yaml); see [`docs/deployment.md`](docs/deployment.md) |
 | 5 | Submission text | this file |
 | 6 | README explaining Band architecture | `README.md` + `docs/band-architecture.md` |
+
+The hosted demo runs Band in **Simulation** mode, so the full five-agent dispatch
+and the live Band Room Viewer work with zero secrets. To mirror the transcript
+into a real Band workspace (uses your Band account), run the included
+`docker-compose.yml` with `THENVOI_API_KEY` set, or deploy the `band-bridge/`
+sidecar and flip `Band__Mode=Live`. Health check: `/healthz`.
 
 ## Demo script (for the video)
 

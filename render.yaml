@@ -1,0 +1,22 @@
+# Render blueprint — one-click deploy of CivicOps Command.
+# https://render.com/docs/blueprint-spec
+#
+# Deploys the ASP.NET Core app from the Dockerfile. Band runs in Simulation mode,
+# so the hosted demo (the full five-agent dispatch + live Room Viewer) works with
+# zero secrets. To mirror the transcript into a real Band workspace, deploy the
+# band-bridge sidecar and set Band__Mode=Live + Band__BridgeUrl (see docs/deployment.md).
+services:
+  - type: web
+    name: civicops-command
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Band__Mode
+        value: Simulation
+      - key: Band__Workspace
+        value: civicops-command

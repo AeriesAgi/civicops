@@ -132,6 +132,27 @@ dotnet run
 
 The scripts are designed to pass in fallback/sandbox mode and do not require live Gemini or WhatsApp credentials.
 
+## Deploy
+
+CivicOps Command ships as a single container (.NET 10) that binds to `$PORT` and
+exposes `/healthz`. Band runs in Simulation by default, so a fresh deploy shows
+the full five-agent dispatch with **zero secrets**.
+
+```bash
+# Docker (any host — Render, Railway, Fly.io, Azure, Cloud Run, a VM)
+docker build -t civicops-command .
+docker run -p 8080:8080 -e PORT=8080 civicops-command   # → http://localhost:8080
+
+# One-click on Render: New → Blueprint → this repo (reads render.yaml)
+
+# Full local stack with LIVE Band (mirrors the transcript to a real Band room):
+THENVOI_API_KEY=sk_... docker compose up --build
+```
+
+A GitHub Actions workflow (`.github/workflows/dotnet.yml`) builds the app and
+asserts a full Band scenario resolves with five collaborating agents on every
+push. Full guide: [`docs/deployment.md`](docs/deployment.md).
+
 ## Safety and honesty
 
 CivicOps uses synthetic civic data for sandbox scenarios. It does not claim official municipal partnerships, does not replace emergency services, and keeps humans in the loop for dispatch or public alert decisions.

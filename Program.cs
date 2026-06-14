@@ -2,9 +2,27 @@ using CivicOps.Services;
 using CivicOps.Band;
 using CivicOps.Band.Agents;
 using CivicOps.Hubs;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// When hosted on a PaaS (Render / Railway / Fly / Azure / Cloud Run), bind to the
+// platform-assigned port. Falls back to the default Kestrel/launch URLs locally.
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
+// Honour the TLS-terminating proxy's forwarded headers so the app sees the real
+// client scheme/IP (correct https links + SignalR negotiation behind the proxy).
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -79,13 +97,24 @@ _ = app.Services.GetRequiredService<BandHttpGateway>();
 _ = app.Services.GetRequiredService<BandSimulationService>();
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// On a PaaS we serve plain HTTP on $PORT and let the platform terminate TLS, so
+// only redirect to HTTPS when an HTTPS endpoint is actually configured (local
+// dev cert, or an explicit HTTPS port) — avoids redirect loops/warnings in prod.
+var httpsConfigured = app.Environment.IsDevelopment()
+    || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_HTTPS_PORTS"))
+    || !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("HTTPS_PORT"));
+if (httpsConfigured)
+{
+    app.UseHttpsRedirection();
+}
 
 var contentTypeProvider = new FileExtensionContentTypeProvider();
 contentTypeProvider.Mappings[".apk"] = "application/vnd.android.package-archive";
@@ -106,5 +135,15 @@ app.MapControllerRoute(
 
 // Real-time stream for the Band Room Viewer.
 app.MapHub<BandHub>("/hubs/band");
+
+// Lightweight health probe for platform health checks / uptime monitors. Reports
+// that the five-agent Band coordination layer is online and which mode it is in.
+app.MapGet("/healthz", (BandOptions band) => Results.Ok(new
+{
+    status = "ok",
+    service = "civicops-command",
+    bandMode = band.Mode,
+    agents = 5
+}));
 
 app.Run();

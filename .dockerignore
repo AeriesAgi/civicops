@@ -1,0 +1,28 @@
+# Build outputs
+**/bin
+**/obj
+
+# Node / sidecar (the band-bridge ships as its own image)
+**/node_modules
+band-bridge
+
+# VCS & CI
+.git
+.gitignore
+.github
+
+# Separate solutions / non-web assets not needed by the running web app
+enterprise-platform
+mobile
+bob_sessions
+docs
+
+# Local & editor
+.vs
+.vscode
+*.user
+**/*.md
+Dockerfile
+.dockerignore
+docker-compose.yml
+render.yaml
