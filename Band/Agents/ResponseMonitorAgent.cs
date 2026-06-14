@@ -9,10 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace CivicOps.Band.Agents
 {
     /// <summary>
-    /// AGENT 3 — reads active assignments from Band, monitors GPS + the SLA timer,
-    /// posts status heartbeats, escalates to a supervisor through Band if the SLA
-    /// is at risk, pushes status back to the citizen, and closes the incident in
-    /// Band with an audit summary when it is resolved.
+    /// AGENT 4 — reads active assignments from Band, monitors GPS + the SLA timer,
+    /// posts status heartbeats, escalates through Band if the SLA is at risk (which
+    /// the ResourceLogisticsAgent and a human supervisor both act on), and closes
+    /// the incident in Band with an audit summary when it is resolved. Citizen-facing
+    /// comms during the response are owned by the PublicInfoAgent; this agent posts
+    /// the final on-scene resolution update as the responding unit closing the loop.
     /// </summary>
     public class ResponseMonitorAgent : BandAgent
     {
@@ -83,13 +85,6 @@ namespace CivicOps.Band.Agents
                         ["lat"] = Math.Round(unit.Latitude, 5),
                         ["lng"] = Math.Round(unit.Longitude, 5)
                     });
-
-                // Push a citizen-facing update midway.
-                if (i == 2)
-                {
-                    Band.Post(roomId, Identity, BandMessageKind.CitizenUpdate,
-                        $"📲 Citizen update ({reference}): your responder {callSign} is on the way, ETA ~{eta} min.");
-                }
 
                 // Demonstrate the escalation path for high-severity incidents.
                 if (!escalated && DispatchMapping.RequiresEscalationPath(priority) && i == 2)

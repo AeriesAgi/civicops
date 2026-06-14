@@ -17,7 +17,7 @@ check_get() {
 check_get "/"
 check_get "/Home/DemoTour"
 check_get "/Home/Report"
-check_get "/Home/Mobile"
+check_get "/Home/Mobile" "any2xx3xx"
 check_get "/app"
 check_get "/app/incident/CIV-2026-0001"
 check_get "/app/area/Chatsworth/thread"

@@ -35,10 +35,12 @@ builder.Services.AddSingleton<IBandTransport>(sp => sp.GetRequiredService<LocalB
 // Command fleet the DispatchCoordinatorAgent matches against.
 builder.Services.AddSingleton<IFleetService, InMemoryFleetService>();
 
-// The three Band-resident agents (singletons → connected for the app lifetime).
+// The five Band-resident agents (singletons → connected for the app lifetime).
 builder.Services.AddSingleton<IncidentIntakeAgent>();
 builder.Services.AddSingleton<DispatchCoordinatorAgent>();
+builder.Services.AddSingleton<ResourceLogisticsAgent>();
 builder.Services.AddSingleton<ResponseMonitorAgent>();
+builder.Services.AddSingleton<PublicInfoAgent>();
 
 // Facade, realtime bridge, optional live mirror and simulation driver.
 builder.Services.AddSingleton<BandAgentService>();

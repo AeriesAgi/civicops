@@ -10,10 +10,11 @@
 
 ## Short description
 
-Three specialised AI agents run emergency dispatch end to end — intake, dispatch
-coordination, and response monitoring — coordinating **through Band**, with a
-human dispatcher confirming every committal inside the shared per-incident Band
-room. The room is the incident; the transcript is the audit trail.
+Five specialised AI agents run emergency dispatch end to end — intake, dispatch
+coordination, resource logistics, response monitoring, and public information —
+coordinating **through Band**, with a human dispatcher confirming every committal
+inside the shared per-incident Band room. The room is the incident; the transcript
+is the audit trail.
 
 ---
 
@@ -22,7 +23,7 @@ room. The room is the incident; the transcript is the audit trail.
 CivicOps Command is a production-grade operational intelligence platform for
 emergency response and dispatch (ASP.NET Core, Clean Architecture, real-time
 SignalR, AI classification). For the Band of Agents Hackathon we added **Band as
-the coordination layer between three specialised agents** that together run a
+the coordination layer between five specialised agents** that together run a
 dispatch from the moment a citizen report arrives to the moment the incident is
 resolved.
 
@@ -41,14 +42,21 @@ the workflow advances purely because context flows through Band.
   dispatcher to confirm in the Band room.** The human sees the full Band context
   and clicks Confirm, Override or Reject; that decision is itself a Band message
   the agent then acts on.
+- **ResourceLogisticsAgent** reacts to the same classified incident *in parallel*:
+  for a serious call it pre-stages a backup unit and mutual-aid resources, and when
+  the monitor escalates an SLA risk it commits that backup — so supporting capacity
+  is arranged through Band without ever touching the human-confirmed primary unit.
 - **ResponseMonitorAgent** reads the active assignment from Band, tracks the unit's
-  GPS and the SLA timer, posts live status heartbeats, escalates to a supervisor
-  through Band if the SLA is at risk, pushes status updates back to the citizen,
-  and closes the incident with an audit summary.
+  GPS and the SLA timer, posts live status heartbeats, escalates through Band if
+  the SLA is at risk, and closes the incident with an audit summary.
+- **PublicInfoAgent** owns the public-facing lane: on dispatch it notifies the
+  reporting citizen, for serious incidents it drafts a public area alert (which a
+  human approves before broadcast), and it posts a transparent delay notice if the
+  SLA slips.
 
 Everything is visible in a live **Band Room Viewer**: a real-time, colour-coded
 stream of every agent message and hand-off, with the human confirmation panel
-inline. Judges can watch three agents and a human collaborate in one shared space,
+inline. Judges can watch five agents and a human collaborate in one shared space,
 then replay the entire incident from the room history.
 
 A one-click **simulation mode** runs a serious incident (e.g. a structural fire
@@ -66,7 +74,9 @@ Command demonstrates.
 - **Application of technology:** Band is the actual coordination layer — identities,
   rooms, messages, subscriptions, hand-offs and history — with a clean
   `IBandTransport` seam that runs in-process for the demo and mirrors to a hosted
-  band.ai workspace in live mode without changing a line of agent code.
+  Band workspace in live mode (via the official `@band-ai/sdk`) without changing a
+  line of agent code. Five agents collaborate, including genuine parallel work and
+  agent-to-agent escalation, not a single linear chain.
 - **Presentation:** emergency dispatch is instantly legible; the Band Room Viewer
   makes multi-agent coordination something you can simply *watch*.
 - **Business value:** real enterprise workflow — faster, auditable, human-governed
@@ -80,7 +90,7 @@ Command demonstrates.
 
 | # | Deliverable | Where |
 |---|---|---|
-| 1 | Working Band integration (3 agents) | `Band/` + `Band/Agents/` |
+| 1 | Working Band integration (5 agents) | `Band/` + `Band/Agents/` |
 | 2 | End-to-end demo flow | `/Band` console + `scripts/band-demo.sh` |
 | 3 | Clean public GitHub repo | this repository |
 | 4 | Hosted demo URL | _add your deployment URL here_ |
@@ -89,11 +99,16 @@ Command demonstrates.
 
 ## Demo script (for the video)
 
-1. Open `/Band`. Point out the three agents and the Command fleet.
+1. Open `/Band`. Point out the five agents and the Command fleet.
 2. Select **Structural fire with people trapped**, **uncheck auto-confirm**, Launch.
 3. Watch **IncidentIntakeAgent** classify and hand off in the Band room.
-4. Watch **DispatchCoordinatorAgent** score units and propose one — note it *waits*.
+4. Watch **DispatchCoordinatorAgent** score units and propose one — note it *waits* —
+   while **ResourceLogisticsAgent** pre-stages a backup unit *in parallel* in the
+   same room.
 5. As the human dispatcher, click **Confirm** inside the Band room.
-6. Watch **ResponseMonitorAgent** track GPS/SLA, escalate to the supervisor,
-   update the citizen, resolve, and post the Band room summary.
-7. Re-run with auto-confirm for the unattended end-to-end pass.
+6. Watch **PublicInfoAgent** notify the citizen and draft a public area alert, then
+   **ResponseMonitorAgent** track GPS/SLA and escalate — at which point
+   **ResourceLogisticsAgent** commits the backup and a human supervisor acknowledges.
+7. Watch the incident resolve and the Band room summary report **5 agents
+   collaborated through Band**.
+8. Re-run with auto-confirm for the unattended end-to-end pass.

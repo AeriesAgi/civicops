@@ -1,6 +1,6 @@
 # CivicOps Command — Band Multi-Agent Architecture
 
-> Band is the **coordination layer**, not a wrapper. Three specialised AI agents
+> Band is the **coordination layer**, not a wrapper. Five specialised AI agents
 > run an emergency dispatch from raw report to resolution by communicating
 > **through Band** — a shared, per-incident interaction room with a full audit
 > trail and a human-in-the-loop confirmation step.
@@ -13,17 +13,24 @@ hand off cleanly, and leave an auditable record — while a human keeps authorit
 over the irreversible decision (committing a unit). Band gives us all of that as
 a first-class substrate: identities, rooms, messages, subscriptions and history.
 
-## The three agents
+## The five agents
 
 | Agent | Identity | Reads from Band | Writes to Band |
 |---|---|---|---|
 | **IncidentIntakeAgent** | `agent.intake` | `RawReport` | `Classified`, `Handoff → dispatch` |
 | **DispatchCoordinatorAgent** | `agent.dispatch` | `Classified`, `HumanDecision` | `UnitsQueried`, `AssignmentProposed` (awaits human), `Dispatched`, `Handoff → monitor` |
-| **ResponseMonitorAgent** | `agent.monitor` | `Dispatched` | `StatusUpdate`, `SlaWarning`, `Escalation → supervisor`, `CitizenUpdate`, `Resolved`, `Summary` |
+| **ResourceLogisticsAgent** | `agent.logistics` | `Classified` (serious), `Escalation` | `ResourceStaged` (backup + mutual aid), `Handoff → monitor` |
+| **ResponseMonitorAgent** | `agent.monitor` | `Dispatched` | `StatusUpdate`, `SlaWarning`, `Escalation`, `CitizenUpdate` (resolution), `Resolved`, `Summary` |
+| **PublicInfoAgent** | `agent.publicinfo` | `Dispatched`, `SlaWarning` | `CitizenUpdate`, `PublicAlert` (draft, awaits human approval) |
 
 Each agent connects to Band **under its own identity** and only ever acts by
 posting messages and reacting to the shared stream. No agent calls another agent
-directly — the workflow advances purely because messages flow through Band.
+directly — the workflow advances purely because messages flow through Band. Note
+the **parallel collaboration**: the moment Intake posts `Classified`, both the
+DispatchCoordinator (matching the primary unit) and the ResourceLogisticsAgent
+(pre-staging backup + mutual aid) react at once in the same room; and when the
+Monitor posts `Escalation`, the LogisticsAgent commits backup while a human
+supervisor acknowledges — all in the shared transcript.
 
 ## The room IS the incident
 
@@ -41,16 +48,21 @@ Citizen channel ──RawReport──▶ ┌────────────
 IncidentIntakeAgent  ◀─────────┤ reads RawReport                                          │
    classifies (Gemini/fallback)│──Classified──▶ ──Handoff→dispatch──▶                     │
                                 │                                                          │
+   ┌── parallel on Classified ──┤                                                          │
 DispatchCoordinatorAgent ◀──────┤ reads Classified                                         │
    scores fleet (ETA+skill+load)│──UnitsQueried──▶ ──AssignmentProposed (awaits human)──▶  │
+ResourceLogisticsAgent ◀────────┤ reads Classified (serious) ──ResourceStaged (backup)──▶  │
                                 │                                                          │
 Human Dispatcher  ─────────────▶│──HumanDecision (confirm / override / reject)──▶          │
                                 │                                                          │
 DispatchCoordinatorAgent ◀──────┤ reads HumanDecision                                      │
                                 │──Dispatched──▶ ──Handoff→monitor──▶                       │
                                 │                                                          │
+PublicInfoAgent ◀───────────────┤ reads Dispatched ──CitizenUpdate──▶ ──PublicAlert(draft)▶│
 ResponseMonitorAgent ◀──────────┤ reads Dispatched                                         │
-   tracks GPS + SLA             │──StatusUpdate──▶ ──SlaWarning──▶ ──Escalation→supervisor─▶│
+   tracks GPS + SLA             │──StatusUpdate──▶ ──SlaWarning──▶ ──Escalation──▶          │
+ResourceLogisticsAgent ◀────────┤ reads Escalation ──ResourceStaged (commit backup)──▶     │
+PublicInfoAgent ◀───────────────┤ reads SlaWarning ──CitizenUpdate (delay notice)──▶       │
                                 │──CitizenUpdate──▶ ──Resolved──▶ ──Summary──▶ (room closed)│
                                 └──────────────────────────────────────────────────────────┘
 ```
@@ -72,9 +84,11 @@ Band/
 ├── BandRealtimeBroadcaster.cs # bridges Band → SignalR for the live viewer
 └── Agents/
     ├── BandAgent.cs               # base: connect, subscribe, react off-thread
-    ├── IncidentIntakeAgent.cs     # AGENT 1
-    ├── DispatchCoordinatorAgent.cs# AGENT 2
-    └── ResponseMonitorAgent.cs    # AGENT 3
+    ├── IncidentIntakeAgent.cs     # AGENT 1 — classify
+    ├── DispatchCoordinatorAgent.cs# AGENT 2 — match + propose (awaits human)
+    ├── ResourceLogisticsAgent.cs  # AGENT 3 — stage backup + mutual aid
+    ├── ResponseMonitorAgent.cs    # AGENT 4 — GPS/SLA track + resolve
+    └── PublicInfoAgent.cs         # AGENT 5 — citizen notifications + public alerts
 Hubs/BandHub.cs                # SignalR hub for the Band Room Viewer
 Controllers/BandController.cs  # console, room viewer, REST + simulate
 Views/Band/Console.cshtml      # launch + fleet + active rooms
@@ -90,10 +104,12 @@ Band runs in two modes, chosen in `appsettings.json` → `Band:Mode`:
   offline, which is exactly what you want for a reliable video and a hosted demo.
 - **Live:** set `Band:Mode=Live`. The same agents run, and `BandHttpGateway`
   additionally relays every message to the **`band-bridge/`** Node sidecar, which
-  republishes them to a hosted Band workspace using the official
-  `@band-sdk/core` SDK (`cd band-bridge && npm install && BAND_API_KEY=... npm start`).
-  The local broker stays the source of truth, so going live is purely additive and
-  never breaks the flow.
+  republishes them to a hosted Band workspace using the official Band SDK
+  (`@band-ai/sdk` + `@thenvoi/rest-client`):
+  `cd band-bridge && npm install && THENVOI_API_KEY=... npm start`.
+  Give each agent its own Band key via `THENVOI_AGENT_KEYS` for true
+  multi-identity. The local broker stays the source of truth, so going live is
+  purely additive and never breaks the flow.
 
 Because every agent is written against `IBandTransport`, swapping Simulation for
 Live changes **no agent code**.

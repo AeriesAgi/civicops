@@ -27,6 +27,16 @@ namespace CivicOps.Band
             Color = "#a855f7"
         };
 
+        public static BandIdentity LogisticsAgent => new()
+        {
+            Id = "agent.logistics",
+            DisplayName = "ResourceLogisticsAgent",
+            Kind = BandParticipantKind.Agent,
+            Role = "Backup & Mutual-Aid Staging",
+            Avatar = "bi-box-seam",
+            Color = "#14b8a6"
+        };
+
         public static BandIdentity MonitorAgent => new()
         {
             Id = "agent.monitor",
@@ -35,6 +45,16 @@ namespace CivicOps.Band
             Role = "Monitoring & Escalation",
             Avatar = "bi-activity",
             Color = "#f97316"
+        };
+
+        public static BandIdentity PublicInfoAgent => new()
+        {
+            Id = "agent.publicinfo",
+            DisplayName = "PublicInfoAgent",
+            Kind = BandParticipantKind.Agent,
+            Role = "Citizen Notifications & Public Alerts",
+            Avatar = "bi-megaphone",
+            Color = "#ec4899"
         };
 
         public static BandIdentity Dispatcher => new()

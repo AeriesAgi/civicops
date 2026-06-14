@@ -30,5 +30,19 @@ namespace CivicOps.Band
 
         public static bool RequiresEscalationPath(IncidentPriority priority) =>
             priority is IncidentPriority.Urgent or IncidentPriority.Critical or IncidentPriority.High;
+
+        /// <summary>Mutual-aid / backup resources the ResourceLogisticsAgent stages
+        /// for a given required unit type, modelling how a real ops room pre-arranges
+        /// supporting capacity alongside the primary responder.</summary>
+        public static string MutualAidFor(UnitType type) => type switch
+        {
+            UnitType.FireRescue => "second pumper + water tanker on standby, EMS co-response requested",
+            UnitType.Ambulance => "ALS backup ambulance staged, receiving-hospital trauma bay pre-alerted",
+            UnitType.ArmedResponse => "SAPS joint response + K9 unit on standby",
+            UnitType.DisasterManagement => "evacuation transport + Red Cross shelter coordination",
+            UnitType.UtilityCrew => "heavy-plant crew + traffic management on standby",
+            UnitType.MetroPolice => "additional patrol + traffic control units on standby",
+            _ => "supporting units placed on standby"
+        };
     }
 }

@@ -30,7 +30,9 @@ namespace CivicOps.Controllers
                 return Content(challenge ?? string.Empty, "text/plain");
             }
 
-            return Forbid();
+            // Forbid() requires an authentication scheme (none is configured) and
+            // would throw a 500; webhook verification must answer a plain 403.
+            return StatusCode(StatusCodes.Status403Forbidden);
         }
 
         [HttpPost]

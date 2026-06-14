@@ -8,7 +8,7 @@ namespace CivicOps.Band
 {
     /// <summary>
     /// Top-level facade over the Band coordination layer for the rest of CivicOps
-    /// Command (controllers, SignalR, simulation). It owns the three agents (so
+    /// Command (controllers, SignalR, simulation). It owns the five agents (so
     /// they are alive and subscribed for the app's lifetime) and exposes the few
     /// operations the outside world performs *into* Band: dropping a raw report,
     /// recording a human dispatcher's decision, and reading room state.
@@ -25,7 +25,9 @@ namespace CivicOps.Band
             BandOptions options,
             IncidentIntakeAgent intakeAgent,
             DispatchCoordinatorAgent dispatchAgent,
+            ResourceLogisticsAgent logisticsAgent,
             ResponseMonitorAgent monitorAgent,
+            PublicInfoAgent publicInfoAgent,
             ILogger<BandAgentService> logger)
         {
             _transport = transport;
@@ -39,9 +41,10 @@ namespace CivicOps.Band
             _transport.Connect(BandIdentities.System);
 
             _logger.LogInformation(
-                "Band coordination layer online in {Mode} mode with agents: {A1}, {A2}, {A3}",
-                _options.Mode, intakeAgent.Identity.DisplayName,
-                dispatchAgent.Identity.DisplayName, monitorAgent.Identity.DisplayName);
+                "Band coordination layer online in {Mode} mode with agents: {A1}, {A2}, {A3}, {A4}, {A5}",
+                _options.Mode, intakeAgent.Identity.DisplayName, dispatchAgent.Identity.DisplayName,
+                logisticsAgent.Identity.DisplayName, monitorAgent.Identity.DisplayName,
+                publicInfoAgent.Identity.DisplayName);
         }
 
         public string Mode => _options.Mode;

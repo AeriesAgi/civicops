@@ -16,10 +16,10 @@ namespace CivicOps.Band
     }
 
     /// <summary>
-    /// Semantic type of a Band message. These types are how the three agents
-    /// reason about the conversation: each agent reacts to specific kinds and
-    /// emits others, so the workflow advances purely by messages flowing
-    /// through Band (never by direct method calls between agents).
+    /// Semantic type of a Band message. These types are how the agents reason
+    /// about the conversation: each agent reacts to specific kinds and emits
+    /// others, so the workflow advances purely by messages flowing through Band
+    /// (never by direct method calls between agents).
     /// </summary>
     public enum BandMessageKind
     {
@@ -32,9 +32,11 @@ namespace CivicOps.Band
         AssignmentProposed, // DispatchCoordinatorAgent recommends a unit (awaits human)
         HumanDecision,      // dispatcher confirms / overrides / rejects
         Dispatched,         // unit confirmed and en route
+        ResourceStaged,     // ResourceLogisticsAgent stages backup / mutual aid
         StatusUpdate,       // ResponseMonitorAgent heartbeat / GPS / ETA
         SlaWarning,         // SLA timer at risk
-        Escalation,         // escalated to supervisor
+        Escalation,         // escalated to supervisor / logistics
+        PublicAlert,        // PublicInfoAgent recommends a public area alert
         CitizenUpdate,      // status pushed back to the citizen
         Resolved,           // incident resolved on scene
         Summary             // closing audit summary of the room
