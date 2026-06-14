@@ -7,9 +7,9 @@ namespace CivicOps.Band
     /// C# Band client wrapper bound to a single identity. This is the surface an
     /// agent (or a human connector) uses to participate in Band: connect, join a
     /// room, publish typed messages, and subscribe to everything other members
-    /// say. It deliberately mirrors the ergonomics of the <c>@band-sdk/core</c>
-    /// client (<c>band.connect()</c>, <c>room.join()</c>, <c>room.post()</c>,
-    /// <c>room.on('message')</c>) so the mental model matches the Band SDK.
+    /// say. It deliberately mirrors the ergonomics of the official Band SDK
+    /// (<c>@band-ai/sdk</c>) client (connect, join a room, post a message,
+    /// react to the stream) so the mental model matches the Band platform.
     /// </summary>
     public class BandAgentClient
     {

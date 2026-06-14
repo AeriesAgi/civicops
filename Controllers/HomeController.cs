@@ -326,7 +326,7 @@ namespace CivicOps.Controllers
             return RedirectToAction("Incident", new { id });
         }
 
-        private static string BuildDefaultPublicUpdate(string? actionType, Incident incident) => actionType switch
+        private static string? BuildDefaultPublicUpdate(string? actionType, Incident incident) => actionType switch
         {
             "acknowledge" => $"{incident.AssignedDepartment.GetDisplayName()} has acknowledged report {incident.ReferenceNumber} and is reviewing the next operational step.",
             "in-progress" => $"Work is now in progress for {incident.ReferenceNumber}. The assigned department will post updates as field information is confirmed.",
@@ -584,10 +584,12 @@ namespace CivicOps.Controllers
             return View("Mobile");
         }
 
-        [HttpGet("/app/area/{area}/thread")]
-        public async Task<IActionResult> AppAreaThread(string area)
+        // Route token deliberately named areaName: a value named "area" would be
+        // treated as an MVC Areas token and break view resolution for this action.
+        [HttpGet("/app/area/{areaName}/thread")]
+        public async Task<IActionResult> AppAreaThread(string areaName)
         {
-            var normalizedArea = Uri.UnescapeDataString(area).Trim();
+            var normalizedArea = Uri.UnescapeDataString(areaName).Trim();
             var incidents = (await _dataService.GetAllIncidentsAsync())
                 .Where(i => i.NormalizedArea.Equals(normalizedArea, StringComparison.OrdinalIgnoreCase) || i.Suburb.Equals(normalizedArea, StringComparison.OrdinalIgnoreCase))
                 .Take(12)

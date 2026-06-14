@@ -17,7 +17,7 @@ namespace CivicOps.Band
 
     /// <summary>
     /// Drives a complete multi-agent dispatch end to end for demos and the video:
-    /// a serious report enters, all three agents coordinate through Band, the
+    /// a serious report enters, all five agents coordinate through Band, the
     /// human confirmation step is exercised (auto or manual), the incident is
     /// monitored and resolved, and the Band room is summarised.
     /// </summary>

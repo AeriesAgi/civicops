@@ -1,20 +1,20 @@
 # CivicOps Command — Band Bridge (Node sidecar)
 
-This is the **real Band client** for CivicOps Command. It uses the official
-`@band-sdk/core` npm SDK to publish the multi-agent dispatch transcript to a
-hosted Band workspace.
+This is the **real Band client** for CivicOps Command. It uses the official Band
+SDK (`@band-ai/sdk` + `@thenvoi/rest-client`) to publish the five-agent dispatch
+transcript into a hosted Band room.
 
 ## How it fits
 
 ```
-┌─────────────────────────── CivicOps Command (ASP.NET Core) ───────────────────────────┐
-│  IncidentIntakeAgent   DispatchCoordinatorAgent   ResponseMonitorAgent                 │
-│        │                       │                          │                            │
-│        └──────────► LocalBandBroker (in-process Band, source of truth) ◄───────────────┤
-│                               │  (Band:Mode=Live)                                       │
-│                       BandHttpGateway ──HTTP──►  ┌─────────────────────────────┐        │
-└──────────────────────────────────────────────── │  band-bridge (this service) │ ──────►  band.ai
-                                                   │  @band-sdk/core             │   (real Band rooms)
+┌──────────────────────────── CivicOps Command (ASP.NET Core) ────────────────────────────┐
+│  IntakeAgent  DispatchAgent  LogisticsAgent  MonitorAgent  PublicInfoAgent               │
+│        │            │              │              │              │                       │
+│        └────────────┴───► LocalBandBroker (in-process Band, source of truth) ◄───────────┤
+│                               │  (Band:Mode=Live)                                         │
+│                       BandHttpGateway ──HTTP──►  ┌─────────────────────────────┐          │
+└──────────────────────────────────────────────── │  band-bridge (this service) │ ──────►  Band
+                                                   │  @band-ai/sdk               │  (real rooms)
                                                    └─────────────────────────────┘
 ```
 
@@ -23,13 +23,35 @@ with zero dependencies. When `Band:Mode=Live`, every message is *also* relayed t
 this sidecar, which republishes it to the real Band platform via the SDK. The
 local broker stays the source of truth — going live is purely additive.
 
+## Identity model
+
+Two ways to attribute the transcript in Band:
+
+- **Single identity:** set `THENVOI_API_KEY`. That one Band identity creates each
+  room and posts every message (each line prefixed with the agent's name).
+- **True multi-identity:** set `THENVOI_AGENT_KEYS` — a JSON map of each CivicOps
+  agent id to its own Band API key — so all five agents appear as five distinct
+  members collaborating in one shared Band room. Any agent without its own key
+  falls back to `THENVOI_API_KEY`.
+
+```jsonc
+THENVOI_AGENT_KEYS={
+  "agent.intake":     "sk_...",
+  "agent.dispatch":   "sk_...",
+  "agent.logistics":  "sk_...",
+  "agent.monitor":    "sk_...",
+  "agent.publicinfo": "sk_..."
+}
+```
+
 ## Run it
 
 ```bash
 cd band-bridge
-npm install                 # installs @band-sdk/core + express
-cp .env.example .env        # set BAND_API_KEY
-BAND_API_KEY=sk_... npm start
+npm install                 # installs @band-ai/sdk + @thenvoi/rest-client + express
+cp .env.example .env        # set THENVOI_API_KEY (and/or THENVOI_AGENT_KEYS)
+THENVOI_API_KEY=sk_... npm start
+# → [band-bridge] Band SDK online → https://app.thenvoi.com (workspace 'civicops-command', ...)
 # → [band-bridge] listening on http://localhost:8787 (mode=live, workspace=civicops-command)
 ```
 
@@ -40,22 +62,30 @@ Then run CivicOps Command with:
 "Band": { "Mode": "Live", "BridgeUrl": "http://localhost:8787", "Workspace": "civicops-command" }
 ```
 
-Launch a scenario at `/Band` and the same transcript appears in your Band room.
+Launch a scenario at `/Band` and the same five-agent transcript appears in your
+Band room.
 
 ## Stub mode
 
-If `@band-sdk/core` isn't installed or `BAND_API_KEY` is empty, the bridge runs in
-**stub mode**: it logs each message it would publish instead of calling Band. This
-lets you exercise the full Live relay path locally without credentials.
+If no key is set (or the SDK can't load), the bridge runs in **stub mode**: it
+logs each message it would publish instead of calling Band. This lets you
+exercise the full Live relay path locally without credentials.
 
 ## HTTP API
 
 | Method | Path | Body | Purpose |
 |---|---|---|---|
-| `GET`  | `/health` | — | `{ ok, mode, workspace }` |
-| `POST` | `/agents` | `{ id, name, role }` | Register/connect a Band agent identity |
-| `POST` | `/rooms/:roomId/messages` | `{ agentId, agentName, role, type, text, handoffTo, data }` | Publish a message to a Band room |
+| `GET`  | `/health` | — | `{ ok, mode, workspace, restUrl, perAgentIdentities }` |
+| `POST` | `/agents` | `{ id, name, role }` | Probe whether an agent posts under its own Band identity |
+| `POST` | `/rooms/:roomId/messages` | `{ agentId, agentName, role, type, text, handoffTo, data }` | Publish a message into the room's Band chat |
 
-> Note: `@band-sdk/core` method shapes are resolved defensively at runtime
-> (`band.room()/joinRoom()`, `room.post()/send()`), so the bridge tolerates SDK
-> surface changes and always degrades to stub mode rather than crashing.
+Each relayed message is posted with `createChatMessage`; the CivicOps message
+**kind** and structured payload travel in `metadata` (the platform validates its
+own `messageType` enum, so domain kinds live in metadata rather than there).
+
+## Resilience
+
+Every Band call is best-effort and wrapped so a live-relay hiccup (auth, network,
+rate limit) is logged and returned as `delivered: "error-soft"` — it never throws
+back into the C# workflow. The in-process broker remains the source of truth, so
+the demo keeps running no matter what the live platform does.

@@ -7,8 +7,8 @@ namespace CivicOps.Band
         /// (also mirror messages to a hosted band.ai room).</summary>
         public string Mode { get; set; } = "Simulation";
 
-        /// <summary>URL of the Node band-bridge sidecar that speaks @band-sdk/core
-        /// to the real Band platform (used only in Live mode).</summary>
+        /// <summary>URL of the Node band-bridge sidecar that speaks the official
+        /// Band SDK (@band-ai/sdk) to the real Band platform (Live mode only).</summary>
         public string BridgeUrl { get; set; } = "http://localhost:8787";
 
         /// <summary>Band workspace / project the rooms live under.</summary>

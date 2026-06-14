@@ -10,9 +10,10 @@ namespace CivicOps.Band
     /// Optional live mirror to the Band platform. When Band:Mode=Live, every
     /// message the agents publish locally is also best-effort relayed to the
     /// Node <c>band-bridge</c> sidecar, which republishes it to a hosted Band
-    /// workspace using the official <c>@band-sdk/core</c> SDK. The local broker
-    /// stays the source of truth, so the demo runs even with no network and no
-    /// sidecar — this layer is purely additive.
+    /// workspace using the official Band SDK (<c>@band-ai/sdk</c> +
+    /// <c>@thenvoi/rest-client</c>). The local broker stays the source of truth,
+    /// so the demo runs even with no network and no sidecar — this layer is
+    /// purely additive.
     /// </summary>
     public class BandHttpGateway
     {

@@ -6,7 +6,7 @@ CivicOps is a polished, app-first civic AI platform for AI-powered civic reporti
 
 ## 🛰️ NEW: Band Multi-Agent Emergency Dispatch (Band of Agents Hackathon — Track 3)
 
-CivicOps Command now coordinates emergency dispatch with **three specialised AI
+CivicOps Command now coordinates emergency dispatch with **five specialised AI
 agents that communicate _through_ [Band](https://band.ai), the shared agent
 interaction layer** — not before or after it. Open **`/Band`** in the running app.
 
@@ -16,24 +16,34 @@ interaction layer** — not before or after it. Open **`/Band`** in the running 
 - **DispatchCoordinatorAgent** — reads the classified incident from Band, scores
   available units by ETA + skill + workload, proposes the best unit, and **waits
   for a human dispatcher to confirm in the same Band room.**
+- **ResourceLogisticsAgent** — works the room in parallel: on a serious incident
+  it pre-stages a backup unit and mutual-aid resources, and when the monitor
+  escalates an SLA risk it commits that backup — all through Band.
 - **ResponseMonitorAgent** — reads the active assignment from Band, monitors GPS +
-  the SLA timer, escalates to a supervisor through Band, pushes citizen updates,
-  and closes the incident with an audit summary.
+  the SLA timer, escalates through Band, and closes the incident with an audit
+  summary.
+- **PublicInfoAgent** — owns the public-facing lane: notifies the reporting
+  citizen on dispatch, drafts a public area alert for serious incidents (for human
+  approval), and posts a transparent delay notice if the SLA slips.
 
 **The room IS the incident** (`incident id = room id`). Every signal — raw report,
-classification, unit scoring, the human confirmation, GPS heartbeats, SLA
-escalation, resolution — flows through one shared Band room that judges can replay
-end to end in the live **Band Room Viewer**.
+classification, backup staging, unit scoring, the human confirmation, GPS
+heartbeats, SLA escalation, citizen alerts, resolution — flows through one shared
+Band room that judges can replay end to end in the live **Band Room Viewer**.
 
 ```
-RawReport → Classified → UnitsProposed → 🧑‍✈️ Human confirm → Dispatched → Monitored → Resolved → Summary
-   (Intake)     (Intake)     (Dispatch)      (Human)          (Dispatch)   (Monitor)   (Monitor)  (Monitor)
+                         ┌─ ResourceLogisticsAgent: stage backup + mutual aid ─┐
+RawReport → Classified → ┤                                                     ├→ 🧑‍✈️ Human confirm →
+ (Intake)   (Intake)     └─ DispatchCoordinatorAgent: score units + propose ───┘      (Human)
+
+→ Dispatched → [PublicInfo: notify citizen + draft alert] → Monitored → Escalation → Resolved → Summary
+  (Dispatch)                                                 (Monitor)  (Logistics)  (Monitor) (Monitor)
 ```
 
 ### Try it in 30 seconds
 1. Run the app, open **`/Band`**.
 2. Pick a scenario (e.g. *Structural fire with people trapped*) → **Launch in Band**.
-3. Watch all three agents coordinate live; confirm the dispatch yourself
+3. Watch all five agents coordinate live; confirm the dispatch yourself
    (uncheck auto-confirm) to see the human-in-the-loop step, or let it auto-drive.
 4. Or from a shell: `./scripts/band-demo.sh structure-fire`
 
@@ -52,9 +62,12 @@ Submission text: [`SUBMISSION.md`](SUBMISSION.md).
 In **Simulation** mode the agents coordinate through an in-process model of Band,
 so the demo runs with zero external dependencies. In **Live** mode the *same*
 agents additionally relay every message to the **`band-bridge/`** Node sidecar,
-which publishes them to a hosted Band workspace using the official
-[`@band-sdk/core`](https://band.ai/docs) SDK — no agent code changes, because each
-agent is written against the `IBandTransport` seam. See [`band-bridge/`](band-bridge/).
+which publishes them to a hosted Band workspace using the official Band SDK
+([`@band-ai/sdk`](https://www.npmjs.com/package/@band-ai/sdk) +
+`@thenvoi/rest-client`) — no agent code changes, because each agent is written
+against the `IBandTransport` seam. Give each of the five agents its own Band key
+(`THENVOI_AGENT_KEYS`) to have them appear as five distinct members in one shared
+Band room. See [`band-bridge/`](band-bridge/).
 
 ---
 
