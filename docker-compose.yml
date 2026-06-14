@@ -1,0 +1,35 @@
+# CivicOps Command — full local stack with LIVE Band.
+#
+# Brings up the ASP.NET app and the Band bridge together, wired so every message
+# the five agents post is mirrored into a real Band workspace.
+#
+#   THENVOI_API_KEY=sk_... docker compose up --build
+#   # open http://localhost:8080/Band and launch a scenario
+#
+# Without a key the bridge runs in stub mode and the app still works end to end
+# (the in-process broker is always the source of truth). For five distinct Band
+# identities, set THENVOI_AGENT_KEYS (see band-bridge/.env.example).
+services:
+  civicops:
+    build: .
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      PORT: "8080"
+      Band__Mode: Live
+      Band__BridgeUrl: http://band-bridge:8787
+      Band__Workspace: civicops-command
+    ports:
+      - "8080:8080"
+    depends_on:
+      - band-bridge
+
+  band-bridge:
+    build: ./band-bridge
+    environment:
+      PORT: "8787"
+      THENVOI_API_KEY: ${THENVOI_API_KEY:-}
+      THENVOI_AGENT_KEYS: ${THENVOI_AGENT_KEYS:-}
+      THENVOI_REST_URL: ${THENVOI_REST_URL:-https://app.thenvoi.com}
+      BAND_WORKSPACE: civicops-command
+    ports:
+      - "8787:8787"
