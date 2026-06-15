@@ -49,6 +49,7 @@ RawReport → Classified → ┤                                                
 
 Architecture deep-dive: [`docs/band-architecture.md`](docs/band-architecture.md).
 Submission text: [`SUBMISSION.md`](SUBMISSION.md).
+Judge readiness checklist: [`HACKATHON_READINESS.md`](HACKATHON_READINESS.md).
 
 ### Band configuration (`appsettings.json` → `Band`)
 ```jsonc

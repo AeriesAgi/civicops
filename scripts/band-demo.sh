@@ -32,6 +32,7 @@ echo
 
 LAST=0
 echo "▶ Streaming Band room transcript (Ctrl-C to stop)…"
+SUMMARY_SEEN=false
 for _ in $(seq 1 40); do
   MSGS=$(curl -s "${BASE}/api/band/rooms/${ROOM}/since/${LAST}")
   # naive pretty-print of new messages
@@ -39,9 +40,20 @@ for _ in $(seq 1 40); do
     | sed -e 's/"senderName":"/[/; s/","senderKind":"[^"]*"[^}]*"kind":"/ · /; s/","text":"/] /; s/\\n/ /g; s/"$//' || true
   NEW=$(echo "$MSGS" | grep -o '"sequence":[0-9]*' | sed 's/"sequence"://' | sort -n | tail -1 || true)
   if [ -n "${NEW:-}" ]; then LAST=$NEW; fi
-  if echo "$MSGS" | grep -q '"kind":"Summary"'; then echo; echo "✔ Incident resolved and Band room summarised."; break; fi
+  if echo "$MSGS" | grep -q '"kind":"Summary"'; then echo; echo "✔ Incident resolved and Band room summarised."; SUMMARY_SEEN=true; break; fi
   sleep 2
 done
 
+ROOM_JSON=$(curl -s "${BASE}/api/band/rooms/${ROOM}")
+AGENT_COUNT=$(printf '%s' "$ROOM_JSON" | python3 -c "import json,sys; data=json.load(sys.stdin); print(len({m.get('senderName') for m in data.get('messages', []) if m.get('senderKind') == 'Agent'}))" 2>/dev/null || echo 0)
+CLOSED=$(printf '%s' "$ROOM_JSON" | python3 -c "import json,sys; data=json.load(sys.stdin); print(str(data.get('room', {}).get('isClosed', False)).lower())" 2>/dev/null || echo false)
+
+if [[ "$SUMMARY_SEEN" != "true" || "$AGENT_COUNT" -lt 5 || "$CLOSED" != "true" ]]; then
+  echo "✗ Demo readiness check failed: summary=${SUMMARY_SEEN}, agents=${AGENT_COUNT}, closed=${CLOSED}" >&2
+  echo "Open the full audit trail in the browser: ${BASE}/Band/Room/${ROOM}" >&2
+  exit 1
+fi
+
+echo "✔ Demo readiness check passed: ${AGENT_COUNT} agents collaborated and the room closed."
 echo
 echo "Open the full audit trail in the browser: ${BASE}/Band/Room/${ROOM}"
