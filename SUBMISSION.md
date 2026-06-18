@@ -1,120 +1,147 @@
-# Band of Agents Hackathon — Submission
+# CivicOps Band of Agents Submission
 
-**Title:** CivicOps Command — Band Multi-Agent Emergency Dispatch System
+## Project Title
 
-**Track:** Track 3 — Regulated & High-Stakes Workflows
+CivicOps Command
 
-**Tech tags:** Band, ASP.NET Core, AI Agents, Emergency Response, Multi-Agent
+## Tagline
 
----
+Multi-agent civic and emergency operations: from citizen report to routed response, public update and audit trail.
 
-## Short description
+## Problem
 
-Five specialised AI agents run emergency dispatch end to end — intake, dispatch
-coordination, resource logistics, response monitoring, and public information —
-coordinating **through Band**, with a human dispatcher confirming every committal
-inside the shared per-incident Band room. The room is the incident; the transcript
-is the audit trail.
+Citizen reports arrive through messy text, WhatsApp-style messages and voice-note transcripts. Municipal and emergency teams then have to extract facts, classify urgency, route work, update the public and preserve an audit trail under pressure. That work is often fragmented across people, spreadsheets and disconnected inboxes.
 
----
+## Solution
 
-## Long description
+CivicOps turns raw citizen reports into structured incidents and coordinates five collaborating agents in a shared Band workflow:
 
-CivicOps Command is a production-grade operational intelligence platform for
-emergency response and dispatch (ASP.NET Core, Clean Architecture, real-time
-SignalR, AI classification). For the Band of Agents Hackathon we added **Band as
-the coordination layer between five specialised agents** that together run a
-dispatch from the moment a citizen report arrives to the moment the incident is
-resolved.
+- Intake Agent extracts location, category, urgency, contact and description.
+- Triage Agent classifies severity, response type and missing information.
+- Dispatch/Routing Agent assigns workflow, response priority, unit and escalation path.
+- Public Status/Comms Agent prepares citizen-friendly WhatsApp/public updates.
+- Audit/Supervisor Agent records key decisions, SLA risk and final supervisor summary.
 
-**Band is the substrate, not a wrapper.** Each agent connects to Band under its
-own identity and acts *only* by posting messages to, and reacting to, a shared
-per-incident room (`incident id = room id`). No agent calls another directly —
-the workflow advances purely because context flows through Band.
+The demo shows the full chain for a seeded water-main incident: voice-note transcript -> Band room -> triage -> dispatch proposal -> human confirmation -> public update -> monitoring -> resolution -> audit summary.
 
-- **IncidentIntakeAgent** accepts raw, unstructured reports from any channel
-  (citizen app, WhatsApp, call centre, walk-in), uses the CivicOps AI pipeline to
-  classify type, severity, affected area and required resource, posts the
-  structured incident into the Band room, and hands off to dispatch.
-- **DispatchCoordinatorAgent** reads the classified incident from Band, queries
-  available units by type and proximity, scores the best match on ETA + skill +
-  current workload, and proposes a unit — then **stops and waits for a human
-  dispatcher to confirm in the Band room.** The human sees the full Band context
-  and clicks Confirm, Override or Reject; that decision is itself a Band message
-  the agent then acts on.
-- **ResourceLogisticsAgent** reacts to the same classified incident *in parallel*:
-  for a serious call it pre-stages a backup unit and mutual-aid resources, and when
-  the monitor escalates an SLA risk it commits that backup — so supporting capacity
-  is arranged through Band without ever touching the human-confirmed primary unit.
-- **ResponseMonitorAgent** reads the active assignment from Band, tracks the unit's
-  GPS and the SLA timer, posts live status heartbeats, escalates through Band if
-  the SLA is at risk, and closes the incident with an audit summary.
-- **PublicInfoAgent** owns the public-facing lane: on dispatch it notifies the
-  reporting citizen, for serious incidents it drafts a public area alert (which a
-  human approves before broadcast), and it posts a transparent delay notice if the
-  SLA slips.
+## Why Now
 
-Everything is visible in a live **Band Room Viewer**: a real-time, colour-coded
-stream of every agent message and hand-off, with the human confirmation panel
-inline. Judges can watch five agents and a human collaborate in one shared space,
-then replay the entire incident from the room history.
+Cities face more climate, infrastructure and safety disruptions while residents expect real-time communication. Multi-agent systems are now strong enough to divide complex operational work into specialized lanes, but high-stakes response still needs human checkpoints and auditable records. Band gives CivicOps a collaboration layer where those agents can work together visibly.
 
-A one-click **simulation mode** runs a serious incident (e.g. a structural fire
-with people trapped) through the whole flow for the demo video, including the
-human-in-the-loop step and a supervisor escalation.
+## Target Users
 
-### Why this matters
-Emergency dispatch is a regulated, high-stakes workflow where minutes save lives,
-specialists must share context, hand-offs must be clean, and every decision must
-be auditable — while a human retains authority over irreversible actions. That is
-precisely what Band provides as a coordination layer, and precisely what CivicOps
-Command demonstrates.
+- Municipal operations centers.
+- Ward offices and public works teams.
+- Utilities and infrastructure response teams.
+- Emergency management and disaster coordination teams.
+- NGOs or civic response groups that triage community reports.
 
-### Judging alignment
-- **Application of technology:** Band is the actual coordination layer — identities,
-  rooms, messages, subscriptions, hand-offs and history — with a clean
-  `IBandTransport` seam that runs in-process for the demo and mirrors to a hosted
-  Band workspace in live mode (via the official `@band-ai/sdk`) without changing a
-  line of agent code. Five agents collaborate, including genuine parallel work and
-  agent-to-agent escalation, not a single linear chain.
-- **Presentation:** emergency dispatch is instantly legible; the Band Room Viewer
-  makes multi-agent coordination something you can simply *watch*.
-- **Business value:** real enterprise workflow — faster, auditable, human-governed
-  dispatch on a production platform, not a toy.
-- **Originality:** multi-agent emergency dispatch with human-in-the-loop
-  confirmation happening *inside* the shared Band room.
+## How Band Is Used
 
----
+Band is the shared interaction layer for the incident. CivicOps runs a local in-process Band-style broker by default so judges can test the complete workflow without external credentials. When live credentials and the Node `band-bridge/` sidecar are configured, the same transcript can be mirrored to a hosted Band room.
 
-## Deliverables
+Secrets are read from environment variables only. The app reports only configured/not-configured flags and never renders API keys to the frontend or logs.
 
-| # | Deliverable | Where |
-|---|---|---|
-| 1 | Working Band integration (5 agents) | `Band/` + `Band/Agents/` |
-| 2 | End-to-end demo flow | `/Band` console + `scripts/band-demo.sh` |
-| 3 | Clean public GitHub repo | this repository |
-| 4 | Hosted demo URL | **`<your-deploy>.onrender.com`** — one-click deploy via [`render.yaml`](render.yaml); see [`docs/deployment.md`](docs/deployment.md) |
-| 5 | Submission text | this file |
-| 6 | README explaining Band architecture | `README.md` + `docs/band-architecture.md` |
+## Agent Workflow
 
-The hosted demo runs Band in **Simulation** mode, so the full five-agent dispatch
-and the live Band Room Viewer work with zero secrets. To mirror the transcript
-into a real Band workspace (uses your Band account), run the included
-`docker-compose.yml` with `THENVOI_API_KEY` set, or deploy the `band-bridge/`
-sidecar and flip `Band__Mode=Live`. Health check: `/healthz`.
+1. A citizen report enters through the seeded demo, web report, WhatsApp-style simulator or voice-note transcript simulator.
+2. The Intake Agent posts the raw report and extracted fields to the incident room.
+3. The Triage Agent classifies category, urgency, severity and missing information.
+4. The Dispatch/Routing Agent recommends the operational workflow and unit, then waits for human confirmation.
+5. The Public Status/Comms Agent writes a clear resident-facing update.
+6. The Audit/Supervisor Agent records decisions, status changes, escalation and the final summary.
 
-## Demo script (for the video)
+## Technology Partners
 
-1. Open `/Band`. Point out the five agents and the Command fleet.
-2. Select **Structural fire with people trapped**, **uncheck auto-confirm**, Launch.
-3. Watch **IncidentIntakeAgent** classify and hand off in the Band room.
-4. Watch **DispatchCoordinatorAgent** score units and propose one — note it *waits* —
-   while **ResourceLogisticsAgent** pre-stages a backup unit *in parallel* in the
-   same room.
-5. As the human dispatcher, click **Confirm** inside the Band room.
-6. Watch **PublicInfoAgent** notify the citizen and draft a public area alert, then
-   **ResponseMonitorAgent** track GPS/SLA and escalate — at which point
-   **ResourceLogisticsAgent** commits the backup and a human supervisor acknowledges.
-7. Watch the incident resolve and the Band room summary report **5 agents
-   collaborated through Band**.
-8. Re-run with auto-confirm for the unattended end-to-end pass.
+- **Band:** multi-agent room, handoff and evidence layer; optional live mirror through `band-bridge/`.
+- **AI/ML API:** optional unified model access for extraction, reasoning and summarization when `AIML_API_KEY` is present.
+- **Featherless AI:** optional OpenAI-compatible serverless open-source inference using `https://api.featherless.ai/v1`.
+- **Gemini:** existing optional enrichment layer; deterministic fallback remains the default.
+
+## Architecture
+
+- ASP.NET Core MVC app.
+- SignalR live Band room viewer.
+- `Band/` local broker, agent identities, room models, simulation service and optional HTTP gateway.
+- `band-bridge/` Node sidecar for optional live Band relay.
+- Optional OpenAI-compatible provider adapter for AI/ML API and Featherless.
+- JSON-backed demo data and deterministic classification fallback.
+- Docker-ready app with `/healthz` and `/api/integrations/status`.
+
+## Impact
+
+CivicOps can reduce dispatcher overload, speed up routing, make resident communication clearer and create a replayable evidence trail. The pattern applies to water leaks, road hazards, power outages, fire risk, flooding and public safety reports.
+
+## Demo Instructions
+
+1. Run `dotnet run --urls http://localhost:5000`.
+2. Open `http://localhost:5000/demo/band`.
+3. Select `Burst water main threatening homes`.
+4. Keep auto-confirm checked for the recording, or uncheck it to perform the human dispatcher decision manually.
+5. Click `Launch in Band`.
+6. Watch the Band room reach dispatch, public update, monitoring, resolution and supervisor summary.
+7. Open `/api/integrations/status` to verify fallback/live readiness without exposing secrets.
+
+## Deployment Instructions
+
+```bash
+dotnet restore
+dotnet build
+dotnet run --urls http://localhost:5000
+```
+
+Container:
+
+```bash
+docker build -t civicops-command .
+docker run -p 8080:8080 -e PORT=8080 -e DEMO_MODE=true civicops-command
+```
+
+Live Band mirror requires the `band-bridge/` sidecar and environment variables listed below.
+
+## Environment Variables
+
+- `BAND_API_KEY`
+- `BAND_API_BASE_URL`
+- `AIML_API_KEY`
+- `AIML_API_BASE_URL`
+- `AIML_MODEL`
+- `FEATHERLESS_API_KEY`
+- `FEATHERLESS_MODEL`
+- `DEMO_MODE`
+- `Band__Mode`
+- `Band__BridgeUrl`
+- `Band__Workspace`
+- `Band__TickSeconds`
+- Existing optional Gemini and WhatsApp variables are documented in `.env.example`.
+
+## What Is Working
+
+- Full local deterministic multi-agent Band demo.
+- `/demo/band` and `/Band` console.
+- Live Band room viewer with real-time SignalR updates.
+- Seeded water-main scenario showing intake, triage, dispatch, public update and audit summary.
+- Human-in-the-loop dispatch confirmation.
+- Optional provider status endpoint.
+- Safe `.env.example`.
+- Submission docs, pitch outline and evidence checklist.
+
+## What Is Simulated / Fallback
+
+- Without Band credentials, the app uses the local Band broker and does not claim live Band delivery.
+- Without AI/ML API, Featherless or Gemini keys, extraction/classification uses deterministic local fallback.
+- WhatsApp and voice-note flows are demo/simulator-ready unless production messaging and transcription credentials are supplied.
+- No production municipal partnership, emergency authority or live deployment is claimed in this repository.
+
+## Future Roadmap
+
+- Live Band room validation with official hackathon credentials.
+- Production identity and access control.
+- Approved WhatsApp templates and real call-center ingestion.
+- GIS/ward boundary integrations.
+- Fleet CAD, work-order and utility outage integrations.
+- Post-incident analytics and model evaluation.
+
+## Contact
+
+info@culltron.app

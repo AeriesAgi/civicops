@@ -1,23 +1,29 @@
 plugins { id 'com.android.application' }
 
 android {
-    namespace 'com.civicops.citizen'
-    compileSdk 35
+    namespace = 'com.civicops.citizen'
+    compileSdk = 35
 
     defaultConfig {
-        applicationId 'com.civicops.citizen'
-        minSdk 24
-        targetSdk 35
-        versionCode 1
-        versionName '1.0.0-hackathon'
+        applicationId = 'com.civicops.citizen'
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 2
+        versionName = '1.0.1-band'
         buildConfigField 'String', 'CIVICOPS_BASE_URL', "\"${project.findProperty('civicopsBaseUrl') ?: 'https://civicops.culltron.app/app'}\""
     }
 
-    buildFeatures { buildConfig true }
+    buildFeatures { buildConfig = true }
 
     buildTypes {
-        debug { applicationIdSuffix '.debug'; versionNameSuffix '-debug' }
-        release { minifyEnabled false; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' }
+        debug {
+            applicationIdSuffix = '.debug'
+            versionNameSuffix = '-debug'
+        }
+        release {
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
 }
 

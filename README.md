@@ -4,27 +4,22 @@ CivicOps is a polished, app-first civic AI platform for AI-powered civic reporti
 
 ---
 
-## 🛰️ NEW: Band Multi-Agent Emergency Dispatch (Band of Agents Hackathon — Track 3)
+## Band Multi-Agent Emergency Dispatch (Band of Agents Hackathon)
 
 CivicOps Command now coordinates emergency dispatch with **five specialised AI
-agents that communicate _through_ [Band](https://band.ai), the shared agent
-interaction layer** — not before or after it. Open **`/Band`** in the running app.
+agents that communicate _through_ Band, the shared agent interaction layer**.
+Open **`/demo/band`** or **`/Band`** in the running app.
 
-- **IncidentIntakeAgent** — receives a raw report (citizen app, WhatsApp, call
-  centre, walk-in), classifies type/severity/area/required resource, and posts
-  the structured incident to a per-incident Band room.
-- **DispatchCoordinatorAgent** — reads the classified incident from Band, scores
-  available units by ETA + skill + workload, proposes the best unit, and **waits
-  for a human dispatcher to confirm in the same Band room.**
-- **ResourceLogisticsAgent** — works the room in parallel: on a serious incident
-  it pre-stages a backup unit and mutual-aid resources, and when the monitor
-  escalates an SLA risk it commits that backup — all through Band.
-- **ResponseMonitorAgent** — reads the active assignment from Band, monitors GPS +
-  the SLA timer, escalates through Band, and closes the incident with an audit
-  summary.
-- **PublicInfoAgent** — owns the public-facing lane: notifies the reporting
-  citizen on dispatch, drafts a public area alert for serious incidents (for human
-  approval), and posts a transparent delay notice if the SLA slips.
+- **Intake Agent** — receives raw citizen app, WhatsApp-style, call-centre or
+  voice-note transcript reports and extracts location, contact, category and
+  description.
+- **Triage Agent** — classifies severity, response type and missing information.
+- **Dispatch/Routing Agent** — scores available units, assigns workflow and waits
+  for a human dispatcher to confirm in the same Band room.
+- **Public Status/Comms Agent** — generates citizen-friendly WhatsApp/public
+  response text.
+- **Audit/Supervisor Agent** — records key decisions, SLA risk, escalation and the
+  final supervisor summary.
 
 **The room IS the incident** (`incident id = room id`). Every signal — raw report,
 classification, backup staging, unit scoring, the human confirmation, GPS
@@ -42,16 +37,20 @@ RawReport → Classified → ┤                                                
 
 ### Try it in 30 seconds
 1. Run the app, open **`/Band`**.
-2. Pick a scenario (e.g. *Structural fire with people trapped*) → **Launch in Band**.
+2. Pick **Burst water main threatening homes** → **Launch in Band**.
 3. Watch all five agents coordinate live; confirm the dispatch yourself
    (uncheck auto-confirm) to see the human-in-the-loop step, or let it auto-drive.
-4. Or from a shell: `./scripts/band-demo.sh structure-fire`
+4. Open `/api/integrations/status` to verify partner/fallback readiness without exposing secrets.
 
 Architecture deep-dive: [`docs/band-architecture.md`](docs/band-architecture.md).
 Submission text: [`SUBMISSION.md`](SUBMISSION.md).
+Demo script: [`BAND_DEMO_SCRIPT.md`](BAND_DEMO_SCRIPT.md).
+Pitch outline: [`PITCH_DECK.md`](PITCH_DECK.md).
+Partner notes: [`TECH_PARTNERS.md`](TECH_PARTNERS.md).
+Evidence checklist: [`EVIDENCE/`](EVIDENCE/).
 Judge readiness checklist: [`HACKATHON_READINESS.md`](HACKATHON_READINESS.md).
 
-### Band configuration (`appsettings.json` → `Band`)
+### Band configuration
 ```jsonc
 "Band": {
   "Mode": "Simulation",        // "Simulation" (in-process, always works) or "Live"
@@ -69,6 +68,12 @@ which publishes them to a hosted Band workspace using the official Band SDK
 against the `IBandTransport` seam. Give each of the five agents its own Band key
 (`THENVOI_AGENT_KEYS`) to have them appear as five distinct members in one shared
 Band room. See [`band-bridge/`](band-bridge/).
+
+Required hackathon env vars are documented in [`.env.example`](.env.example):
+`BAND_API_KEY`, `BAND_API_BASE_URL`, `AIML_API_KEY`, `AIML_API_BASE_URL`,
+`AIML_MODEL`, `FEATHERLESS_API_KEY`, `FEATHERLESS_MODEL` and `DEMO_MODE`.
+All are optional for local judging; deterministic fallback remains fully working
+without external keys.
 
 ---
 
@@ -119,7 +124,7 @@ Do not commit `GEMINI_API_KEY`, WhatsApp tokens, phone numbers or credentials.
 
 ## Judge route
 
-Open `/Home/DemoTour` and follow the 3–5 minute route: home, report, Citizen App, AI Agent, dashboard, lookup, alerts/weather, optional WhatsApp sandbox, connector readiness and Bob evidence.
+Open `/Home/DemoTour` and follow the 3–5 minute route: Band Dispatch, home, report, Citizen App, AI Agent, dashboard, lookup, alerts/weather, optional WhatsApp sandbox and connector readiness.
 
 ## Local verification
 
@@ -127,11 +132,12 @@ Open `/Home/DemoTour` and follow the 3–5 minute route: home, report, Citizen A
 dotnet restore
 dotnet build
 dotnet run
-./scripts/smoke-test.sh http://localhost:5000
-./scripts/api-check.sh http://localhost:5000
+curl http://localhost:5000/healthz
+curl http://localhost:5000/api/integrations/status
 ```
 
-The scripts are designed to pass in fallback/sandbox mode and do not require live Gemini or WhatsApp credentials.
+The app is designed to pass in fallback/sandbox mode and does not require live
+Band, Gemini, AI/ML API, Featherless or WhatsApp credentials.
 
 ## Deploy
 
@@ -144,31 +150,16 @@ the full five-agent dispatch with **zero secrets**.
 docker build -t civicops-command .
 docker run -p 8080:8080 -e PORT=8080 civicops-command   # → http://localhost:8080
 
-# One-click on Render: New → Blueprint → this repo (reads render.yaml)
-
 # Full local stack with LIVE Band (mirrors the transcript to a real Band room):
-THENVOI_API_KEY=sk_... docker compose up --build
+BAND_API_KEY=... DEMO_MODE=false docker compose up --build
 ```
 
 A GitHub Actions workflow (`.github/workflows/dotnet.yml`) builds the app and
-asserts a full Band scenario resolves with five collaborating agents on every
-push. Full guide: [`docs/deployment.md`](docs/deployment.md).
+asserts the app builds on every push. Full guide: [`docs/deployment.md`](docs/deployment.md).
 
 ## Safety and honesty
 
 CivicOps uses synthetic civic data for sandbox scenarios. It does not claim official municipal partnerships, does not replace emergency services, and keeps humans in the loop for dispatch or public alert decisions.
-
-## IBM Bob evidence
-
-IBM Bob was used to build and accelerate the main CivicOps hackathon implementation. Preserved evidence docs include:
-
-- `docs/bob-report.md`
-- `docs/build-log.md`
-- `docs/ibm-bob-session-report.md`
-- `docs/ibm-bob-final-continuity-report.md`
-- `docs/evidence/`
-
-Final engineering polish may have been completed after Bob and is not falsely claimed as Bob work.
 
 ## Final submission positioning
 

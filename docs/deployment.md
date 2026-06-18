@@ -68,7 +68,7 @@ truth, so Live is additive and never breaks the demo.
 
 ```bash
 # one shared Band identity (messages prefixed with each agent's name):
-THENVOI_API_KEY=sk_... docker compose up --build
+THENVOI_API_KEY=<band-api-key> docker compose up --build
 
 # OR five distinct Band identities — one per agent:
 THENVOI_AGENT_KEYS='{"agent.intake":"k1","agent.dispatch":"k2","agent.logistics":"k3","agent.monitor":"k4","agent.publicinfo":"k5"}' \

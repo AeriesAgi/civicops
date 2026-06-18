@@ -14,10 +14,21 @@ namespace CivicOps.Band
         /// <summary>Band workspace / project the rooms live under.</summary>
         public string Workspace { get; set; } = "civicops-command";
 
+        /// <summary>Hosted Band REST base URL used by the optional Node bridge.
+        /// Stored for readiness/status only; API keys are never exposed.</summary>
+        public string ApiBaseUrl { get; set; } = "https://app.thenvoi.com";
+
+        /// <summary>True when BAND_API_KEY is present in the server environment.</summary>
+        public bool ApiKeyConfigured { get; set; }
+
+        /// <summary>True when deterministic demo mode is explicitly requested.</summary>
+        public bool DemoMode { get; set; } = true;
+
         /// <summary>Seconds between ResponseMonitorAgent status heartbeats.</summary>
         public double TickSeconds { get; set; } = 2.5;
 
-        public bool IsLive => string.Equals(Mode, "Live", System.StringComparison.OrdinalIgnoreCase)
+        public bool IsLive => !DemoMode
+                              && string.Equals(Mode, "Live", System.StringComparison.OrdinalIgnoreCase)
                               && !string.IsNullOrWhiteSpace(BridgeUrl);
     }
 }

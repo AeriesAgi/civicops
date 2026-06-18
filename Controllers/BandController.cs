@@ -25,6 +25,7 @@ namespace CivicOps.Controllers
         // ---- Views ------------------------------------------------------------
 
         [HttpGet("/Band")]
+        [HttpGet("/demo/band")]
         public IActionResult Console()
         {
             ViewData["Title"] = "Band Dispatch Console";

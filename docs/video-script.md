@@ -8,7 +8,7 @@ The dashboard gives civic teams a control-room view of open incidents, high-prio
 
 WhatsApp is connector-ready for sandbox/live-test and future pilots, but CivicOps does not depend on WhatsApp. The main public channel is the installable Citizen App / Installable PWA.
 
-IBM Bob helped build and accelerate the hackathon implementation; final engineering polish is documented separately. CivicOps uses synthetic civic data, makes no official municipal partnership claim, and does not replace emergency services.
+CivicOps uses synthetic civic data, makes no official municipal partnership claim, and does not replace emergency services.
 
 ## Final submission positioning
 
@@ -23,14 +23,14 @@ IBM Bob helped build and accelerate the hackathon implementation; final engineer
 
 ## Final 90-second video flow
 
-1. Resident opens the Citizen App / Installable PWA.
-2. Resident submits a messy report with a misspelled area, for example “Chatworth” and a blocked drain description.
-3. Gemini/fallback normalizes the area to Chatsworth, estimates the ward or flags uncertainty, classifies the issue and routes it to Roads & Stormwater.
-4. A department user signs in and sees only their queue.
-5. The public tracks the reference on the status page.
-6. Area Alerts and Weather/Area Risk provide public context.
-7. Admin dashboard shows eThekwini-wide synthetic workload.
-8. Bob Evidence page shows IBM Bob assistance and continuity notes.
+1. Open Band Dispatch and launch a structural-fire scenario.
+2. Show five named agents coordinating through one incident room and closing with a summary.
+3. Resident opens the Citizen App / Installable PWA.
+4. Resident submits a messy report with a misspelled area, for example “Chatworth” and a blocked drain description.
+5. Gemini/fallback normalizes the area to Chatsworth, estimates the ward or flags uncertainty, classifies the issue and routes it to Roads & Stormwater.
+6. A department user signs in and sees only their queue.
+7. The public tracks the reference on the status page.
+8. Area Alerts and Weather/Area Risk provide public context.
 9. WhatsApp is shown only as optional connector-ready.
 
 

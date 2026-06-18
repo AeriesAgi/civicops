@@ -365,8 +365,8 @@ namespace CivicOps.Controllers
                     Status = _geminiService.Status,
                     Mode = _geminiService.IsEnabled ? "Live Connector Ready" : "Fallback Active",
                     Description = "AI-powered incident classification and routing",
-                    EnvVars = "Gemini__Enabled, Gemini__Mode, Gemini__Model, Gemini__PremiumModel, Gemini__RoutineModel, Gemini__FallbackModels, GEMINI_API_KEY (legacy env aliases GEMINI_ENABLED, GEMINI_MODEL, GEMINI_ROUTINE_MODEL supported)",
-                    Documentation = "/Home/BobEvidence and docs/gemini-setup.md"
+                    EnvVars = "Server-side only; see .env.example. No keys are rendered to the browser.",
+                    Documentation = "docs/gemini-setup.md"
                 },
                 new ConnectorInfo
                 {
@@ -374,7 +374,7 @@ namespace CivicOps.Controllers
                     Status = "Installable PWA Ready",
                     Mode = "Backend Gemini/fallback enrichment",
                     Description = "Main public channel for reports, tracking, alerts and profile without WhatsApp dependency",
-                    EnvVars = "None on device; Gemini runs on backend only",
+                    EnvVars = "None on device; model providers run on backend only.",
                     Documentation = "docs/mobile-pwa.md"
                 },
                 new ConnectorInfo
@@ -383,7 +383,7 @@ namespace CivicOps.Controllers
                     Status = "Future Connector",
                     Mode = "Pilot-ready architecture",
                     Description = "Department queues can be mapped to municipal ticketing/ERP systems after approvals",
-                    EnvVars = "ERP_API_URL, ERP_API_KEY",
+                    EnvVars = "Server-side connector secret store only.",
                     Documentation = "docs/integration-readiness.md"
                 },
                 new ConnectorInfo
@@ -392,7 +392,7 @@ namespace CivicOps.Controllers
                     Status = "Future Connector",
                     Mode = "Synthetic ward estimates now",
                     Description = "Real GIS/ward data required for production-grade geocoding",
-                    EnvVars = "GIS_API_KEY",
+                    EnvVars = "Server-side connector secret store only.",
                     Documentation = "docs/integration-readiness.md"
                 },
                 new ConnectorInfo
@@ -401,7 +401,7 @@ namespace CivicOps.Controllers
                     Status = "Sandbox Context",
                     Mode = "Area risk cards",
                     Description = "Weather and area context support alert recommendations",
-                    EnvVars = "WEATHER_API_KEY",
+                    EnvVars = "No browser-exposed keys.",
                     Documentation = "docs/integration-readiness.md"
                 },
                 new ConnectorInfo
@@ -410,7 +410,7 @@ namespace CivicOps.Controllers
                     Status = "Future Connector",
                     Mode = "Placeholder",
                     Description = "Approved citizen messaging channels can be added without changing the intake story",
-                    EnvVars = "SMS_API_KEY, SMTP_HOST",
+                    EnvVars = "Server-side connector secret store only.",
                     Documentation = "docs/integration-readiness.md"
                 },
                 new ConnectorInfo
@@ -419,8 +419,8 @@ namespace CivicOps.Controllers
                     Status = _whatsAppService.GetStatus().Status,
                     Mode = _whatsAppService.GetStatus().Mode,
                     Description = "Optional connector-ready WhatsApp Cloud API integration for future pilots/live-test messaging.",
-                    EnvVars = "WHATSAPP_ENABLED, WHATSAPP_DEMO_MODE, WHATSAPP_VERIFY_TOKEN, WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_GRAPH_VERSION, WHATSAPP_PUBLIC_BASE_URL",
-                    Documentation = "/Home/BobEvidence and docs/whatsapp-setup.md"
+                    EnvVars = "Server-side only; see .env.example. Token values are never rendered.",
+                    Documentation = "docs/whatsapp-setup.md"
                 },
                 new ConnectorInfo
                 {
@@ -428,7 +428,7 @@ namespace CivicOps.Controllers
                     Status = "Future Connector",
                     Mode = "Transcript sandbox",
                     Description = "Voice-note transcripts can enter the same Gemini/fallback intake pipeline",
-                    EnvVars = "VOICE_API_KEY, VOICE_SERVICE_URL",
+                    EnvVars = "Server-side connector secret store only.",
                     Documentation = "docs/integration-readiness.md"
                 }
             };
@@ -599,11 +599,6 @@ namespace CivicOps.Controllers
         }
 
         public IActionResult DemoTour()
-        {
-            return View();
-        }
-
-        public IActionResult BobEvidence()
         {
             return View();
         }

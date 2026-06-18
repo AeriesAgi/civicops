@@ -26,7 +26,7 @@
 import express from "express";
 
 const PORT = process.env.PORT || 8787;
-const REST_URL = process.env.THENVOI_REST_URL || "https://app.thenvoi.com";
+const REST_URL = process.env.BAND_API_BASE_URL || process.env.THENVOI_REST_URL || "https://app.thenvoi.com";
 const WORKSPACE = process.env.BAND_WORKSPACE || "civicops-command";
 const PRIMARY_KEY = process.env.THENVOI_API_KEY || process.env.BAND_API_KEY || "";
 

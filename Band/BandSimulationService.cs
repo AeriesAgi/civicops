@@ -31,6 +31,14 @@ namespace CivicOps.Band
         {
             new()
             {
+                Key = "water-main-leak",
+                Title = "Burst water main threatening homes",
+                Channel = "WhatsApp",
+                Area = "Phoenix",
+                RawText = "Voice note transcript: There is a burst water pipe outside 14 Palmview Road in Phoenix. Water is flooding the road and running toward houses, the pavement is breaking up and cars are swerving. Please send water and road crews urgently. My name is Aisha, phone 555-0108."
+            },
+            new()
+            {
                 Key = "structure-fire",
                 Title = "Structural fire with people trapped",
                 Channel = "WhatsApp",

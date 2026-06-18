@@ -3,7 +3,7 @@
 # Brings up the ASP.NET app and the Band bridge together, wired so every message
 # the five agents post is mirrored into a real Band workspace.
 #
-#   THENVOI_API_KEY=sk_... docker compose up --build
+#   THENVOI_API_KEY=<band-api-key> docker compose up --build
 #   # open http://localhost:8080/Band and launch a scenario
 #
 # Without a key the bridge runs in stub mode and the app still works end to end

@@ -40,10 +40,19 @@ builder.Services.AddSingleton<IResidentAuthService, ResidentAuthService>();
 builder.Services.AddSingleton<IWeatherService, WeatherService>();
 builder.Services.AddSingleton<IIncidentIntakeService, IncidentIntakeService>();
 builder.Services.AddSingleton<IWhatsAppService, WhatsAppService>();
+builder.Services.AddSingleton(sp => PartnerAiOptions.FromConfiguration(sp.GetRequiredService<IConfiguration>()));
+builder.Services.AddSingleton<OptionalAiProviderRegistry>();
 
 // ── Band multi-agent coordination layer ───────────────────────────────────
 var bandOptions = new BandOptions();
 builder.Configuration.GetSection("Band").Bind(bandOptions);
+bandOptions.ApiKeyConfigured = !string.IsNullOrWhiteSpace(builder.Configuration["BAND_API_KEY"]);
+bandOptions.ApiBaseUrl = builder.Configuration["BAND_API_BASE_URL"] ?? bandOptions.ApiBaseUrl;
+bandOptions.DemoMode = builder.Configuration.GetValue<bool?>("DEMO_MODE") ?? bandOptions.DemoMode;
+if (bandOptions.DemoMode)
+{
+    bandOptions.Mode = "Simulation";
+}
 builder.Services.AddSingleton(bandOptions);
 
 // The Band interaction layer (one shared instance behind the transport seam).
@@ -98,6 +107,15 @@ _ = app.Services.GetRequiredService<BandSimulationService>();
 
 // Configure the HTTP request pipeline.
 app.UseForwardedHeaders();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.TryAdd("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.TryAdd("X-Frame-Options", "DENY");
+    context.Response.Headers.TryAdd("Referrer-Policy", "no-referrer");
+    context.Response.Headers.TryAdd("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)");
+    context.Response.Headers.TryAdd("Cross-Origin-Opener-Policy", "same-origin");
+    await next();
+});
 
 if (!app.Environment.IsDevelopment())
 {
@@ -138,12 +156,35 @@ app.MapHub<BandHub>("/hubs/band");
 
 // Lightweight health probe for platform health checks / uptime monitors. Reports
 // that the five-agent Band coordination layer is online and which mode it is in.
-app.MapGet("/healthz", (BandOptions band) => Results.Ok(new
+app.MapGet("/healthz", (BandOptions band, PartnerAiOptions aiPartners) => Results.Ok(new
 {
     status = "ok",
     service = "civicops-command",
     bandMode = band.Mode,
+    bandLiveMirror = band.IsLive,
+    bandApiKeyConfigured = band.ApiKeyConfigured,
+    demoMode = band.DemoMode,
+    optionalAiProvider = aiPartners.PreferredProvider,
     agents = 5
+}));
+
+app.MapGet("/api/integrations/status", (BandOptions band, PartnerAiOptions aiPartners, OptionalAiProviderRegistry registry) => Results.Ok(new
+{
+    band = new
+    {
+        mode = band.Mode,
+        liveMirror = band.IsLive,
+        apiKeyConfigured = band.ApiKeyConfigured,
+        apiBaseUrlConfigured = !string.IsNullOrWhiteSpace(band.ApiBaseUrl),
+        bridgeUrlConfigured = !string.IsNullOrWhiteSpace(band.BridgeUrl),
+        demoMode = band.DemoMode
+    },
+    ai = registry.Status(),
+    fallback = new
+    {
+        enabled = true,
+        note = "CivicOps runs the deterministic local multi-agent demo when partner credentials are absent."
+    }
 }));
 
 app.Run();

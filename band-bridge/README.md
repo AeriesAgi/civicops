@@ -36,11 +36,11 @@ Two ways to attribute the transcript in Band:
 
 ```jsonc
 THENVOI_AGENT_KEYS={
-  "agent.intake":     "sk_...",
-  "agent.dispatch":   "sk_...",
-  "agent.logistics":  "sk_...",
-  "agent.monitor":    "sk_...",
-  "agent.publicinfo": "sk_..."
+  "agent.intake":     "<band-agent-key>",
+  "agent.dispatch":   "<band-agent-key>",
+  "agent.logistics":  "<band-agent-key>",
+  "agent.monitor":    "<band-agent-key>",
+  "agent.publicinfo": "<band-agent-key>"
 }
 ```
 
@@ -50,7 +50,7 @@ THENVOI_AGENT_KEYS={
 cd band-bridge
 npm install                 # installs @band-ai/sdk + @thenvoi/rest-client + express
 cp .env.example .env        # set THENVOI_API_KEY (and/or THENVOI_AGENT_KEYS)
-THENVOI_API_KEY=sk_... npm start
+THENVOI_API_KEY=<band-api-key> npm start
 # → [band-bridge] Band SDK online → https://app.thenvoi.com (workspace 'civicops-command', ...)
 # → [band-bridge] listening on http://localhost:8787 (mode=live, workspace=civicops-command)
 ```

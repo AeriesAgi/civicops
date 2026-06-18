@@ -29,9 +29,11 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug -PcivicopsBaseUrl=https://civicops.culltron.app
       - name: Copy APK into web downloads path
-        run: ./gradlew copyDebugApkToWeb
+        run: ./gradlew copyDebugApkToWeb -PcivicopsBaseUrl=https://civicops.culltron.app
+      - name: Show APK output
+        run: ls -lh ../../wwwroot/downloads/CivicOpsCitizenCompanion-debug.apk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
